@@ -20,7 +20,6 @@
 #endif
 
 #include <CryMemory/CrySizer.h>
-#include <CryFlowGraph/IFlowSystem.h>
 
 struct ILevelRotationFile;
 struct IConsoleCmdArgs;
@@ -140,14 +139,14 @@ struct ILevelInfo
 
 	virtual const char*                      GetDefaultGameRules() const = 0;
 
-	virtual bool                             GetAttribute(const char* name, TFlowInputData& val) const = 0;
+	//virtual bool                             GetAttribute(const char* name, TFlowInputData& val) const = 0;
 
 	template<typename T> bool                GetAttribute(const char* name, T& outVal) const
 	{
-		TFlowInputData val;
-		if (GetAttribute(name, val) == false)
+		/*TFlowInputData val;
+		if (GetAttribute(name, val) == false)*/
 			return false;
-		return val.GetValueWithConversion(outVal);
+		//return val.GetValueWithConversion(outVal);
 	}
 };
 

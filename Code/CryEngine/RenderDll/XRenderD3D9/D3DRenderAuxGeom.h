@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <forward_list>
+
 #include "../Common/Renderer.h"     // CRenderer
 #include "../Common/CommonRender.h" // gRenDev
 #include "../Common/RenderAuxGeom.h"

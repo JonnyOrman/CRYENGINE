@@ -105,10 +105,6 @@ enum EConstantBufferShaderSlot
 	eConstantBufferShaderSlot_PerView                   = 6, // EShaderStage_All
 	eConstantBufferShaderSlot_VrProjection              = 7,
 	
-	// Scaleform
-	eConstantBufferShaderSlot_ScaleformMeshAttributes   = 0, // EShaderStage_Vertex
-	eConstantBufferShaderSlot_ScaleformRenderParameters = 0, // EShaderStage_Pixel
-
 	// Primitive/Custom/Post
 	eConstantBufferShaderSlot_PerPrimitive              = eConstantBufferShaderSlot_PerDraw,
 

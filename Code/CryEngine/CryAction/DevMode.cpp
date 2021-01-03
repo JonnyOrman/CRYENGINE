@@ -19,7 +19,6 @@
 #include "CryAction.h"
 #include "IActorSystem.h"
 #include <IMovementController.h>
-#include <CrySystem/Scaleform/IFlashUI.h>
 #include <CrySystem/Profilers/IStatoscope.h>
 
 CDevMode::CDevMode()
@@ -80,23 +79,13 @@ void CDevMode::SaveTagPoint(int i)
 
 void CDevMode::OnGameplayCommand(const char* cmd)
 {
-	SUIArguments args;
-	args.SetDelimiter(":");
-	args.SetArguments(cmd);
-
 	string action;
-	args.GetArg(0, action);
 	if (action == "GotoTagPoint")
 	{
-		int tagpoint;
-		args.GetArg(1, tagpoint);
-		if (tagpoint >= 0 && tagpoint <= 11)
-			GotoTagPoint(tagpoint);
 	}
 	else if (action == "SetViewMode" && gEnv->pGameFramework)
 	{
-		int mode;
-		args.GetArg(1, mode);
+		int mode = 0;
 		IActor* pPlayer = gEnv->pGameFramework->GetClientActor();
 		static ICVar* pCamVar = gEnv->pConsole->GetCVar("cl_cam_orbit");
 		if (pPlayer && pCamVar)
@@ -121,8 +110,7 @@ void CDevMode::OnGameplayCommand(const char* cmd)
 	}
 	else if (action == "SetFlyMode" && gEnv->pGameFramework)
 	{
-		int mode;
-		args.GetArg(1, mode);
+		int mode = 0;
 		IActor* pPlayer = gEnv->pGameFramework->GetClientActor();
 		if (pPlayer && mode >= 0 && mode < 3)
 			pPlayer->SetFlyMode(mode);

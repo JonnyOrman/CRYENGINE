@@ -13,7 +13,6 @@
 #define GET_PLUGIN_ID_FROM_MENU_ID(ID)     (((ID) & 0x000000FF))
 #define GET_UI_ELEMENT_ID_FROM_MENU_ID(ID) ((((ID) & 0x0000FF00) >> 8))
 
-class CAIManager;
 class CBaseLibraryDialog;
 class CClassFactory;
 class CCustomActionsEditorManager;
@@ -186,9 +185,6 @@ public:
 	CEditorFlowGraphModuleManager* GetFlowGraphModuleManager()  { return m_pFlowGraphModuleManager; }
 	CFlowGraphDebuggerEditor*      GetFlowGraphDebuggerEditor() { return m_pFlowGraphDebuggerEditor; }
 	CMaterialFXGraphMan*           GetMatFxGraphManager()       { return m_pMatFxGraphManager; }
-
-	virtual IAIManager*            GetAIManager() override;
-	CAIManager*                    GetAI() { return m_pAIManager; }
 
 	//////////////////////////////////////////////////////////////////////////
 	// UI
@@ -364,7 +360,6 @@ protected:
 	wstring                                  m_masterCDFolder;
 	string                                   m_userFolder;
 	bool                                     m_bSelectionLocked;
-	CAIManager*                              m_pAIManager;
 	CUIManager*                              m_pUIManager;
 	CCustomActionsEditorManager*             m_pCustomActionsManager;
 	CEditorFlowGraphModuleManager*           m_pFlowGraphModuleManager;

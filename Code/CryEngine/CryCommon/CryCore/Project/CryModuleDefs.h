@@ -26,7 +26,6 @@
 //#define eCryM_Online 21
 #define eCryM_AudioImplementation 22
 #define eCryM_MonoBridge 23
-#define eCryM_ScaleformHelper 24
 #define eCryM_FlowGraph 25
 //! Legacy module, does not need a specific name and is only kept for backwards compatibility
 #define eCryM_Legacy 26

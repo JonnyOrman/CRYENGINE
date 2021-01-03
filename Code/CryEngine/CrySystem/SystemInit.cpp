@@ -14,7 +14,6 @@
 #include "NullImplementation/NULLRenderAuxGeom.h"
 #include "MemoryManager.h"
 #include "MemReplay.h"
-#include "ImeManager.h"
 #include <CrySystem/IEngineModule.h>
 #include <CrySystem/ICryPlugin.h>
 #include <CryExtension/CryCreateClassInstance.h>
@@ -28,10 +27,6 @@
 	#include <dlfcn.h>
 #endif
 
-#if defined(INCLUDE_SCALEFORM_SDK) || defined(CRY_FEATURE_SCALEFORM_HELPER)
-	#include <CrySystem/Scaleform/IScaleformHelper.h>
-#endif
-
 #if CRY_PLATFORM_WINDOWS
 	#include <float.h>
 	#include <timeapi.h>
@@ -39,7 +34,6 @@
 #endif
 
 #include <Cry3DEngine/I3DEngine.h>
-#include <CryAISystem/IAISystem.h>
 #include <CryAnimation/ICryAnimation.h>
 #include <CryAudio/IAudioSystem.h>
 #include <CryEntitySystem/IEntitySystem.h>
@@ -174,7 +168,6 @@ extern AAssetManager* androidGetAssetManager();
 #define DLL_INPUT         "CryInput"
 #define DLL_PHYSICS       "CryPhysics"
 #define DLL_MOVIE         "CryMovie"
-#define DLL_AI            "CryAISystem"
 #define DLL_ANIMATION     "CryAnimation"
 #define DLL_FONT          "CryFont"
 #define DLL_3DENGINE      "Cry3DEngine"
@@ -185,7 +178,6 @@ extern AAssetManager* androidGetAssetManager();
 #define DLL_LIVECREATE    "CryLiveCreate"
 #define DLL_MONO_BRIDGE   "CryMonoBridge"
 #define DLL_UDR           "CryUDR"
-#define DLL_SCALEFORM     "CryScaleformHelper"
 
 //////////////////////////////////////////////////////////////////////////
 #if CRY_PLATFORM_WINDOWS || CRY_PLATFORM_LINUX || CRY_PLATFORM_ANDROID || CRY_PLATFORM_DURANGO || CRY_PLATFORM_APPLE
@@ -1635,23 +1627,6 @@ bool CSystem::InitMovieSystem(const SSystemInitParams& startupParams)
 
 /////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////
-bool CSystem::InitAISystem(const SSystemInitParams& startupParams)
-{
-	CRY_PROFILE_FUNCTION(PROFILE_LOADING_ONLY);
-	MEMSTAT_CONTEXT(EMemStatContextType::Other, "Init AISystem ");
-
-	const char* sDLLName = m_sys_dll_ai->GetString();
-	if (!InitializeEngineModule(startupParams, sDLLName, cryiidof<IAIEngineModule>(), false))
-		return false;
-
-	if (!m_env.pAISystem)
-		CryWarning(VALIDATOR_MODULE_SYSTEM, VALIDATOR_WARNING, "Cannot create AI System!");
-
-	return true;
-}
-
-/////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////
 bool CSystem::InitScriptSystem(const SSystemInitParams& startupParams)
 {
 	CRY_PROFILE_FUNCTION(PROFILE_LOADING_ONLY);
@@ -3022,9 +2997,6 @@ bool CSystem::Initialize(SSystemInitParams& startupParams)
 			}
 		}
 
-		// Note: IME manager needs to be created before Scaleform is initialized
-		m_pImeManager = new CImeManager();
-
 #if defined(USE_MONO) && USE_MONO == 1
 		// Initialize CryMono / C# integration
 		// Note that this has to occur before plug-ins are loaded as this is a prerequisite for C# plug-ins!
@@ -3089,31 +3061,6 @@ bool CSystem::Initialize(SSystemInitParams& startupParams)
 				m_env.pRenderer->EF_Query(EFQ_MultiGPUEnabled, bMultiGPUEnabled);
 				if (bMultiGPUEnabled)
 					LoadConfiguration("mgpu.cfg");
-
-#if defined(INCLUDE_SCALEFORM_SDK) || defined(CRY_FEATURE_SCALEFORM_HELPER)
-				if (!m_bShaderCacheGenMode)
-				{
-					if (!InitializeEngineModule(startupParams, DLL_SCALEFORM, cryiidof<IScaleformHelperEngineModule>(), false))
-					{
-						m_env.pScaleformHelper = nullptr;
-						CryLog("Attempt to load Scaleform helper library from '%s' failed, this feature will not be available", DLL_SCALEFORM);
-					}
-					else if (!m_env.pScaleformHelper->Init())
-					{
-						m_env.pScaleformHelper->Destroy();
-						m_env.pScaleformHelper = nullptr;
-						CryLog("Unable to initialize Scaleform helper library, this feature will not be available");
-					}
-					else
-					{
-						m_env.pScaleformHelper->SetAmpEnabled(false);
-					}
-				}
-#endif
-				else
-				{
-					m_env.pScaleformHelper = nullptr;
-				}
 			}
 		}
 		else
@@ -3466,13 +3413,6 @@ bool CSystem::Initialize(SSystemInitParams& startupParams)
 		InlineInitializationProcessing("CSystem::Init LZ4Decompressor");
 
 		//////////////////////////////////////////////////////////////////////////
-		// Load FlowGraph
-		if (!startupParams.bShaderCacheGen)
-		{
-			InitializeEngineModule(startupParams, "CryFlowGraph", cryiidof<IFlowSystemEngineModule>(), true);
-		}
-
-		//////////////////////////////////////////////////////////////////////////
 		// AI
 		//////////////////////////////////////////////////////////////////////////
 		if (!m_bUIFrameworkMode && !startupParams.bShaderCacheGen)
@@ -3483,25 +3423,7 @@ bool CSystem::Initialize(SSystemInitParams& startupParams)
 			{
 				CryLogAlways("AI initialization");
 				INDENT_LOG_DURING_SCOPE();
-
-				if (!InitAISystem(startupParams))
-					return false;
 			}
-		}
-
-		//////////////////////////////////////////////////////////////////////////
-		// AI SYSTEM INITIALIZATION
-		//////////////////////////////////////////////////////////////////////////
-		// AI System needs to be initialized after entity system
-		if (!m_bUIFrameworkMode && m_env.pAISystem)
-		{
-			MEMSTAT_CONTEXT(EMemStatContextType::Other, "Initialize AI System");
-
-			if (m_pUserCallback)
-				m_pUserCallback->OnInitProgress("Initializing AI System...");
-			CryLogAlways("Initializing AI System");
-			INDENT_LOG_DURING_SCOPE();
-			m_env.pAISystem->Init();
 		}
 
 		if (m_pUserCallback)
@@ -4721,7 +4643,6 @@ void CSystem::CreateSystemVars()
 	// Register DLL names as cvars before we load them
 	//
 	EVarFlags dllFlags = (EVarFlags)0;
-	m_sys_dll_ai = REGISTER_STRING("sys_dll_ai", DLL_AI, dllFlags, "Specifies the DLL to load for the AI system");
 
 	m_sys_dll_response_system = REGISTER_STRING("sys_dll_response_system", "CryDynamicResponseSystem", dllFlags, "Specifies the DLL to load for the dynamic response system");
 

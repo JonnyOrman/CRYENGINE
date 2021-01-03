@@ -33,7 +33,6 @@
 #include <IViewSystem.h>
 #include <IVehicleSystem.h>
 #include <IGameRulesSystem.h>
-#include <CrySystem/Scaleform/IFlashUI.h>
 #include <IPlayerProfiles.h>
 #include <ISubtitleManager.h>
 #include <IForceFeedbackSystem.h>
@@ -148,7 +147,6 @@
 %csconstvalue("5") eUIDT_WString;
 %ignore IUIElement::CreateVariable; //ambiguous
 %ignore IUIElement::CreateArray; //ambiguous
-%include "../../../../CryEngine/CryCommon/CrySystem/Scaleform/IFlashUI.h"
 %include "../../../CryEngine/CryAction/IPlayerProfiles.h"
 %include "../../../CryEngine/CryAction/ISubtitleManager.h"
 %include "../../../CryEngine/CryAction/IForceFeedbackSystem.h"

@@ -485,7 +485,7 @@ bool CAnimatedCharacter::InitializeMannequin()
 
 		m_pMannequinAGState = new MannequinAG::CMannequinAGState();
 		m_pMannequinAGState->SetAnimatedCharacter(this, 0, NULL);
-		m_pMannequinAGState->AddListener("animchar", this);
+		//m_pMannequinAGState->AddListener("animchar", this);
 	}
 
 	ResetVars();

@@ -30,7 +30,6 @@
 		"CryAudioCommon",
 		"CryAudioImplWwise",
 		"CrySystem",
-		"CryScaleformHelper",
 		"CryAction",
 		"CrySchematyc2",
 		"CryFlowGraph",
@@ -127,9 +126,7 @@
 		"CryAudioImplFmod",
 		"CryAudioImplPortAudio",
 		
-		"CryRenderD3D11",
-
-		"CryScaleformHelper"
+		"CryRenderD3D11"
 	],
 	
 	"win_modules": [

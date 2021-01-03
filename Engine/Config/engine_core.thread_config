@@ -166,11 +166,6 @@ StackSizeKB:
 		
 		<!-- [VOXEL]-->
 		<Thread name ="VoxelStreamingWorker_*" Priority="Below_Normal"/>
-		
-		<!-- [SCALEFORM][3rd Party] -->
-		<Thread name ="GFxVideo_SoundUpdate" DisablePriorityBoost="ignore" StackSizeKB="16"/>	
-		<Thread name ="GFxVideo_Decoder" DisablePriorityBoost="ignore" StackSizeKB="ignore"/>	
-		<Thread name ="GFxVideo_Reader" DisablePriorityBoost="ignore" StackSizeKB="ignore"/>	
 	</Platform> 
 
 	<!-- ============= -->
@@ -277,11 +272,6 @@ StackSizeKB:
 		
 		<!-- [VOXEL]-->
 		<Thread name ="VoxelStreamingWorker_*" Priority="Below_Normal"/>
-
-		<!-- [SCALEFORM][3rd Party] -->
-		<Thread name ="GFxVideo_SoundUpdate" Affinity="5" Priority="time_critical" DisablePriorityBoost="ignore" StackSizeKB="ignore"/>
-		<Thread name ="GFxVideo_Decoder" Affinity="5" Priority="highest" DisablePriorityBoost="ignore" StackSizeKB="ignore"/>
-		<Thread name ="GFxVideo_Reader" Affinity="6" Priority="highest" DisablePriorityBoost="ignore" StackSizeKB="ignore"/>
 	</Platform>
 
 	<!-- ============ -->
@@ -378,9 +368,6 @@ StackSizeKB:
 
 		<!-- [VOXEL]-->
 		<Thread name ="VoxelStreamingWorker_*" Priority="Below_Normal"/>		
-		
-		<!-- [SCALEFORM][3rd Party] -->
-		<Thread name ="GFxVideo_SoundUpdate" Affinity="ignore" Priority="highest" DisablePriorityBoost="ignore" StackSizeKB="16"/>	
 		
 		<!-- Special case to add additional decoder threads with an increase incremental number. "GFxVideo_Decoder_0" sets thread priority for all other decoder threads-->
 		<!-- Wildcards such as GFxVideo_Decoder_* is not allowed for video threads -->

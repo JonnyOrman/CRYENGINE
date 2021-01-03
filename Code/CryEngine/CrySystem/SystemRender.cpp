@@ -15,12 +15,10 @@
 #include <CrySystem/Profilers/IStatoscope.h>
 #include <CryRenderer/IRenderer.h>
 #include <CryRenderer/IRenderAuxGeom.h>
-#include <CryRenderer/IScaleform.h>
 #include <CrySystem/IProcess.h>
 #include "Log.h"
 #include "XConsole.h"
 #include <Cry3DEngine/I3DEngine.h>
-#include <CryAISystem/IAISystem.h>
 #include <CryCore/Platform/CryLibrary.h>
 #include <CrySystem/IBudgetingSystem.h>
 #include "PhysRenderer.h"
@@ -47,7 +45,6 @@
 #include "PerfHUD.h"
 #include "ThreadInfo.h"
 
-#include <CrySystem/Scaleform/IScaleformHelper.h>
 #include <CrySystem/VR/IHMDManager.h>
 
 #include "Statistics.h"
@@ -252,16 +249,6 @@ void CSystem::RenderBegin(const SDisplayContextKey& displayContextKey, const SGr
 		}
 		++gEnv->nMainFrameID;
 	}
-
-#if defined(INCLUDE_SCALEFORM_SDK) || defined(CRY_FEATURE_SCALEFORM_HELPER)
-	if (rndAvail && !gEnv->IsDedicated() && gEnv->pScaleformHelper)
-	{
-		// render thread IDs might get updated in BeginFrame() so update GFx render layer
-		threadID mainThread(0), renderThread(0);
-		m_env.pRenderer->GetThreadIDs(mainThread, renderThread);
-		gEnv->pScaleformHelper->SetRenderThreadIDs(mainThread, renderThread);
-	}
-#endif
 }
 
 char* PhysHelpersToStr(int iHelpers, char* strHelpers);
@@ -661,11 +648,6 @@ void CSystem::RenderStatistics()
 	RenderMemStats();
 	RenderMemoryInfo();
 
-	if (gEnv->pScaleformHelper)
-	{
-		gEnv->pScaleformHelper->RenderFlashInfo();
-	}
-
 	// [VR]
 	// Update debug info
 	if (m_sys_vr_support && m_sys_vr_support->GetIVal())
@@ -721,9 +703,6 @@ void CSystem::Render(const SGraphicsPipelineKey& graphicsPipelineKey)
 #if !defined(_RELEASE)
 				if (m_pVisRegTest)
 					m_pVisRegTest->AfterRender();
-
-				if (m_env.pAISystem)
-					m_env.pAISystem->DebugDraw();
 #endif
 
 				if (m_env.pMovieSystem)

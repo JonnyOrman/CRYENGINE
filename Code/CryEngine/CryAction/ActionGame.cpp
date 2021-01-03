@@ -27,7 +27,6 @@
 #include "Network/BreakReplicator.h"
 #include "Network/ObjectSelector.h"
 
-#include <CrySystem/Scaleform/IFlashUI.h>
 #include <CrySystem/ConsoleRegistration.h>
 
 CActionGame* CActionGame::s_this = 0;
@@ -216,7 +215,6 @@ CActionGame::CActionGame(CScriptRMI* pScriptRMI)
 	GetISystem()->GetISystemEventDispatcher()->RegisterListener(this, "CActionGame");
 
 	m_pGameContext = new CGameContext(CCryAction::GetCryAction(), pScriptRMI, this);
-	m_pGameTokenSystem = CCryAction::GetCryAction()->GetIGameTokenSystem();
 	m_inDeleteEntityCallback = 0;
 }
 
@@ -447,26 +445,6 @@ bool CActionGame::Init(const SGameStartParams* pGameStartParams)
 	{
 		gEnv->pNetContext = m_pNetwork->CreateNetContext(m_pGameContext, ctxFlags);
 		m_pGameContext->Init(gEnv->pNetContext);
-	}
-
-	if (gEnv->pAISystem)
-	{
-		ICVar* pAIEnabled = NULL;
-		if (gEnv->bMultiplayer)
-		{
-			if (pGameStartParams->flags & eGSF_Server)
-			{
-				pAIEnabled = gEnv->pConsole->GetCVar("sv_AISystem");
-			}
-			else if (pGameStartParams->flags & eGSF_Client)
-			{
-				pAIEnabled = gEnv->pConsole->GetCVar("cl_AISystem");
-			}
-		}
-
-		bool aiSystemEnable = (pAIEnabled ? pAIEnabled->GetIVal() != 0 : true);
-
-		gEnv->pAISystem->Enable(aiSystemEnable);
 	}
 
 	CRY_ASSERT(m_pGameServerNub == NULL);
@@ -4740,8 +4718,6 @@ void CActionGame::OnEditorSetGameMode(bool bGameMode)
 	// reset time of day scheduler before flowsystem
 	// as nodes could register in initialize
 	pCryAction->GetTimeOfDayScheduler()->Reset();
-	gEnv->pFlowSystem->Reset(false);
-	if (gEnv->pFlashUI) gEnv->pFlashUI->Reload();
 
 	pCryAction->GetPersistantDebug()->Reset();
 }

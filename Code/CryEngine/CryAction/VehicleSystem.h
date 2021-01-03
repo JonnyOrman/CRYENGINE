@@ -95,7 +95,6 @@ public:
 	void                SetInitializingSeat(CVehicleSeat* pSeat) { m_pInitializingSeat = pSeat; };
 	CVehicleSeat*       GetInitializingSeat()                    { return m_pInitializingSeat; };
 
-	void                RegisterVehicleClass(const char* name, IGameFramework::IVehicleCreator* pCreator, bool isAI);
 	void                AddVehicle(EntityId entityId, IVehicle* pProxy);
 	void                RemoveVehicle(EntityId entityId);
 

@@ -114,7 +114,7 @@ struct Timestamp
 		IF_LIKELY (!eventsDeclaration)
 			return;
 
-		SerializeContainerAsSortedStringList(archive, "setOnEventName", "^Set on event", eventsDeclaration->GetEventsWithFlags(), "Event", setOnEventName);
+		//SerializeContainerAsSortedStringList(archive, "setOnEventName", "^Set on event", eventsDeclaration->GetEventsWithFlags(), "Event", setOnEventName);
 		archive.doc("Event that triggers the start of the Timestamp");
 
 		const Timestamps* timestamps = archive.context<Timestamps>();
@@ -137,7 +137,7 @@ struct Timestamp
 			}
 		}
 
-		SerializeContainerAsSortedStringList(archive,  "exclusiveTo", "^<Exclusive To", timestampsWithoutThis, "Exclusive To", exclusiveTo.timestampName, false, true);
+		//SerializeContainerAsSortedStringList(archive,  "exclusiveTo", "^<Exclusive To", timestampsWithoutThis, "Exclusive To", exclusiveTo.timestampName, false, true);
 	}
 
 	const string& SerializeToString() const

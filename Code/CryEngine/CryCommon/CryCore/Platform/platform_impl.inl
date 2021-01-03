@@ -11,7 +11,7 @@
 #include <CryExtension/ICryFactoryRegistryImpl.h>
 #include <CryString/UnicodeFunctions.h>
 #include <CrySystem/CryUtils.h>
-#include <CryFlowGraph/IFlowBaseNode.h>
+#include "CrySystem/IConsole.h"
 
 //////////////////////////////////////////////////////////////////////////
 // Global environment variable.
@@ -478,9 +478,6 @@ EQuestionResult CryMessageBox(const wchar_t* szText, const wchar_t* szCaption, E
 //////////////////////////////////////////////////////////////////////////
 // Support for automatic FlowNode types registration
 //////////////////////////////////////////////////////////////////////////
-CAutoRegFlowNodeBase* CAutoRegFlowNodeBase::s_pFirst = nullptr;
-CAutoRegFlowNodeBase* CAutoRegFlowNodeBase::s_pLast = nullptr;
-bool                  CAutoRegFlowNodeBase::s_bNodesRegistered = false;
 
 CRY_ALIGN(64) uint32 BoxSides[0x40 * 8] = {
 	0, 0, 0, 0, 0, 0, 0, 0, //00

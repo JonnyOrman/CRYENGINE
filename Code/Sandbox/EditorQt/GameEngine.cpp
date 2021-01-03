@@ -25,7 +25,6 @@
 #include "Terrain/SurfaceType.h"
 #include "Terrain/TerrainGrid.h"
 #include "TerrainLighting.h"
-#include "UI/UIManager.h"
 #include "Util/Ruler.h"
 #include "CryEditDoc.h"
 #include "GameExporter.h"

@@ -18,10 +18,10 @@ class CAttributeEnumerator : public IAttributeEnumerator
 {
 	struct AttributeComparer
 	{
-		bool operator()(const CPlayerProfile::TAttributeMap::value_type& lhs, const CPlayerProfile::TAttributeMap::value_type& rhs) const
+		/*bool operator()(const CPlayerProfile::TAttributeMap::value_type& lhs, const CPlayerProfile::TAttributeMap::value_type& rhs) const
 		{
 			return lhs.first.compare(rhs.first) < 0;
-		}
+		}*/
 	};
 
 public:
@@ -29,24 +29,24 @@ public:
 	CAttributeEnumerator(CPlayerProfile* pProfile) :
 		m_nRefs(0)
 	{
-		const CPlayerProfile::TAttributeMap& localMap = pProfile->GetAttributeMap();
-		const CPlayerProfile::TAttributeMap& parentMap = pProfile->GetDefaultAttributeMap();
-		std::merge(localMap.begin(), localMap.end(), parentMap.begin(), parentMap.end(),
-		           std::inserter(m_mergedMap, m_mergedMap.begin()), AttributeComparer());
+		/*const CPlayerProfile::TAttributeMap& localMap = pProfile->GetAttributeMap();
+		const CPlayerProfile::TAttributeMap& parentMap = pProfile->GetDefaultAttributeMap();*/
+		/*std::merge(localMap.begin(), localMap.end(), parentMap.begin(), parentMap.end(),
+		           std::inserter(m_mergedMap, m_mergedMap.begin()), AttributeComparer());*/
 
-		m_cur = m_mergedMap.begin();
-		m_end = m_mergedMap.end();
+		/*m_cur = m_mergedMap.begin();
+		m_end = m_mergedMap.end();*/
 	}
 
 	bool Next(SAttributeDescription& desc)
 	{
-		if (m_cur != m_end)
+		/*if (m_cur != m_end)
 		{
 			desc.name = m_cur->first.c_str();
 			++m_cur;
 			return true;
 		}
-		desc.name = "";
+		desc.name = "";*/
 		return false;
 	}
 
@@ -63,9 +63,9 @@ public:
 
 private:
 	int m_nRefs;
-	CPlayerProfile::TAttributeMap::iterator m_cur;
+	/*CPlayerProfile::TAttributeMap::iterator m_cur;
 	CPlayerProfile::TAttributeMap::iterator m_end;
-	CPlayerProfile::TAttributeMap           m_mergedMap;
+	CPlayerProfile::TAttributeMap           m_mergedMap;*/
 };
 
 //------------------------------------------------------------------------
@@ -89,14 +89,14 @@ bool CPlayerProfile::Reset()
 	IActionMapManager* pAM = CCryAction::GetCryAction()->GetIActionMapManager();
 	pAM->Reset();
 	// well, not very efficient at the moment...
-	TAttributeMap::iterator iter = m_attributeMap.begin();
+	/*TAttributeMap::iterator iter = m_attributeMap.begin();
 	while (iter != m_attributeMap.end())
 	{
 		TAttributeMap::iterator next = iter;
 		++next;
 		ResetAttribute(iter->first);
 		iter = next;
-	}
+	}*/
 
 	LoadGamerProfileDefaults();
 	gEnv->pSystem->AutoDetectSpec(false);
@@ -128,23 +128,23 @@ void CPlayerProfile::LoadGamerProfileDefaults()
 	{
 		if (gEnv->pSystem->GetPlatformOS()->GetUserProfilePreference(user, IPlatformOS::EUPP_CONTROLLER_INVERT_Y, preference))
 		{
-			TFlowInputData value(preference.GetInt());
-			SetAttribute("InvertY", value);
+			/*TFlowInputData value(preference.GetInt());
+			SetAttribute("InvertY", value);*/
 		}
 		if (gEnv->pSystem->GetPlatformOS()->GetUserProfilePreference(user, IPlatformOS::EUPP_CONTROLLER_SENSITIVITY, preference))
 		{
-			TFlowInputData value(preference.GetFloat());
-			SetAttribute("Sensitivity", value);
+			/*TFlowInputData value(preference.GetFloat());
+			SetAttribute("Sensitivity", value);*/
 		}
 		if (gEnv->pSystem->GetPlatformOS()->GetUserProfilePreference(user, IPlatformOS::EUPP_GAME_DIFFICULTY, preference))
 		{
-			TFlowInputData value(preference.GetInt());
-			SetAttribute("SP/Difficulty", value);
+			/*TFlowInputData value(preference.GetInt());
+			SetAttribute("SP/Difficulty", value);*/
 		}
 		if (gEnv->pSystem->GetPlatformOS()->GetUserProfilePreference(user, IPlatformOS::EUPP_AIM_ASSIST, preference))
 		{
-			TFlowInputData value(preference.GetInt());
-			SetAttribute("AimAssistance", value);
+			/*TFlowInputData value(preference.GetInt());
+			SetAttribute("AimAssistance", value);*/
 		}
 	}
 }
@@ -179,7 +179,7 @@ bool CPlayerProfile::SetAttribute(const char* name, const TFlowInputData& value)
 	if (IsDefault())
 		return false;
 
-	m_attributeMap[name] = value;
+	//m_attributeMap[name] = value;
 	return true;
 }
 
@@ -190,45 +190,45 @@ bool CPlayerProfile::ResetAttribute(const char* name)
 	if (IsDefault())
 		return false;
 
-	const TAttributeMap& defaultMap = GetDefaultAttributeMap();
+	//const TAttributeMap& defaultMap = GetDefaultAttributeMap();
 	// resetting means deleting from this profile and using the default value
 	// but: if no entry in default map, keep it
-	if (defaultMap.find(CONST_TEMP_STRING(name)) != defaultMap.end())
+	/*if (defaultMap.find(CONST_TEMP_STRING(name)) != defaultMap.end())
 	{
 		TAttributeMap::size_type count = m_attributeMap.erase(name);
 		return count > 0;
-	}
+	}*/
 	return false;
 }
 //------------------------------------------------------------------------
 // delete an attribute from attribute map (regardless if has a default)
 void CPlayerProfile::DeleteAttribute(const char* name)
 {
-	m_attributeMap.erase(name);
+	//m_attributeMap.erase(name);
 }
 
 //------------------------------------------------------------------------
 // get the value of an attribute. if not specified optionally lookup in default profile
-bool CPlayerProfile::GetAttribute(const char* name, TFlowInputData& val, bool bUseDefaultFallback) const
-{
-	TAttributeMap::const_iterator iter = m_attributeMap.find(CONST_TEMP_STRING(name));
-	if (iter != m_attributeMap.end())
-	{
-		val = iter->second;
-		return true;
-	}
-	if (bUseDefaultFallback && !IsDefault())
-	{
-		const TAttributeMap& defaultMap = GetDefaultAttributeMap();
-		TAttributeMap::const_iterator iter2 = defaultMap.find(CONST_TEMP_STRING(name));
-		if (iter2 != defaultMap.end())
-		{
-			val = iter2->second;
-			return true;
-		}
-	}
-	return false;
-}
+//bool CPlayerProfile::GetAttribute(const char* name, TFlowInputData& val, bool bUseDefaultFallback) const
+//{
+//	//TAttributeMap::const_iterator iter = m_attributeMap.find(CONST_TEMP_STRING(name));
+//	//if (iter != m_attributeMap.end())
+//	//{
+//	//	//val = iter->second;
+//	//	return true;
+//	//}
+//	//if (bUseDefaultFallback && !IsDefault())
+//	//{
+//	//	const TAttributeMap& defaultMap = GetDefaultAttributeMap();
+//	//	TAttributeMap::const_iterator iter2 = defaultMap.find(CONST_TEMP_STRING(name));
+//	//	if (iter2 != defaultMap.end())
+//	//	{
+//	//		//val = iter2->second;
+//	//		return true;
+//	//	}
+//	//}
+//	return false;
+//}
 
 //------------------------------------------------------------------------
 // get name all attributes available
@@ -350,12 +350,12 @@ bool CPlayerProfile::SerializeXML(CPlayerProfileManager::IProfileXMLSerializer* 
 }
 
 //------------------------------------------------------------------------
-const CPlayerProfile::TAttributeMap& CPlayerProfile::GetDefaultAttributeMap() const
-{
-	CPlayerProfile* pDefaultProfile = static_cast<CPlayerProfile*>(m_pManager->GetDefaultProfile());
-	CRY_ASSERT(pDefaultProfile != 0);
-	return pDefaultProfile->GetAttributeMap();
-}
+//const CPlayerProfile::TAttributeMap& CPlayerProfile::GetDefaultAttributeMap() const
+//{
+//	CPlayerProfile* pDefaultProfile = static_cast<CPlayerProfile*>(m_pManager->GetDefaultProfile());
+//	CRY_ASSERT(pDefaultProfile != 0);
+//	return pDefaultProfile->GetAttributeMap();
+//}
 
 //------------------------------------------------------------------------
 bool CPlayerProfile::SaveAttributes(const XmlNodeRef& root)
@@ -363,34 +363,34 @@ bool CPlayerProfile::SaveAttributes(const XmlNodeRef& root)
 	if (m_attributesVersion > 0)
 		root->setAttr(VERSION_TAG, m_attributesVersion);
 
-	const TAttributeMap& defaultMap = GetDefaultAttributeMap();
-	TAttributeMap::iterator iter = m_attributeMap.begin();
-	while (iter != m_attributeMap.end())
-	{
-		string val;
-		iter->second.GetValueWithConversion(val);
-		bool bSaveIt = true;
-		TAttributeMap::const_iterator defaultIter = defaultMap.find(iter->first);
-		if (defaultIter != defaultMap.end())
-		{
-			string defaultVal;
-			defaultIter->second.GetValueWithConversion(defaultVal);
-			// check if value is different from default
-			bSaveIt = val != defaultVal;
-		}
-		if (m_pManager->IsOnlineOnlyAttribute(iter->first))
-		{
-			bSaveIt = false;
-		}
-		if (bSaveIt)
-		{
-			// TODO: config. variant saving
-			XmlNodeRef child = root->newChild("Attr");
-			child->setAttr("name", iter->first);
-			child->setAttr("value", val);
-		}
-		++iter;
-	}
+	//const TAttributeMap& defaultMap = GetDefaultAttributeMap();
+	//TAttributeMap::iterator iter = m_attributeMap.begin();
+	//while (iter != m_attributeMap.end())
+	//{
+	//	string val;
+	//	iter->second.GetValueWithConversion(val);
+	//	bool bSaveIt = true;
+	//	TAttributeMap::const_iterator defaultIter = defaultMap.find(iter->first);
+	//	if (defaultIter != defaultMap.end())
+	//	{
+	//		string defaultVal;
+	//		//defaultIter->second.GetValueWithConversion(defaultVal);
+	//		// check if value is different from default
+	//		bSaveIt = val != defaultVal;
+	//	}
+	//	if (m_pManager->IsOnlineOnlyAttribute(iter->first))
+	//	{
+	//		bSaveIt = false;
+	//	}
+	//	if (bSaveIt)
+	//	{
+	//		// TODO: config. variant saving
+	//		XmlNodeRef child = root->newChild("Attr");
+	//		child->setAttr("name", iter->first);
+	//		child->setAttr("value", val);
+	//	}
+	//	++iter;
+	//}
 
 	if (m_pManager->HasEnabledOnlineAttributes() && m_pManager->CanProcessOnlineAttributes() && !IsDefault())
 	{
@@ -429,26 +429,6 @@ bool CPlayerProfile::LoadAttributes(const XmlNodeRef& root, int requiredVersion)
 		XmlNodeRef child = root->getChild(i);
 		if (child && strcmp(child->getTag(), "Attr") == 0)
 		{
-			const char* name = child->getAttr("name");
-			const char* value = child->getAttr("value");
-			const char* platform = child->getAttr("platform");
-
-			bool platformValid = true;
-			if (platform != NULL && platform[0])
-			{
-#if CRY_PLATFORM_DURANGO
-				platformValid = (strstr(platform, "xbox") != 0);
-#elif CRY_PLATFORM_ORBIS
-				platformValid = (strstr(platform, "ps4") != 0);
-#else
-				platformValid = (strstr(platform, "pc") != 0);
-#endif
-			}
-
-			if (name && value && platformValid)
-			{
-				m_attributeMap[name] = TFlowInputData(string(value));
-			}
 		}
 	}
 
@@ -465,5 +445,5 @@ void CPlayerProfile::GetMemoryStatistics(ICrySizer* pSizer)
 	pSizer->AddObject(this, sizeof(*this));
 	pSizer->AddObject(m_name);
 	pSizer->AddObject(m_userId);
-	pSizer->AddObject(m_attributeMap);
+	//pSizer->AddObject(m_attributeMap);
 }

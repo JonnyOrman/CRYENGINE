@@ -527,17 +527,6 @@ void CKeyboard::Update(bool bFocus)
 		{
 			if (g_pInputCVars->i_bufferedkeys)
 			{
-				if (GetDXInput().IsImeComposing())
-				{
-					// This is somewhat of a hack, to work around difference between Win32 message input and DirectInput.
-					// The problem happens when IME is used to compose character input, some keyboard events such as WM_KEYDOWN/WM_KEYUP are masked.
-					// Typically, the IME will set the virtual key to VK_PROCESSKEY if it has consumed the keyboard input, causing the event to be ignored for other purposes.
-					// However, DirectInput hooks lower into the input event stream, and thus observes events before the IME has had a chance to mask them.
-					// Therefore, we mask all keyboard events here by just ignoring them as long as composition is happening to get similar behavior.
-					// Failure to do this will cause weird behavior in Scaleform IME handling, as it can't (for example) deal with backspace input during composition.
-					break;
-				}
-
 				// go through all buffered items
 				for (unsigned int k = 0; k < dwItems; k++)
 				{

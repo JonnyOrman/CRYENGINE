@@ -74,9 +74,6 @@ public:
 	virtual void SerializeProperties(Serialization::IArchive& archive) override;
 	// ~IEntityPropertyGroup
 
-public:
-	static void OnFlowgraphActivation(EntityId entityId, IFlowNode::SActivationInfo* pActInfo, const class CEntityFlowNode* pNode);
-
 protected:
 	IPhysicalEntity* m_pPhysEnt;
 

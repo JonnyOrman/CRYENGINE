@@ -206,8 +206,6 @@ void CPostEffectStage::Execute()
 
 	m_context.EnableAltBackBuffer(true);
 
-	Execute3DHudFlashUpdate();
-
 	const auto& viewInfo = RenderView()->GetViewInfo(CCamera::eEye_Left);
 	std::shared_ptr<CGraphicsPipeline> pGP = RenderView()->GetGraphicsPipeline();
 
@@ -343,26 +341,6 @@ void CPostEffectStage::Execute()
 
 	// TODO: port to new graphics pipeline after all post effects are ported to new graphics pipeline.
 	m_pPostMgr->End(RenderView());
-}
-
-void CPostEffectStage::Execute3DHudFlashUpdate()
-{
-	const auto& viewInfo = RenderView()->GetViewInfo(CCamera::eEye_Left);
-	auto* p3DHUD = m_context.GetPostEffect(EPostEffectID::HUD3D);
-
-	// If HUD enabled, pre-process flash updates first.
-	// post effects of EPostEffectID::NanoGlass and EPostEffectID::PostStereo depend on this HUD update.
-	if (p3DHUD && p3DHUD->Preprocess(viewInfo))
-	{
-		auto& pPostEffect = m_postEffectArray[EPostEffectID::HUD3D];
-		if (pPostEffect)
-		{
-			auto* pHud3dPass = static_cast<CHud3DPass*>(pPostEffect.get());
-			auto& hud3d = *static_cast<CHud3D*>(p3DHUD);
-
-			pHud3dPass->ExecuteFlashUpdate(hud3d);
-		}
-	}
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -1466,103 +1444,6 @@ void CHud3DPass::Execute()
 
 		ExecuteBloomTexUpdate(hud3d);
 		ExecuteFinalPass(pDstTex, pDepthS, hud3d);
-	}
-}
-
-// Reminder: for efficient multiple flash files to work correctly - uv's must not override
-void CHud3DPass::ExecuteFlashUpdate(CHud3D& hud3d)
-{
-#if defined(USE_VBIB_PUSH_DOWN)
-	//workaround for deadlock when streaming thread wants renderthread to clean mesh pool
-	if (gRenDev->m_bStartLevelLoading)
-	{
-		CRenderMesh::Tick();
-	}
-#endif
-
-	const uint32 nThreadID = gRenDev->GetRenderThreadID();
-
-	const bool bForceRefresh = (hud3d.m_pOverideCacheDelay->GetParam() > 0.5f);
-
-	if (!hud3d.m_pRenderData[nThreadID].empty() || bForceRefresh) //&& m_nFlashUpdateFrameID != rd->GetFrameID(false) )
-	{
-		auto pGraphicsPipeline = m_pContext->GetRenderView()->GetGraphicsPipeline();
-		auto PipelineResources = pGraphicsPipeline->GetPipelineResources();
-
-		// Share hud render target with scene normals
-		hud3d.m_pHUD_RT       = PipelineResources.m_pTexHUD3D[0];
-		hud3d.m_pHUDScaled_RT = PipelineResources.m_pTexHUD3D[1];
-
-		if ((m_pContext->GetRenderView()->GetFrameId() % max(1, (int)CRenderer::CV_r_PostProcessHUD3DCache)) != 0)
-		{
-			if (!bForceRefresh)
-			{
-				// CV_r_PostProcessHUD3DCache>0 will skip flash asset advancing. Accumulate frame time of
-				//skipped frames and add it when we're actually advancing.
-				hud3d.m_accumulatedFrameTime += gEnv->pTimer->GetFrameTime();
-
-				hud3d.ReleaseFlashPlayerRef(nThreadID);
-
-				return;
-			}
-			else
-			{
-				hud3d.m_pOverideCacheDelay->SetParam(0.0f);
-				CryLog("reseting param");
-			}
-		}
-
-		hud3d.m_nFlashUpdateFrameID = m_pContext->GetRenderView()->GetFrameId();
-
-		PROFILE_LABEL_SCOPE("3D HUD FLASHPLAYER UPDATES");
-
-		CClearSurfacePass::Execute(hud3d.m_pHUD_RT, Clr_Transparent);
-
-		const int rtWidth  = std::min<int>(SHudData::s_nFlashWidthMax , hud3d.m_pHUD_RT->GetWidth());
-		const int rtHeight = std::min<int>(SHudData::s_nFlashHeightMax, hud3d.m_pHUD_RT->GetHeight());
-
-		const float accumulatedDeltaTime = gEnv->pTimer->GetFrameTime() + hud3d.m_accumulatedFrameTime;
-
-		SEfResTexture* pDiffuse = nullptr;
-		SEfResTexture* pPrevDiffuse = nullptr;
-
-		for (SHudData& pData : hud3d.m_pRenderData[nThreadID])
-		{
-			pDiffuse = pData.pDiffuse;
-			if (!pDiffuse || !pDiffuse->m_Sampler.m_pDynTexSource)
-			{
-				continue;
-			}
-
-			if (pData.pFlashPlayer && pPrevDiffuse != pDiffuse)
-			{
-				PROFILE_LABEL_SCOPE("3D HUD FLASHFILE");
-
-				const int width  = std::min(pData.pFlashPlayer->GetWidth (), rtWidth);
-				const int height = std::min(pData.pFlashPlayer->GetHeight(), rtHeight);
-
-				pData.pFlashPlayer->Advance(accumulatedDeltaTime);
-
-				pData.pFlashPlayer->SetViewport(0, 0, width, height);
-				pData.pFlashPlayer->SetScissorRect(0, 0, width, height);
-				pData.pFlashPlayer->AvoidStencilClear(!CRendererCVars::CV_r_PostProcessHUD3DStencilClear);
-
-				// Lockless rendering playback.
-				CScaleformPlayback::RenderFlashPlayerToTexture(pData.pFlashPlayer, hud3d.m_pHUD_RT);
-
-				pData.pFlashPlayer->AvoidStencilClear(false);
-
-				pPrevDiffuse = pDiffuse;
-
-				break;
-			}
-		}
-
-		hud3d.m_accumulatedFrameTime = 0.0f;
-		hud3d.ReleaseFlashPlayerRef(nThreadID);
-
-		// Downsample/blur hud into half res target _1 time only_ - we'll use this for Bloom/Dof
-		ExecuteDownsampleHud4x4(hud3d, hud3d.m_pHUDScaled_RT);
 	}
 }
 

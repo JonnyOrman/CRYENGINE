@@ -75,8 +75,6 @@ static void MN_DebugAI(IConsoleCmdArgs* pArgs)
 		const Vec3 cameraWorldPosition = viewCameraMatrix.GetTranslation();
 		const Vec3 cameraWorldDirectionForward = viewCameraMatrix.GetColumn1().GetNormalized();
 
-		float highestDotProduct = -2.0f;
-
 		const CActionController::TActionControllerList& actionControllersList = CActionController::GetGlobalActionControllers();
 		for (size_t i = 0; i < actionControllersList.size(); ++i)
 		{
@@ -87,19 +85,6 @@ static void MN_DebugAI(IConsoleCmdArgs* pArgs)
 			if (entityId == 0)
 			{
 				continue;
-			}
-
-			IEntity& entity = pActionController->GetEntity();
-			const IAIObject* pAiObject = entity.GetAI();
-
-			const Vec3 entityWorldPosition = pAiObject ? pAiObject->GetPos() : entity.GetWorldPos();
-			const Vec3 cameraToEntityWorldDirection = (entityWorldPosition - cameraWorldPosition).GetNormalized();
-			const float dotProduct = cameraWorldDirectionForward.Dot(cameraToEntityWorldDirection);
-
-			if ((highestDotProduct < dotProduct) && pAiObject)
-			{
-				pDebugEntity = &entity;
-				highestDotProduct = dotProduct;
 			}
 		}
 	}

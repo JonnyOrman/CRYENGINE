@@ -12,7 +12,6 @@
 #include <CryNetwork/SerializeFwd.h>
 #include "IActionMapManager.h"
 #include <CryMemory/PoolAllocator.h>
-#include <CryFlowGraph/IFlowSystem.h>
 #include <CryNetwork/Rmi.h>
 #include "IGameObjectSystem.h"
 
@@ -188,8 +187,6 @@ public:
 	virtual bool WantsPhysicsEvent(int events) = 0;
 	virtual void AttachDistanceChecker() = 0;
 
-	// enable/disable AI activation flag
-	virtual bool SetAIActivation(EGameObjectAIActivationMode mode) = 0;
 	// enable/disable auto-disabling of physics
 	virtual void SetAutoDisablePhysicsMode(EAutoDisablePhysicsMode mode) = 0;
 	// for debugging updates
@@ -413,18 +410,6 @@ protected:
 		}
 
 		return NULL;
-	}
-
-	static void ActivateOutputPort(EntityId id, int port, const TFlowInputData& data)
-	{
-		SEntityEvent evnt;
-		evnt.event = ENTITY_EVENT_ACTIVATE_FLOW_NODE_OUTPUT;
-		evnt.nParam[0] = port;
-		evnt.nParam[1] = (INT_PTR)&data;
-
-		IEntity* pEntity = gEnv->pEntitySystem->GetEntity(id);
-		if (pEntity)
-			pEntity->SendEvent(evnt);
 	}
 
 	static const SGameObjectExtensionRMI* Helper_AddMessage(SGameObjectExtensionRMI::DecoderFunction decoder, const char* description, ERMIAttachmentType attach, bool isServerCall, ENetReliabilityType reliability, bool lowDelay)

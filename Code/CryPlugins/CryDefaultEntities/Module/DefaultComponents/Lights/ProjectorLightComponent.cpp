@@ -104,15 +104,15 @@ void CProjectorLightComponent::Initialize()
 		szProjectorTexturePath = "%ENGINE%/EngineAssets/Textures/lights/softedge.dds";
 	}
 
-	const char* pExt = PathUtil::GetExt(szProjectorTexturePath);
+	/*const char* pExt = PathUtil::GetExt(szProjectorTexturePath);
 	if (!stricmp(pExt, "swf") || !stricmp(pExt, "gfx") || !stricmp(pExt, "usm") || !stricmp(pExt, "ui"))
 	{
 		light.m_pLightDynTexSource = gEnv->pRenderer->EF_LoadDynTexture(szProjectorTexturePath, false);
 	}
 	else
-	{
+	{*/
 		light.m_pLightImage = gEnv->pRenderer->EF_LoadTexture(szProjectorTexturePath, 0);
-	}
+	//}
 
 	if ((light.m_pLightImage == nullptr || !light.m_pLightImage->IsTextureLoaded()) && light.m_pLightDynTexSource == nullptr)
 	{

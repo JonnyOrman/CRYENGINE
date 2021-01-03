@@ -12,7 +12,6 @@
 #include <Cry3DEngine/I3DEngine.h>
 #include <CryString/StringUtils.h>
 #include <Cry3DEngine/ImageExtensionHelper.h>
-#include <CrySystem/Scaleform/IFlashPlayer.h>
 #include <CryCore/BitFiddling.h>    // ConvertBlock3DcToDXT5()
 #include "D3DStereo.h"
 #include "../Common/PostProcess/PostProcessUtils.h"
@@ -1148,105 +1147,6 @@ void CD3D9Renderer::DrawAllDynTextures(const char* szFilter, const bool bLogName
 
 	GetIRenderAuxGeom()->SetOrthographicProjection(false);
 #endif
-}
-
-void CFlashTextureSourceBase::Advance(const float delta, bool isPaused)
-{
-	if (!m_pFlashPlayer)
-		return;
-
-	const auto& pFlashPlayer = m_pFlashPlayer->GetTempPtr();
-	if (!pFlashPlayer)
-		return;
-
-	if (pFlashPlayer)
-	{
-		if (isPaused != pFlashPlayer->IsPaused())
-			pFlashPlayer->Pause(isPaused);
-
-		m_pFlashPlayer->Advance(delta);
-	}
-}
-
-bool CFlashTextureSourceBase::Update()
-{
-	if (!m_pFlashPlayer)
-		return false;
-
-	const auto& pFlashPlayer = m_pFlashPlayer->GetTempPtr();
-	if (!pFlashPlayer)
-		return false;
-
-	SDynTexture* pDynTexture = GetDynTexture();
-	assert(pDynTexture);
-	if (!pDynTexture)
-		return false;
-
-	const int rtWidth  = GetWidth();
-	const int rtHeight = GetHeight();
-	if (!UpdateDynTex(rtWidth, rtHeight))
-		return false;
-
-	m_width  = std::min(pFlashPlayer->GetWidth (), rtWidth);
-	m_height = std::min(pFlashPlayer->GetHeight(), rtHeight);
-	m_aspectRatio = ((float)pFlashPlayer->GetWidth() / (float)m_width) * ((float)m_height / (float)pFlashPlayer->GetHeight());
-
-	pFlashPlayer->SetViewport(0, 0, m_width, m_height, m_aspectRatio);
-	pFlashPlayer->SetScissorRect(0, 0, m_width, m_height);
-	pFlashPlayer->SetBackgroundAlpha(Clr_Transparent.a);
-
-	m_lastVisibleFrameID = gRenDev->GetRenderFrameID();
-	m_lastVisible = gEnv->pTimer->GetAsyncTime();
-
-	{
-		PROFILE_LABEL_SCOPE("FlashDynTexture");
-
-		CScaleformPlayback::RenderFlashPlayerToTexture(pFlashPlayer.get(), pDynTexture->m_pTexture);
-
-		pDynTexture->SetUpdateMask();
-	}
-
-	return true;
-}
-
-bool CFlashTextureSource::Update()
-{
-	if (!CFlashTextureSourceBase::Update())
-		return false;
-	if (!m_pMipMapper)
-		m_pMipMapper = new CMipmapGenPass(gcpRendD3D->FindGraphicsPipeline(SGraphicsPipelineKey::BaseGraphicsPipelineKey).get());
-
-	// calculate mip-maps after update, if mip-maps have been allocated
-	{
-		PROFILE_LABEL_SCOPE("FlashDynTexture MipMap");
-
-		m_pMipMapper->Execute((CTexture*)m_pDynTexture->GetTexture());
-	}
-
-	return true;
-}
-
-void CFlashTextureSourceSharedRT::ProbeDepthStencilSurfaceCreation(int width, int height)
-{
-	CTexture* pTex = CRendererResources::CreateDepthTarget(width, height, Clr_Empty, eTF_Unknown);
-	SAFE_RELEASE(pTex);
-}
-
-bool CFlashTextureSourceSharedRT::Update()
-{
-	if (!CFlashTextureSourceBase::Update())
-		return false;
-	if (!ms_pMipMapper)
-		ms_pMipMapper = new CMipmapGenPass(gcpRendD3D->FindGraphicsPipeline(SGraphicsPipelineKey::BaseGraphicsPipelineKey).get());
-
-	// calculate mip-maps after update, if mip-maps have been allocated
-	{
-		PROFILE_LABEL_SCOPE("FlashDynTexture MipMap");
-
-		ms_pMipMapper->Execute((CTexture*)ms_pDynTexture->GetTexture());
-	}
-
-	return true;
 }
 
 void CTexture::CopySliceChain(CDeviceTexture* const pDstDevTex, int8 nDstNumMips, int nDstSliceOffset, int8 nDstMipOffset,

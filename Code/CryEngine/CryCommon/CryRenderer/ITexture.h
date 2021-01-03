@@ -515,9 +515,7 @@ struct IDynTextureSource
 {
 	enum EDynTextureSource
 	{
-		DTS_UNKNOWN,
-
-		DTS_I_FLASHPLAYER
+		DTS_UNKNOWN
 	};
 
 	enum EDynTextureRTType

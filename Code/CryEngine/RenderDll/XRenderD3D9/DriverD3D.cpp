@@ -164,7 +164,6 @@ void CD3D9Renderer::InitRenderer()
 	}
 #endif
 
-	m_pSFResD3D = 0;
 	m_pPostProcessMgr = 0;
 	m_pWaterSimMgr = 0;
 	m_pComputeSkinningStorage = 0;
@@ -796,7 +795,6 @@ void CD3D9Renderer::BeginFrame(const SDisplayContextKey& displayContextKey, cons
 
 	CRenderMesh::ClearStaleMemory(true, gRenDev->GetMainThreadID());
 	CRenderElement::Tick();
-	CFlashTextureSourceSharedRT::Tick();
 
 	gEnv->nMainFrameID++;
 
@@ -1044,10 +1042,6 @@ void CD3D9Renderer::RT_BeginFrame(const SDisplayContextKey& displayContextKey, c
 	CResFile::Tick();
 	m_DevBufMan.Update(gRenDev->GetRenderFrameID(), false);
 	GetDeviceObjectFactory().OnBeginFrame(gRenDev->GetRenderFrameID());
-
-	// Render updated dynamic flash textures
-	CFlashTextureSourceSharedRT::TickRT();
-	CFlashTextureSourceBase::RenderLights();
 
 	//////////////////////////////////////////////////////////////////////
 	// Build the matrices
@@ -3145,16 +3139,6 @@ void CD3D9Renderer::RenderAux_RT()
 
 		++nIconIndex;
 
-		if (IAISystem* pAISystem = gEnv->pAISystem)
-		{
-			if (INavigationSystem* pAINavigation = pAISystem->GetNavigationSystem())
-			{
-				if (pAINavigation->GetState() == INavigationSystem::EWorkingState::Working)
-					IRenderAuxImage::Draw2dImage(nIconSize * nIconIndex + overscanOffset.x, overscanOffset.y, nIconSize, nIconSize, CRendererResources::s_ptexIconNavigationProcessing->GetID(), 0, 1, 1, 0);
-			}
-		}
-
-		++nIconIndex;
 	}
 
 	m_nDisableTemporalEffects = max(0, m_nDisableTemporalEffects - 1);

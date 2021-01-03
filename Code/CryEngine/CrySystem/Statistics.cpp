@@ -18,7 +18,6 @@
 #include <CryCore/ToolsHelpers/ResourceCompilerHelper.h>
 #include "PhysRenderer.h"
 #include <CrySystem/File/IResourceManager.h>
-#include <CrySystem/Scaleform/IFlashPlayer.h>
 #include <CrySystem/IStreamEngine.h>
 #include <CryAction/ITimeDemoRecorder.h>
 #include <CrySystem/Profilers/ILegacyProfiler.h>

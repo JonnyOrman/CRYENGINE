@@ -205,14 +205,6 @@ public:
 
 	virtual uint8 GetComponentChangeState() const final;
 
-	//////////////////////////////////////////////////////////////////////////
-	virtual const IAIObject* GetAI() const final                 { return m_aiObjectID ? GetAIObject() : nullptr; }
-	virtual IAIObject*       GetAI() final                       { return m_aiObjectID ? GetAIObject() : nullptr; }
-	virtual bool             HasAI() const final                 { return (m_flags & ENTITY_FLAG_HAS_AI) != 0; }
-	virtual tAIObjectID      GetAIObjectID() const final         { return m_aiObjectID; }
-	virtual void             SetAIObjectID(tAIObjectID id) final { m_aiObjectID = id; }
-	//////////////////////////////////////////////////////////////////////////
-
 	virtual ISerializableInfoPtr GetSerializableNetworkSpawnInfo() const final;
 
 	//////////////////////////////////////////////////////////////////////////
@@ -444,8 +436,6 @@ private:
 	{
 		return (fabsf(m_scale.x - 1.0f) + fabsf(m_scale.y - 1.0f) + fabsf(m_scale.z - 1.0f)) >= threshold;
 	}
-	// Fetch the IA object from the AIObjectID, if any
-	IAIObject* GetAIObject() const;
 
 	void       AddComponentInternal(std::shared_ptr<IEntityComponent> pComponent, const CryGUID& componentTypeID, IEntityComponent::SInitParams* pInitParams, const CEntityComponentClassDesc* pClassDescription);
 

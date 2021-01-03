@@ -5,6 +5,7 @@
 #include "CrySchematyc/IObject.h"
 #include "CrySchematyc/Utils/Assert.h"
 #include "CrySchematyc/Utils/GUID.h"
+#include "CryEntitySystem/IEntityComponent.h"
 
 namespace Schematyc
 {

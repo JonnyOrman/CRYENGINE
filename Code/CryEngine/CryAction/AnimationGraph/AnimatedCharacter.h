@@ -166,7 +166,7 @@ struct IAnimatedCharacterListener
 
 //--------------------------------------------------------------------------------
 // TODO: Shuffle variable members around to better align and pack things tightly and reduce padding.
-class CAnimatedCharacter : public CGameObjectExtensionHelper<CAnimatedCharacter, IAnimatedCharacter>, public IAnimationGraphStateListener
+class CAnimatedCharacter : public CGameObjectExtensionHelper<CAnimatedCharacter, IAnimatedCharacter>//, public IAnimationGraphStateListener
 {
 public:
 	CAnimatedCharacter();

@@ -2879,25 +2879,6 @@ bool CVehicle::IsCrewHostile(EntityId userId)
 	if (GetStatus().passengerCount == 0)
 		return false;
 
-	IEntity* pEntity = gEnv->pEntitySystem->GetEntity(userId);
-	const bool hasAI = pEntity ? pEntity->HasAI() : false;
-
-	if (!hasAI)
-		return false;
-
-	for (TVehicleSeatVector::const_iterator it = m_seats.begin(), end = m_seats.end(); it != end; ++it)
-	{
-		IActor* pPassengerActor = it->second->GetPassengerActor();
-
-		if (pPassengerActor != NULL)
-		{
-			if (pPassengerActor->IsDead())
-				continue;
-
-			return !pPassengerActor->IsFriendlyEntity(userId, false);
-		}
-	}
-
 	return false;
 }
 
@@ -4410,31 +4391,6 @@ bool CVehicle::IsPlayerDriving(bool clientOnly)
 //------------------------------------------------------------------------
 bool CVehicle::HasFriendlyPassenger(IEntity* pPlayer)
 {
-	if (!pPlayer || (!gEnv->bMultiplayer && !pPlayer->HasAI()))
-		return false;
-
-	EntityId playerId = pPlayer->GetId();
-
-	for (int i = FirstVehicleSeatId, nSeatCount = GetSeatCount(); i <= nSeatCount; ++i)
-	{
-		CVehicleSeat* pSeat = (CVehicleSeat*)GetSeatById(i);
-		if (!pSeat)
-			continue;
-
-		IActor* pActor = pSeat->GetPassengerActor();
-
-		if (pActor)
-		{
-			if (pActor->GetEntityId() == playerId)
-				continue; // the requester itself doesn't count as a passenger
-
-			if (pActor->IsFriendlyEntity(playerId, false))
-			{
-				return true;
-			}
-		}
-	}
-
 	return false;
 }
 

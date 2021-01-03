@@ -6,7 +6,6 @@
 
 #include <CryNetwork/INetwork.h>
 #include <Cry3DEngine/I3DEngine.h>
-#include <CryAISystem/IAISystem.h>
 #include <CryRenderer/IRenderer.h>
 #include <CrySystem/File/ICryPak.h>
 #include <CryMovie/IMovieSystem.h>
@@ -19,7 +18,6 @@
 #include <CryGame/IGameFramework.h>
 #include <CryCore/Platform/IPlatformOS.h>
 #include <CryString/StringUtils.h>
-#include <CrySystem/Scaleform/IScaleformHelper.h>
 #include <CryFont/IFont.h>
 
 #if CRY_PLATFORM_LINUX || CRY_PLATFORM_ANDROID || CRY_PLATFORM_APPLE
@@ -85,7 +83,6 @@ const char* g_szModuleGroups[][2] = {
 	{ "CryInput.dll",        g_szGroupCore },
 	{ "CryAudioSystem.dll",  g_szGroupCore },
 	{ "CryFont.dll",         g_szGroupCore },
-	{ "CryAISystem.dll",     g_szGroupCore },
 	{ "CryEntitySystem.dll", g_szGroupCore },
 	{ "Cry3DEngine.dll",     g_szGroupCore },
 	{ "Game.dll",            g_szGroupCore },
@@ -292,12 +289,6 @@ void CSystem::CollectMemStats(ICrySizer* pSizer, MemStatsPurposeEnum nPurpose, s
 				m_pXMLUtils->GetMemoryUsage(pSizer);
 			}
 
-			if (m_env.pScaleformHelper)
-			{
-				SIZER_COMPONENT_NAME(pSizer, "Scaleform");
-				m_env.pScaleformHelper->GetFlashMemoryUsage(pSizer);
-			}
-
 			if (m_env.pConsole)
 			{
 				SIZER_COMPONENT_NAME(pSizer, "Console");
@@ -428,21 +419,6 @@ void CSystem::CollectMemStats(ICrySizer* pSizer, MemStatsPurposeEnum nPurpose, s
 					pSizer->AddObject(info, static_cast<size_t>(info->memInfo.allocated - info->memInfo.requested));
 			}
 			m_env.pScriptSystem->GetMemoryStatistics(pSizer);
-		}
-
-	}
-
-	if (m_env.pAISystem)
-	{
-		SIZER_COMPONENT_NAME(pSizer, "CryAISystem");
-		{
-			{
-				SIZER_COMPONENT_NAME(pSizer, "$Allocations waste");
-				const SmallModuleInfo* info = FindModuleInfo(stats, "CryAISystem.dll");
-				if (info)
-					pSizer->AddObject(info, static_cast<size_t>(info->memInfo.allocated - info->memInfo.requested));
-			}
-			m_env.pAISystem->GetMemoryStatistics(pSizer);
 		}
 
 	}

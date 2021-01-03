@@ -172,27 +172,6 @@ void CCustomActionManager::LoadLibraryActions(const char* sPath)
 	{
 		do
 		{
-			filename = path;
-			filename += "/";
-			filename += fd.name;
-
-			XmlNodeRef root = GetISystem()->LoadXmlFromFile(filename);
-			if (root)
-			{
-				if (gEnv->pFlowSystem)
-				{
-					filename = PathUtil::GetFileName(filename);
-					CCustomAction& action = m_actionsLib[filename];   // this creates a new entry in m_actionsLib
-					if (!action.m_pFlowGraph)
-					{
-						action.m_customActionGraphName = filename;
-						action.m_pFlowGraph = gEnv->pFlowSystem->CreateFlowGraph();
-						action.m_pFlowGraph->SetSuspended(true);
-						action.m_pFlowGraph->SetCustomAction(&action);
-						action.m_pFlowGraph->SerializeXML(root, true);
-					}
-				}
-			}
 		}
 		while (pCryPak->FindNext(handle, &fd) >= 0);
 
@@ -361,9 +340,9 @@ void CCustomActionManager::Update()
 		if (action.GetCurrentState() == CAS_Ended)
 		{
 			// Remove the pointer to this action in the flow graph
-			IFlowGraph* pFlowGraph = action.GetFlowGraph();
-			if (pFlowGraph && pFlowGraph->GetCustomAction() != NULL)   // Might be null if terminated
-				pFlowGraph->SetCustomAction(NULL);
+			//IFlowGraph* pFlowGraph = action.GetFlowGraph();
+			//if (pFlowGraph && pFlowGraph->GetCustomAction() != NULL)   // Might be null if terminated
+			//	pFlowGraph->SetCustomAction(NULL);
 
 			// Remove in the actual list
 			m_activeActions.remove(action);
@@ -384,7 +363,7 @@ ICustomAction* CCustomActionManager::AddActiveCustomAction(IEntity* pObject, con
 		return NULL;
 
 	// Instance custom actions don't need to have a custom action graph
-	IFlowGraphPtr pFlowGraph = NULL;
+	//IFlowGraphPtr pFlowGraph = NULL;
 	if (szCustomActionGraphName != NULL && szCustomActionGraphName[0] != 0)
 	{
 		ICustomAction* pCustomActionFromLibrary = GetCustomActionFromLibrary(szCustomActionGraphName);
@@ -395,14 +374,14 @@ ICustomAction* CCustomActionManager::AddActiveCustomAction(IEntity* pObject, con
 		}
 		// Create a clone of the flow graph
 
-		if (IFlowGraph* pLibraryActionFlowGraph = pCustomActionFromLibrary->GetFlowGraph())
-			pFlowGraph = pLibraryActionFlowGraph->Clone();
+		/*if (IFlowGraph* pLibraryActionFlowGraph = pCustomActionFromLibrary->GetFlowGraph())
+			pFlowGraph = pLibraryActionFlowGraph->Clone();*/
 
-		if (!pFlowGraph)
+		/*if (!pFlowGraph)
 		{
 			CryWarning(VALIDATOR_MODULE_GAME, VALIDATOR_WARNING, "CCustomActionManager::AddActiveCustomAction: No flow graph in action: %s in library", szCustomActionGraphName);
 			return NULL;
-		}
+		}*/
 	}
 
 	// create active action and add it to the list
@@ -410,7 +389,7 @@ ICustomAction* CCustomActionManager::AddActiveCustomAction(IEntity* pObject, con
 
 	CCustomAction& addedAction = m_activeActions.front();
 
-	addedAction.m_pFlowGraph = pFlowGraph;
+	//addedAction.m_pFlowGraph = pFlowGraph;
 	addedAction.m_customActionGraphName = szCustomActionGraphName;
 	addedAction.m_pObjectEntity = pObject;
 
@@ -419,18 +398,18 @@ ICustomAction* CCustomActionManager::AddActiveCustomAction(IEntity* pObject, con
 		addedAction.RegisterListener(pListener, "ListenerFlowGraphCustomAction");
 	}
 
-	if (pFlowGraph)
-	{
-		// The Object will be first graph entity.
-		pFlowGraph->SetGraphEntity(pObject->GetId(), 0);
+	//if (pFlowGraph)
+	//{
+	//	// The Object will be first graph entity.
+	//	pFlowGraph->SetGraphEntity(pObject->GetId(), 0);
 
-		// Initialize the graph
-		pFlowGraph->InitializeValues();
+	//	// Initialize the graph
+	//	pFlowGraph->InitializeValues();
 
-		pFlowGraph->SetCustomAction(&addedAction);
+	//	pFlowGraph->SetCustomAction(&addedAction);
 
-		pFlowGraph->SetSuspended(false);
-	}
+	//	pFlowGraph->SetSuspended(false);
+	//}
 
 	return &addedAction;
 }

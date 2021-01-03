@@ -6,7 +6,6 @@
 #include "ResponseSystem.h"
 
 #include <CryGame/IGameTokens.h>
-#include <CryFlowGraph/IFlowSystem.h>
 #include <CrySystem/ISystem.h>
 #include <CryGame/IGameFramework.h>
 
@@ -66,7 +65,7 @@ void CActionSetGameToken::Serialize(Serialization::IArchive& ar)
 		{
 			ar.warning(m_stringValueToSet, "Value starts or ends with a space. Check if this is really wanted.");
 		}
-		if (IGameToken* pToken = gEnv->pGameFramework->GetIGameTokenSystem()->FindToken(m_tokenName.c_str()))
+		/*if (IGameToken* pToken = gEnv->pGameFramework->GetIGameTokenSystem()->FindToken(m_tokenName.c_str()))
 		{
 			if (pToken->GetType() == eFDT_Float && (m_typeToSet != CActionSetGameToken::EValueToSet::FloatVariableValue && m_typeToSet != CActionSetGameToken::EValueToSet::FloatValue))
 			{
@@ -84,7 +83,7 @@ void CActionSetGameToken::Serialize(Serialization::IArchive& ar)
 			{
 				ar.warning(m_tokenName, "GameToken is of type string, but the value to set is not.");
 			}
-		}
+		}*/
 
 		if (m_typeToSet == CActionSetGameToken::EValueToSet::IntVariableValue || m_typeToSet == CActionSetGameToken::EValueToSet::FloatVariableValue || m_typeToSet == CActionSetGameToken::EValueToSet::BoolVariableValue)
 		{
@@ -121,9 +120,6 @@ void CActionSetGameToken::Serialize(Serialization::IArchive& ar)
 //--------------------------------------------------------------------------------------------------
 DRS::IResponseActionInstanceUniquePtr CActionSetGameToken::Execute(DRS::IResponseInstance* pResponseInstance)
 {
-	IGameTokenSystem* pTokenSystem = gEnv->pGameFramework->GetIGameTokenSystem();
-	TFlowInputData dataToSet;
-
 	switch (m_typeToSet)
 	{
 	case CActionSetGameToken::EValueToSet::IntVariableValue:
@@ -139,12 +135,6 @@ DRS::IResponseActionInstanceUniquePtr CActionSetGameToken::Execute(DRS::IRespons
 			{
 				if (CryDRS::CVariable* pVariable = pCollection->CreateOrGetVariable(m_variableName))
 				{
-					if (m_typeToSet == CActionSetGameToken::EValueToSet::IntVariableValue)
-						dataToSet.Set(pVariable->GetValueAsInt());
-					else if (m_typeToSet == CActionSetGameToken::EValueToSet::BoolVariableValue)
-						dataToSet.Set(pVariable->GetValueAsBool());
-					else
-						dataToSet.Set(pVariable->GetValueAsFloat());
 				}
 				else
 					return nullptr;
@@ -154,34 +144,18 @@ DRS::IResponseActionInstanceUniquePtr CActionSetGameToken::Execute(DRS::IRespons
 		}
 		break;
 	case CActionSetGameToken::EValueToSet::BoolValue:
-		dataToSet.Set(m_bBooleanValueToSet);
 		break;
 	case CActionSetGameToken::EValueToSet::IntValue:
-		dataToSet.Set(m_intValueToSet);
 		break;
 	case CActionSetGameToken::EValueToSet::FloatValue:
-		dataToSet.Set(m_floatValueToSet);
 		break;
 	case CActionSetGameToken::EValueToSet::CurrentActorName:
-		dataToSet.Set(pResponseInstance->GetCurrentActor()->GetName());
 		break;
 	default:
-		dataToSet.Set(m_stringValueToSet);
 		break;
 	}
 
-	if (m_bCreateTokenIfNotExisting)
-	{
-		pTokenSystem->SetOrCreateToken(m_tokenName.c_str(), dataToSet);
-	}
-	else if (IGameToken* pToken = pTokenSystem->FindToken(m_tokenName.c_str()))
-	{
-		pToken->SetValue(dataToSet);
-	}
-	else
-	{
-		DrsLogWarning(string().Format("Could not find gametoken '%s'", m_tokenName.c_str()).c_str());
-	}
+	DrsLogWarning(string().Format("Could not find gametoken '%s'", m_tokenName.c_str()).c_str());
 
 	return nullptr;
 }

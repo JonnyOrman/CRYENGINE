@@ -27,7 +27,6 @@ def build(bld):
 
 		# conversion warning if XML_LARGE_SIZE is not set and the target is 64-bit (pointer subtraction)
 		# however, since we can never load 4GB+ files in that case, the truncation to 32-bit is actually safe
-		# setting XML_LARGE_SIZE would require rebuilding Scaleform to be 100% sure we don't break their ABI
 		win_cflags = [ '/wd4244' ], 
 		durango_cflags = [ '/wd4244' ],
 	)

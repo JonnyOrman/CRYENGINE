@@ -13,8 +13,8 @@ class CPlugin_CryDefaultEntities final : public IPlugin_CryDefaultEntities
 	CRYGENERATE_SINGLETONCLASS_GUID(CPlugin_CryDefaultEntities, "Plugin_CryDefaultEntities", "{55641353-7542-4392-9614-351C88A1DAC3}"_cry_guid)
 
 
-	PLUGIN_FLOWNODE_REGISTER
-	PLUGIN_FLOWNODE_UNREGISTER
+	/*PLUGIN_FLOWNODE_REGISTER
+	PLUGIN_FLOWNODE_UNREGISTER*/
 
 	virtual ~CPlugin_CryDefaultEntities();
 

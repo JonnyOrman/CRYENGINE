@@ -52,8 +52,8 @@ const char* CItemParamsNode::GetAttribute(int i) const
 	TAttributeMap::const_iterator it = GetConstIterator<TAttributeMap>(m_attributes, i);
 	if (it != m_attributes.end())
 	{
-		const string* str = it->second.GetPtr<string>();
-		return str ? str->c_str() : 0;
+		/*const string* str = it->second.GetPtr<string>();
+		return str ? str->c_str() : 0;*/
 	}
 	return 0;
 }
@@ -61,9 +61,9 @@ const char* CItemParamsNode::GetAttribute(int i) const
 //------------------------------------------------------------------------
 bool CItemParamsNode::GetAttribute(int i, Vec3& attr) const
 {
-	TAttributeMap::const_iterator it = GetConstIterator<TAttributeMap>(m_attributes, i);
-	if (it != m_attributes.end())
-		return it->second.GetValueWithConversion(attr);
+	//TAttributeMap::const_iterator it = GetConstIterator<TAttributeMap>(m_attributes, i);
+	/*if (it != m_attributes.end())
+		return it->second.GetValueWithConversion(attr);*/
 	return false;
 }
 
@@ -79,27 +79,27 @@ bool CItemParamsNode::GetAttribute(int i, Ang3& attr) const
 //------------------------------------------------------------------------
 bool CItemParamsNode::GetAttribute(int i, float& attr) const
 {
-	TAttributeMap::const_iterator it = GetConstIterator<TAttributeMap>(m_attributes, i);
-	if (it != m_attributes.end())
-		return it->second.GetValueWithConversion(attr);
+	//TAttributeMap::const_iterator it = GetConstIterator<TAttributeMap>(m_attributes, i);
+	/*if (it != m_attributes.end())
+		return it->second.GetValueWithConversion(attr);*/
 	return false;
 }
 
 //------------------------------------------------------------------------
 bool CItemParamsNode::GetAttribute(int i, int& attr) const
 {
-	TAttributeMap::const_iterator it = GetConstIterator<TAttributeMap>(m_attributes, i);
-	if (it != m_attributes.end())
-		return it->second.GetValueWithConversion(attr);
+	//TAttributeMap::const_iterator it = GetConstIterator<TAttributeMap>(m_attributes, i);
+	/*if (it != m_attributes.end())
+		return it->second.GetValueWithConversion(attr);*/
 	return false;
 }
 
 //------------------------------------------------------------------------
 int CItemParamsNode::GetAttributeType(int i) const
 {
-	TAttributeMap::const_iterator it = GetConstIterator<TAttributeMap>(m_attributes, i);
-	if (it != m_attributes.end())
-		return it->second.GetType();
+	//TAttributeMap::const_iterator it = GetConstIterator<TAttributeMap>(m_attributes, i);
+	/*if (it != m_attributes.end())
+		return it->second.GetType();*/
 	return eIPT_None;
 }
 
@@ -112,33 +112,33 @@ const char* CItemParamsNode::GetNameAttribute() const
 //------------------------------------------------------------------------
 const char* CItemParamsNode::GetAttribute(const char* name) const
 {
-	TAttributeMap::const_iterator it = FindAttrIterator(m_attributes, name);
-	if (it != m_attributes.end())
-	{
-		const string* str = it->second.GetPtr<string>();
-		return str ? str->c_str() : 0;
-	}
+	//TAttributeMap::const_iterator it = FindAttrIterator(m_attributes, name);
+	//if (it != m_attributes.end())
+	//{
+	//	/*const string* str = it->second.GetPtr<string>();
+	//	return str ? str->c_str() : 0;*/
+	//}
 	return 0;
 }
 
 //------------------------------------------------------------------------
 const char* CItemParamsNode::GetAttributeSafe(const char* name) const
 {
-	TAttributeMap::const_iterator it = FindAttrIterator(m_attributes, name);
-	if (it != m_attributes.end())
-	{
-		const string* str = it->second.GetPtr<string>();
-		return str ? str->c_str() : "";
-	}
+	//TAttributeMap::const_iterator it = FindAttrIterator(m_attributes, name);
+	//if (it != m_attributes.end())
+	//{
+	//	/*const string* str = it->second.GetPtr<string>();
+	//	return str ? str->c_str() : "";*/
+	//}
 	return "";
 }
 
 //------------------------------------------------------------------------
 bool CItemParamsNode::GetAttribute(const char* name, Vec3& attr) const
 {
-	TAttributeMap::const_iterator it = FindAttrIterator(m_attributes, name);
-	if (it != m_attributes.end())
-		return it->second.GetValueWithConversion(attr);
+	//TAttributeMap::const_iterator it = FindAttrIterator(m_attributes, name);
+	/*if (it != m_attributes.end())
+		return it->second.GetValueWithConversion(attr);*/
 	return false;
 }
 
@@ -155,27 +155,27 @@ bool CItemParamsNode::GetAttribute(const char* name, Ang3& attr) const
 //------------------------------------------------------------------------
 bool CItemParamsNode::GetAttribute(const char* name, float& attr) const
 {
-	TAttributeMap::const_iterator it = FindAttrIterator(m_attributes, name);
-	if (it != m_attributes.end())
-		return it->second.GetValueWithConversion(attr);
+	//TAttributeMap::const_iterator it = FindAttrIterator(m_attributes, name);
+	/*if (it != m_attributes.end())
+		return it->second.GetValueWithConversion(attr);*/
 	return false;
 }
 
 //------------------------------------------------------------------------
 bool CItemParamsNode::GetAttribute(const char* name, int& attr) const
 {
-	TAttributeMap::const_iterator it = FindAttrIterator(m_attributes, name);
-	if (it != m_attributes.end())
-		return it->second.GetValueWithConversion(attr);
+	//TAttributeMap::const_iterator it = FindAttrIterator(m_attributes, name);
+	/*if (it != m_attributes.end())
+		return it->second.GetValueWithConversion(attr);*/
 	return false;
 }
 
 //------------------------------------------------------------------------
 int CItemParamsNode::GetAttributeType(const char* name) const
 {
-	TAttributeMap::const_iterator it = FindAttrIterator(m_attributes, name);
-	if (it != m_attributes.end())
-		return it->second.GetType();
+	//TAttributeMap::const_iterator it = FindAttrIterator(m_attributes, name);
+	/*if (it != m_attributes.end())
+		return it->second.GetType();*/
 	return eIPT_None;
 }
 
@@ -219,31 +219,31 @@ void CItemParamsNode::SetAttribute(const char* name, const char* attr)
 	if (!strcmpi(name, "name"))
 	{
 		m_nameAttribute = attr;
-		AddAttribute(name, TItemParamValue(m_nameAttribute));
+		//AddAttribute(name, TItemParamValue(m_nameAttribute));
 	}
-	else
-		AddAttribute(name, TItemParamValue(string(attr)));
+	//else
+		//AddAttribute(name, TItemParamValue(string(attr)));
 }
 
 //------------------------------------------------------------------------
 void CItemParamsNode::SetAttribute(const char* name, const Vec3& attr)
 {
 	//m_attributes.insert(TAttributeMap::value_type(name, attr));
-	AddAttribute(name, TItemParamValue(attr));
+	//AddAttribute(name, TItemParamValue(attr));
 }
 
 //------------------------------------------------------------------------
 void CItemParamsNode::SetAttribute(const char* name, float attr)
 {
 	//m_attributes.insert(TAttributeMap::value_type(name, attr));
-	AddAttribute(name, TItemParamValue(attr));
+	//AddAttribute(name, TItemParamValue(attr));
 }
 
 //------------------------------------------------------------------------
 void CItemParamsNode::SetAttribute(const char* name, int attr)
 {
 	//m_attributes.insert(TAttributeMap::value_type(name, attr));
-	AddAttribute(name, TItemParamValue(attr));
+	//AddAttribute(name, TItemParamValue(attr));
 }
 
 //------------------------------------------------------------------------

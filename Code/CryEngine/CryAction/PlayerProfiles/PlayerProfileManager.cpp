@@ -40,12 +40,12 @@ void DumpAttrs(IPlayerProfile* pProfile)
 	IAttributeEnumerator::SAttributeDescription desc;
 	CryLogAlways("Attributes of profile %s", pProfile->GetName());
 	int i = 0;
-	TFlowInputData val;
+	//TFlowInputData val;
 	while (pEnum->Next(desc))
 	{
-		pProfile->GetAttribute(desc.name, val);
+		//pProfile->GetAttribute(desc.name, val);
 		string sVal;
-		val.GetValueWithConversion(sVal);
+		//val.GetValueWithConversion(sVal);
 		CryLogAlways("Attr %d: %s=%s", i, desc.name, sVal.c_str());
 		++i;
 	}
@@ -143,10 +143,10 @@ void TestProfile(IConsoleCmdArgs* args)
 	{
 		DumpActionMap(pProfile, "default");
 		DumpAttrs(pProfile);
-		pProfile->SetAttribute("hallo2", TFlowInputData(222));
-		pProfile->SetAttribute("newAddedAttribute", TFlowInputData(24.10f));
+		//pProfile->SetAttribute("hallo2", TFlowInputData(222));
+		//pProfile->SetAttribute("newAddedAttribute", TFlowInputData(24.10f));
 		DumpAttrs(pProfile);
-		pProfile->SetAttribute("newAddedAttribute", TFlowInputData(25.10f));
+		//pProfile->SetAttribute("newAddedAttribute", TFlowInputData(25.10f));
 		DumpAttrs(pProfile);
 		pProfile->ResetAttribute("newAddedAttribute");
 		pProfile->ResetAttribute("hallo2");
@@ -1652,8 +1652,8 @@ void CPlayerProfileManager::SaveOnlineAttributes(IPlayerProfile* pProfile)
 	{
 		if (m_registered)
 		{
-			TFlowInputData versionData(GetOnlineAttributesVersion());
-			pProfile->SetAttribute(ONLINE_VERSION_ATTRIBUTE_NAME, versionData);
+			/*TFlowInputData versionData(GetOnlineAttributesVersion());
+			pProfile->SetAttribute(ONLINE_VERSION_ATTRIBUTE_NAME, versionData);*/
 
 			const int listenerSize = m_listeners.size();
 			for (int i = 0; i < listenerSize; i++)
@@ -1668,14 +1668,14 @@ void CPlayerProfileManager::SaveOnlineAttributes(IPlayerProfile* pProfile)
 			{
 				if (iter->second >= k_onlineChecksums)
 				{
-					TFlowInputData data;
+					//TFlowInputData data;
 #if defined(USE_CRY_ASSERT)
-					bool hasAttr = pProfile->GetAttribute(iter->first.c_str(), data);
-					CRY_ASSERT(hasAttr, ("Expected %s to be set by SavingOnlineAttributes but wasn't", iter->first.c_str()));
+					/*bool hasAttr = pProfile->GetAttribute(iter->first.c_str(), data);
+					CRY_ASSERT(hasAttr, ("Expected %s to be set by SavingOnlineAttributes but wasn't", iter->first.c_str()));*/
 #else
 					pProfile->GetAttribute(iter->first.c_str(), data);
 #endif
-					SetUserData(&m_onlineData[iter->second], data);
+					//SetUserData(&m_onlineData[iter->second], data);
 				}
 
 				++iter;
@@ -1772,134 +1772,134 @@ uint32 CPlayerProfileManager::GetDefaultOnlineAttributes(SCryLobbyUserData* pDat
 }
 
 //------------------------------------------------------------------------
-bool CPlayerProfileManager::SetUserData(SCryLobbyUserData* data, const TFlowInputData& value)
-{
-	switch (data->m_type)
-	{
-	case eCLUDT_Int8:
-	case eCLUDT_Int16:
-	case eCLUDT_Int32:
-		{
-			const int* pInt = NULL;
-			int stringValue = 0;
-			if (const string* pString = value.GetPtr<string>())
-			{
-				stringValue = atoi(pString->c_str());
-				pInt = &stringValue;
-			}
-			else
-			{
-				pInt = value.GetPtr<int>();
-			}
-
-			if (pInt)
-			{
-				if (data->m_type == eCLUDT_Int32)
-				{
-					data->m_int32 = (*pInt);
-				}
-				else if (data->m_type == eCLUDT_Int16)
-				{
-					data->m_int16 = (*pInt);
-				}
-				else if (data->m_type == eCLUDT_Int8)
-				{
-					data->m_int8 = (*pInt);
-				}
-				else
-				{
-					CRY_ASSERT(false, "TFlowInputData int didn't match UserData types");
-					return false;
-				}
-				return true;
-			}
-			//This can be removed when CryNetwork adds support for bools in user data
-			else if (const bool* pBool = value.GetPtr<bool>())
-			{
-				if (data->m_type == eCLUDT_Int8)
-				{
-					data->m_int8 = (*pBool);
-				}
-				else
-				{
-					CRY_ASSERT(false, "TFlowInputData int didn't match UserData types");
-					return false;
-				}
-				return true;
-			}
-			else
-			{
-				CRY_ASSERT(false, "TFlowInputData didn't contain expected int/bool");
-				return false;
-			}
-		}
-		break;
-	case eCLUDT_Float32:
-		{
-			const float* pFloat = NULL;
-			float stringValue = 0.0f;
-			if (const string* pString = value.GetPtr<string>())
-			{
-				stringValue = (float) atof(pString->c_str());
-				pFloat = &stringValue;
-			}
-			else
-			{
-				pFloat = value.GetPtr<float>();
-			}
-
-			if (pFloat)
-			{
-				data->m_f32 = (*pFloat);
-				return true;
-			}
-			else
-			{
-				CRY_ASSERT(false, "TFlowInputData didn't contain expected float");
-				return false;
-			}
-		}
-		break;
-	}
-
-	CRY_ASSERT(false, "Unable to store data size");
-	return false;
-}
+//bool CPlayerProfileManager::SetUserData(SCryLobbyUserData* data, const TFlowInputData& value)
+//{
+//	switch (data->m_type)
+//	{
+//	case eCLUDT_Int8:
+//	case eCLUDT_Int16:
+//	case eCLUDT_Int32:
+//		{
+//			const int* pInt = NULL;
+//			int stringValue = 0;
+//			if (const string* pString = value.GetPtr<string>())
+//			{
+//				stringValue = atoi(pString->c_str());
+//				pInt = &stringValue;
+//			}
+//			else
+//			{
+//				pInt = value.GetPtr<int>();
+//			}
+//
+//			if (pInt)
+//			{
+//				if (data->m_type == eCLUDT_Int32)
+//				{
+//					data->m_int32 = (*pInt);
+//				}
+//				else if (data->m_type == eCLUDT_Int16)
+//				{
+//					data->m_int16 = (*pInt);
+//				}
+//				else if (data->m_type == eCLUDT_Int8)
+//				{
+//					data->m_int8 = (*pInt);
+//				}
+//				else
+//				{
+//					CRY_ASSERT(false, "TFlowInputData int didn't match UserData types");
+//					return false;
+//				}
+//				return true;
+//			}
+//			//This can be removed when CryNetwork adds support for bools in user data
+//			else if (const bool* pBool = value.GetPtr<bool>())
+//			{
+//				if (data->m_type == eCLUDT_Int8)
+//				{
+//					data->m_int8 = (*pBool);
+//				}
+//				else
+//				{
+//					CRY_ASSERT(false, "TFlowInputData int didn't match UserData types");
+//					return false;
+//				}
+//				return true;
+//			}
+//			else
+//			{
+//				CRY_ASSERT(false, "TFlowInputData didn't contain expected int/bool");
+//				return false;
+//			}
+//		}
+//		break;
+//	case eCLUDT_Float32:
+//		{
+//			const float* pFloat = NULL;
+//			float stringValue = 0.0f;
+//			if (const string* pString = value.GetPtr<string>())
+//			{
+//				stringValue = (float) atof(pString->c_str());
+//				pFloat = &stringValue;
+//			}
+//			else
+//			{
+//				pFloat = value.GetPtr<float>();
+//			}
+//
+//			if (pFloat)
+//			{
+//				data->m_f32 = (*pFloat);
+//				return true;
+//			}
+//			else
+//			{
+//				CRY_ASSERT(false, "TFlowInputData didn't contain expected float");
+//				return false;
+//			}
+//		}
+//		break;
+//	}
+//
+//	CRY_ASSERT(false, "Unable to store data size");
+//	return false;
+//}
 
 //------------------------------------------------------------------------
-bool CPlayerProfileManager::ReadUserData(const SCryLobbyUserData* data, TFlowInputData& val)
-{
-	switch (data->m_type)
-	{
-	case eCLUDT_Int32:
-		{
-			val.Set(data->m_int32);
-			return true;
-		}
-		break;
-	case eCLUDT_Int16:
-		{
-			val.Set((int) data->m_int16);
-			return true;
-		}
-		break;
-	case eCLUDT_Int8:
-		{
-			val.Set((int) data->m_int8);
-			return true;
-		}
-		break;
-	case eCLUDT_Float32:
-		{
-			val.Set(data->m_f32);
-			return true;
-		}
-		break;
-	}
-
-	CRY_ASSERT(false, "Unable to read data size");
-	return false;
-}
+//bool CPlayerProfileManager::ReadUserData(const SCryLobbyUserData* data, TFlowInputData& val)
+//{
+//	switch (data->m_type)
+//	{
+//	case eCLUDT_Int32:
+//		{
+//			val.Set(data->m_int32);
+//			return true;
+//		}
+//		break;
+//	case eCLUDT_Int16:
+//		{
+//			val.Set((int) data->m_int16);
+//			return true;
+//		}
+//		break;
+//	case eCLUDT_Int8:
+//		{
+//			val.Set((int) data->m_int8);
+//			return true;
+//		}
+//		break;
+//	case eCLUDT_Float32:
+//		{
+//			val.Set(data->m_f32);
+//			return true;
+//		}
+//		break;
+//	}
+//
+//	CRY_ASSERT(false, "Unable to read data size");
+//	return false;
+//}
 
 //------------------------------------------------------------------------
 uint32 CPlayerProfileManager::UserDataSize(const SCryLobbyUserData* data)
@@ -1953,7 +1953,7 @@ void CPlayerProfileManager::ReadUserDataCallback(CryLobbyTaskID taskID, ECryLobb
 		{
 			TOnlineAttributeMap::const_iterator iter = pManager->m_onlineAttributeMap.begin();
 			TOnlineAttributeMap::const_iterator end = pManager->m_onlineAttributeMap.end();
-			TFlowInputData blankData;
+			//TFlowInputData blankData;
 			while (iter != end)
 			{
 				pManager->m_pReadingProfile->DeleteAttribute(iter->first);
@@ -1992,48 +1992,48 @@ void CPlayerProfileManager::ReadOnlineAttributes(IPlayerProfile* pProfile, const
 		TOnlineAttributeMap::const_iterator versionIter = m_onlineAttributeMap.find(ONLINE_VERSION_ATTRIBUTE_NAME);
 		if (versionIter != end)
 		{
-			TFlowInputData versionData;
-			ReadUserData(&pData[versionIter->second], versionData);
+			//TFlowInputData versionData;
+			//ReadUserData(&pData[versionIter->second], versionData);
 
-			const int* pInt = versionData.GetPtr<int>();
-			if (pInt)
-			{
-				const int version = *pInt;
-				if (version == GetOnlineAttributesVersion())
-				{
+			//const int* pInt = versionData.GetPtr<int>();
+			//if (pInt)
+			//{
+			//	const int version = *pInt;
+			//	if (version == GetOnlineAttributesVersion())
+			//	{
 
-					if (ValidChecksums(pData, m_onlineDataCount))
-					{
-						TOnlineAttributeMap::const_iterator iter = m_onlineAttributeMap.begin();
+			//		if (ValidChecksums(pData, m_onlineDataCount))
+			//		{
+			//			TOnlineAttributeMap::const_iterator iter = m_onlineAttributeMap.begin();
 
-						while (iter != end)
-						{
-							TFlowInputData data;
-							ReadUserData(&pData[iter->second], data);
-							pProfile->SetAttribute(iter->first, data);
-							++iter;
-						}
+			//			while (iter != end)
+			//			{
+			//				TFlowInputData data;
+			//				//ReadUserData(&pData[iter->second], data);
+			//				pProfile->SetAttribute(iter->first, data);
+			//				++iter;
+			//			}
 
-						const int listenerSize = m_listeners.size();
-						for (int i = 0; i < listenerSize; i++)
-						{
-							m_listeners[i]->LoadFromProfile(pProfile, true, ePR_All); // TODO: perhaps this only wants to be ePR_Options or needs an extra check?
-						}
-					}
-					else
-					{
-						CryWarning(VALIDATOR_MODULE_GAME, VALIDATOR_ERROR, "OnlineAttributes - Checksum was invalid (Not reading online attributes)");
-					}
-				}
-				else
-				{
-					CryWarning(VALIDATOR_MODULE_GAME, VALIDATOR_ERROR, "OnlineAttributes - version mismatch (Not reading online attributes)");
-				}
-			}
-			else
-			{
+			//			const int listenerSize = m_listeners.size();
+			//			for (int i = 0; i < listenerSize; i++)
+			//			{
+			//				m_listeners[i]->LoadFromProfile(pProfile, true, ePR_All); // TODO: perhaps this only wants to be ePR_Options or needs an extra check?
+			//			}
+			//		}
+			//		else
+			//		{
+			//			CryWarning(VALIDATOR_MODULE_GAME, VALIDATOR_ERROR, "OnlineAttributes - Checksum was invalid (Not reading online attributes)");
+			//		}
+			//	}
+			//	else
+			//	{
+			//		CryWarning(VALIDATOR_MODULE_GAME, VALIDATOR_ERROR, "OnlineAttributes - version mismatch (Not reading online attributes)");
+			//	}
+			//}
+			//else
+			//{
 				CryWarning(VALIDATOR_MODULE_GAME, VALIDATOR_ERROR, "OnlineAttributes - version data invalid (Not reading online attributes)");
-			}
+			//}
 		}
 		else
 		{
@@ -2321,16 +2321,16 @@ void CPlayerProfileManager::DbgTestOnlineAttributes(IConsoleCmdArgs* args)
 
 					CryLogAlways("Copying Profile FlowData");
 					int arrayIndex = 0;
-					CPlayerProfile* pProfile = (CPlayerProfile*) pPlayerProfMan->GetCurrentProfile(pPlayerProfMan->GetCurrentUser());
+					//CPlayerProfile* pProfile = (CPlayerProfile*) pPlayerProfMan->GetCurrentProfile(pPlayerProfMan->GetCurrentUser());
 
 					TOnlineAttributeMap::const_iterator end = pPlayerProfMan->m_onlineAttributeMap.end();
 					TOnlineAttributeMap::const_iterator iter = pPlayerProfMan->m_onlineAttributeMap.begin();
 					while (iter != end)
 					{
-						TFlowInputData inputData;
-						pProfile->GetAttribute(iter->first.c_str(), inputData);
-						int inputIntData;
-						inputData.GetValueWithConversion(inputIntData);
+						//TFlowInputData inputData;
+						//pProfile->GetAttribute(iter->first.c_str(), inputData);
+						int inputIntData = 0;
+						//inputData.GetValueWithConversion(inputIntData);
 
 						pPlayerProfMan->m_testFlowData[arrayIndex] = inputIntData;
 
@@ -2370,7 +2370,7 @@ void CPlayerProfileManager::DbgTestOnlineAttributes(IConsoleCmdArgs* args)
 
 					CryLogAlways("Checking Profile FlowData");
 					int arrayIndex = 0;
-					CPlayerProfile* pProfile = (CPlayerProfile*) pPlayerProfMan->GetCurrentProfile(pPlayerProfMan->GetCurrentUser());
+					//CPlayerProfile* pProfile = (CPlayerProfile*) pPlayerProfMan->GetCurrentProfile(pPlayerProfMan->GetCurrentUser());
 
 					TOnlineAttributeMap::const_iterator end = pPlayerProfMan->m_onlineAttributeMap.end();
 					TOnlineAttributeMap::const_iterator iter = pPlayerProfMan->m_onlineAttributeMap.begin();
@@ -2378,10 +2378,10 @@ void CPlayerProfileManager::DbgTestOnlineAttributes(IConsoleCmdArgs* args)
 					{
 						if (iter->second >= k_onlineChecksums)
 						{
-							TFlowInputData data;
-							pProfile->GetAttribute(iter->first.c_str(), data);
+							//TFlowInputData data;
+							//pProfile->GetAttribute(iter->first.c_str(), data);
 							int intValue = -1;
-							data.GetValueWithConversion(intValue);
+							//data.GetValueWithConversion(intValue);
 							if (pPlayerProfMan->m_testFlowData[arrayIndex] != intValue)
 							{
 								CryLogAlways("Non-matching Flow Data! FAILED!!!!!");

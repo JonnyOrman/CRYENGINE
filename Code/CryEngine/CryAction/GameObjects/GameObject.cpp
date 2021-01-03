@@ -426,8 +426,6 @@ void CGameObject::DebugUpdateState()
 	pOut += sprintf(pOut, "%s: %s", GetEntity()->GetName(), UpdateNames[m_updateState]);
 	if (m_updateTimer < (0.5f * UPDATE_TIMEOUT_HUGE))
 		pOut += sprintf(pOut, " timeout:%.2f", m_updateTimer);
-	if (ShouldUpdateAI())
-		pOut += sprintf(pOut, m_aiMode == eGOAIAM_Always ? "AI_ALWAYS" : " AIACTIVE");
 	if (m_bPrePhysicsEnabled)
 		pOut += sprintf(pOut, " PREPHYSICS");
 	if (m_prePhysicsUpdateRule != ePPU_Never)
@@ -442,7 +440,7 @@ void CGameObject::DebugUpdateState()
 
 	if (g_showUpdateState == 2)
 	{
-		bool checkAIDisable = !ShouldUpdateAI() && GetEntity()->HasAI();
+		bool checkAIDisable = false;// !ShouldUpdateAI() && GetEntity()->HasAI();
 		for (TExtensions::iterator iter = m_extensions.begin(); iter != m_extensions.end(); ++iter)
 		{
 			uint slotbit = 1;
@@ -529,9 +527,8 @@ void CGameObject::Update(SEntityUpdateContext& ctx)
 	/*
 	 * UPDATE EXTENSIONS
 	 */
-	bool shouldUpdateAI = ShouldUpdateAI();
-	bool keepUpdating = shouldUpdateAI;
-	bool checkAIDisableOnSlots = !shouldUpdateAI && GetEntity()->HasAI();
+	bool keepUpdating = false;
+	bool checkAIDisableOnSlots = false;// !shouldUpdateAI && GetEntity()->HasAI();
 	for (TExtensions::iterator iter = m_extensions.begin(); iter != m_extensions.end(); ++iter)
 	{
 		uint32 slotbit = 1;
@@ -1576,10 +1573,9 @@ void CGameObject::SetUpdateSlotEnableCondition(IGameObjectExtension* pExtension,
 bool CGameObject::ShouldUpdate()
 {
 	// evaluate main-loop activation
-	bool shouldUpdateAI(!GetEntity()->IsHidden() && (IsProbablyVisible() || !IsProbablyDistant()));
-	bool shouldBeActivated = shouldUpdateAI;
-	bool hasAI = GetEntity()->HasAI();
-	bool checkAIDisableOnSlots = !shouldUpdateAI && hasAI;
+	bool shouldBeActivated = false;
+	//bool hasAI = GetEntity()->HasAI();
+	bool checkAIDisableOnSlots = false;// !shouldUpdateAI && hasAI;
 	for (TExtensions::iterator iter = m_extensions.begin(); iter != m_extensions.end() && !shouldBeActivated; ++iter)
 	{
 		uint32 slotbit = 1;
@@ -1595,10 +1591,9 @@ bool CGameObject::ShouldUpdate()
 void CGameObject::EvaluateUpdateActivation()
 {
 	// evaluate main-loop activation
-	bool shouldUpdateAI = ShouldUpdateAI();
-	bool shouldBeActivated = shouldUpdateAI;
-	bool hasAI = GetEntity()->HasAI();
-	bool checkAIDisableOnSlots = !shouldUpdateAI && hasAI;
+	bool shouldBeActivated = false;
+	//bool hasAI = GetEntity()->HasAI();
+	bool checkAIDisableOnSlots = false;// !shouldUpdateAI && hasAI;
 	for (TExtensions::iterator iter = m_extensions.begin(); iter != m_extensions.end() && !shouldBeActivated; ++iter)
 	{
 		uint32 slotbit = 1;
@@ -1617,9 +1612,9 @@ void CGameObject::EvaluateUpdateActivation()
 	switch (m_prePhysicsUpdateRule)
 	{
 	case ePPU_WhenAIActivated:
-		if (hasAI)
+		/*if (hasAI)
 			shouldActivatePrePhysics = ShouldUpdateAI();
-		else
+		else*/
 		case ePPU_Always: // yes this is what i intended...
 			shouldActivatePrePhysics = true;
 		break;
@@ -1780,40 +1775,6 @@ NetworkAspectType CGameObject::GetEnabledAspects() const
 uint8 CGameObject::GetDefaultProfile(EEntityAspects aspect)
 {
 	return m_pNetEntity->GetDefaultProfile(aspect);
-}
-
-bool CGameObject::SetAIActivation(EGameObjectAIActivationMode mode)
-{
-	// this should be done only for gameobjects with AI. Otherwise breaks weapons (scope update, etc)
-	if (!GetEntity()->HasAI())
-		return false;
-
-	if (m_aiMode != mode)
-	{
-		m_aiMode = mode;
-		EvaluateUpdateActivation(); // need to recheck any updates on slots
-	}
-
-	return GetEntity()->IsActivatedForUpdates();
-}
-
-bool CGameObject::ShouldUpdateAI()
-{
-	if (GetEntity()->IsHidden() || !GetEntity()->HasAI())
-		return false;
-
-	switch (m_aiMode)
-	{
-	case eGOAIAM_Never:
-		return false;
-	case eGOAIAM_Always:
-		return true;
-	case eGOAIAM_VisibleOrInRange:
-		return IsProbablyVisible() || !IsProbablyDistant();
-	default:
-		CRY_ASSERT(false);
-		return false;
-	}
 }
 
 void CGameObject::EnablePrePhysicsUpdate(EPrePhysicsUpdate updateRule)

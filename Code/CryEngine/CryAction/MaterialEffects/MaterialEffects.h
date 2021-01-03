@@ -8,7 +8,7 @@
 #include "MFXContainer.h"
 #include "SurfacesLookupTable.h"
 
-class CMaterialFGManager;
+//class CMaterialFGManager;
 class CScriptBind_MaterialEffects;
 
 namespace MaterialEffectsUtils
@@ -91,8 +91,6 @@ public:
 	virtual void                CompleteInit();
 	virtual void                ReloadMatFXFlowGraphs();
 	virtual size_t              GetMatFXFlowGraphCount() const;
-	virtual IFlowGraphPtr       GetMatFXFlowGraph(int index, string* pFileName = NULL) const;
-	virtual IFlowGraphPtr       LoadNewMatFXFlowGraph(const string& filename);
 	virtual void                EnumerateEffectNames(EnumerateMaterialEffectsDataCallback& callback, const char* szLibraryName) const;
 	virtual void                EnumerateLibraryNames(EnumerateMaterialEffectsDataCallback& callback) const;
 	virtual void                LoadFXLibraryFromXMLInMemory(const char* szName, XmlNodeRef root);
@@ -104,10 +102,9 @@ public:
 	// ~IMaterialEffects
 
 	void                GetMemoryUsage(ICrySizer* s) const;
-	void                NotifyFGHudEffectEnd(IFlowGraphPtr pFG);
 	void                Update(float frameTime);
 	void                SetUpdateMode(bool bMode);
-	CMaterialFGManager* GetFGManager() const { return m_pMaterialFGManager; }
+	//CMaterialFGManager* GetFGManager() const { return m_pMaterialFGManager; }
 
 	void                FullReload();
 
@@ -156,7 +153,7 @@ private:
 	int                 m_canopySurfaceId;
 	bool                m_bUpdateMode;
 	bool                m_bDataInitialized;
-	CMaterialFGManager* m_pMaterialFGManager;
+	//CMaterialFGManager* m_pMaterialFGManager;
 	IAnimFXEvents*      m_pAnimFXEvents;
 
 	// other systems can respond to internal events

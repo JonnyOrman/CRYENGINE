@@ -18,7 +18,6 @@
 
 //engine interfaces
 #include <Cry3DEngine/I3DEngine.h>
-#include <CryFlowGraph/IFlowSystem.h>
 #include <CryAISystem/IAISystem.h>
 #include <CryGame/IGameTokens.h>
 #include <CryGame/IGameFramework.h>
@@ -309,8 +308,6 @@ void CCheckpointSystem::WriteGameTokens(XmlNodeRef parentNode)
 
 	//get serialization data
 	TSerialize ser = TSerialize(pWriter);
-	IGameTokenSystem* pTokenSystem = CCryAction::GetCryAction()->GetIGameTokenSystem();
-	pTokenSystem->Serialize(ser);
 
 	//add to parent node
 	parentNode->addChild(node);
@@ -544,13 +541,6 @@ void CCheckpointSystem::ResetEngine()
 
 	REINST("notify the audio system?");
 
-	//AI System
-	if (gEnv->pAISystem)
-	{
-		gEnv->pAISystem->Reset(IAISystem::RESET_EXIT_GAME);
-		gEnv->pAISystem->Reset(IAISystem::RESET_ENTER_GAME);
-	}
-
 	//flow system
 
 	//reset trackview
@@ -734,8 +724,6 @@ void CCheckpointSystem::ReadGameTokens(XmlNodeRef parentNode)
 
 	//read serialization data
 	TSerialize ser = TSerialize(pReader);
-	IGameTokenSystem* pTokenSystem = CCryAction::GetCryAction()->GetIGameTokenSystem();
-	pTokenSystem->Serialize(ser);
 
 	pSerializer->Release();
 }

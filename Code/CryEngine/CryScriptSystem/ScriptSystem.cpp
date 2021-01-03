@@ -2163,10 +2163,6 @@ void CScriptSystem::Update()
 	{
 		int aiTicks = 0;
 
-		IAISystem* pAISystem = gEnv->pAISystem;
-
-		if (pAISystem)
-			aiTicks = pAISystem->GetAITickCount();
 		pScriptSystem->SetGlobalValue("_aitick", aiTicks);
 	}
 

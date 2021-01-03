@@ -80,7 +80,6 @@ public:
 	virtual void GetMemoryUsage(class ICrySizer* pSizer) const;
 	// ~IEntitySystemSink
 
-	void         RegisterActorClass(const char* name, IGameFramework::IActorCreator*, bool isAI);
 	void         AddActor(EntityId entityId, IActor* pProxy);
 	void         RemoveActor(EntityId entityId);
 
@@ -112,9 +111,8 @@ private:
 	struct SActorClassDesc
 	{
 		IEntityClass*                  pEntityClass;
-		IGameFramework::IActorCreator* pCreator;
 
-		SActorClassDesc() : pEntityClass(), pCreator() {}
+		SActorClassDesc() : pEntityClass() {}
 	};
 
 	class CActorIterator : public IActorIterator

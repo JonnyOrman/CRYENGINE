@@ -182,7 +182,6 @@ void CMatMan::ForceDelayedMaterialDeletion()
 	// make sure nothing is in flight on RT if we force delete materials
 	if (GetRenderer())
 	{
-		GetRenderer()->StopLoadtimeFlashPlayback();
 		GetRenderer()->FlushRTCommands(true, true, true);
 	}
 

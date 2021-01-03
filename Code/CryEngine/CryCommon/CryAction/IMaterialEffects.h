@@ -5,7 +5,6 @@
 	#define MATERIAL_EFFECTS_DEBUG
 #endif
 
-#include <CryFlowGraph/IFlowSystem.h> // <> required for Interfuscator
 #include <CryParticleSystem/IParticles.h>
 #include <CryMath/Cry_Color.h>
 #include <CryCore/Containers/CryFixedArray.h>
@@ -631,8 +630,6 @@ struct IMaterialEffects
 
 	virtual void                ReloadMatFXFlowGraphs() = 0;
 	virtual size_t              GetMatFXFlowGraphCount() const = 0;
-	virtual IFlowGraphPtr       GetMatFXFlowGraph(int index, string* pFileName = NULL) const = 0;
-	virtual IFlowGraphPtr       LoadNewMatFXFlowGraph(const string& filename) = 0;
 
 	virtual void                EnumerateEffectNames(EnumerateMaterialEffectsDataCallback& callback, const char* szLibraryName) const = 0;
 	virtual void                EnumerateLibraryNames(EnumerateMaterialEffectsDataCallback& callback) const = 0;

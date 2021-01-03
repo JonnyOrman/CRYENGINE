@@ -660,16 +660,16 @@ size_t CLevelInfo::GetGameRules(const char** pszGameRules, size_t numGameRules) 
 }
 
 //------------------------------------------------------------------------
-bool CLevelInfo::GetAttribute(const char* name, TFlowInputData& val) const
-{
-	TAttributeList::const_iterator it = m_levelAttributes.find(name);
-	if (it != m_levelAttributes.end())
-	{
-		val = it->second;
-		return true;
-	}
-	return false;
-}
+//bool CLevelInfo::GetAttribute(const char* name, TFlowInputData& val) const
+//{
+//	TAttributeList::const_iterator it = m_levelAttributes.find(name);
+//	if (it != m_levelAttributes.end())
+//	{
+//		val = it->second;
+//		return true;
+//	}
+//	return false;
+//}
 
 //////////////////////////////////////////////////////////////////////////
 bool CLevelInfo::ReadInfo()
@@ -746,7 +746,7 @@ void CLevelInfo::ReadMetaData()
 	fullPath.append("/");
 	fullPath.append(mapName);
 	fullPath.append(".xml");
-	m_levelAttributes.clear();
+	//m_levelAttributes.clear();
 
 	m_levelDisplayName = string("@ui_") + mapName;
 
@@ -833,8 +833,8 @@ void CLevelInfo::ReadMetaData()
 				for (int a = 0; a < rulesNode->getChildCount(); ++a)
 				{
 					XmlNodeRef attrib = rulesNode->getChild(a);
-					CRY_ASSERT(m_levelAttributes.find(attrib->getTag()) == m_levelAttributes.end());
-					m_levelAttributes[attrib->getTag()] = TFlowInputData(string(attrib->getAttr("value")));
+					//CRY_ASSERT(m_levelAttributes.find(attrib->getTag()) == m_levelAttributes.end());
+					//m_levelAttributes[attrib->getTag()] = TFlowInputData(string(attrib->getAttr("value")));
 				}
 			}
 			else if (!stricmp(name, "LevelType"))
@@ -1278,8 +1278,6 @@ public:
 			CCamera defaultCam;
 			m_levelSystem.m_pSystem->SetViewCamera(defaultCam);
 			{
-				IGameTokenSystem* pGameTokenSystem = CCryAction::GetCryAction()->GetIGameTokenSystem();
-				pGameTokenSystem->Reset();
 			}
 
 			m_levelSystem.m_pLoadingLevelInfo = pLevelInfo;
@@ -1306,13 +1304,6 @@ public:
 			{
 				m_spamDelay = m_pSpamDelay->GetFVal();
 				m_pSpamDelay->Set(0.0f);
-			}
-
-			// load all GameToken libraries this level uses incl. LevelLocal
-			{
-				IGameTokenSystem* pGameTokenSystem = CCryAction::GetCryAction()->GetIGameTokenSystem();
-				ILevelInfo* pLevelInfo = m_levelSystem.m_pLoadingLevelInfo;
-				pGameTokenSystem->LoadLibs(pLevelInfo->GetPath() + string("/GameTokens/*.xml"));
 			}
 		}
 
@@ -1390,11 +1381,6 @@ public:
 			// reset all the script timers
 			gEnv->pScriptSystem->ResetTimers();
 
-			if (gEnv->pAISystem)
-			{
-				gEnv->pAISystem->Reset(IAISystem::RESET_LOAD_LEVEL);
-			}
-
 			// Reset TimeOfDayScheduler
 			CCryAction::GetCryAction()->GetTimeOfDayScheduler()->Reset();
 			CCryAction::GetCryAction()->OnActionEvent(SActionEvent(eAE_loadLevel));
@@ -1405,11 +1391,6 @@ public:
 		NEXT_STEP(EStep::LoadLevelAiAndGame)
 		{
 			ILevelInfo* pLevelInfo = m_levelSystem.m_pLoadingLevelInfo;
-			if (gEnv->pAISystem && gEnv->pAISystem->IsEnabled())
-			{
-				gEnv->pAISystem->FlushSystem();
-				gEnv->pAISystem->LoadLevelData(pLevelInfo->GetPath(), pLevelInfo->GetDefaultGameType()->name);
-			}
 
 			if (auto* pGame = gEnv->pGameFramework->GetIGame())
 			{
@@ -1466,10 +1447,6 @@ public:
 
 		NEXT_STEP(EStep::LoadResetAiMfxFg)
 		{
-			// Now that we've registered our AI objects, we can init
-			if (gEnv->pAISystem)
-				gEnv->pAISystem->Reset(IAISystem::RESET_ENTER_GAME);
-
 			//////////////////////////////////////////////////////////////////////////
 			// Movie system must be loaded after entities.
 			//////////////////////////////////////////////////////////////////////////
@@ -1482,8 +1459,6 @@ public:
 			}
 
 			CCryAction::GetCryAction()->GetIMaterialEffects()->PreLoadAssets();
-
-			gEnv->pFlowSystem->Reset(false);
 		}
 
 		NEXT_STEP(EStep::NotifyLoadingComplete)
@@ -2230,13 +2205,6 @@ void CLevelSystem::UnLoadLevel()
 		m_pLevelLoadTimeslicer.reset();
 	}
 
-	// One last update to execute pending requests.
-	// Do this before the EntitySystem resets!
-	if (gEnv->pFlowSystem)
-	{
-		gEnv->pFlowSystem->Update();
-	}
-
 	I3DEngine* p3DEngine = gEnv->p3DEngine;
 	if (p3DEngine)
 	{
@@ -2332,13 +2300,6 @@ void CLevelSystem::UnLoadLevel()
 		gEnv->pGameFramework->GetIMaterialEffects()->Reset(true);
 	}
 
-	if (gEnv->pAISystem)
-	{
-		gEnv->pAISystem->FlushSystem(true);
-		gEnv->pAISystem->Reset(IAISystem::RESET_EXIT_GAME);
-		gEnv->pAISystem->Reset(IAISystem::RESET_UNLOAD_LEVEL);
-	}
-
 	if (gEnv->pMovieSystem)
 	{
 		gEnv->pMovieSystem->Reset(false, false);
@@ -2355,15 +2316,6 @@ void CLevelSystem::UnLoadLevel()
 	{
 		IGameObjectSystem* pGameObjectSystem = pCryAction->GetIGameObjectSystem();
 		pGameObjectSystem->Reset();
-	}
-
-	IGameTokenSystem* pGameTokenSystem = CCryAction::GetCryAction()->GetIGameTokenSystem();
-	pGameTokenSystem->RemoveLibrary("Level");
-	pGameTokenSystem->Reset();
-
-	if (gEnv->pFlowSystem)
-	{
-		gEnv->pFlowSystem->Reset(true);
 	}
 
 	if (gEnv->pEntitySystem)

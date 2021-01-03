@@ -2534,12 +2534,7 @@ void CAnimEntityNode::AnimateLookAt(CLookAtTrack* pTrack, SAnimContext& animCont
 
 	ICharacterInstance* pCharacter = 0;
 
-	IAIActor* pAIActor = CastToIAIActorSafe(pEntity->GetAI());
-
-	if (!pAIActor)
-	{
-		pCharacter = pEntity->GetCharacter(0);
-	}
+	pCharacter = pEntity->GetCharacter(0);
 
 	EntityId lookAtEntityId = 0;
 	bool allowAdditionalTransforms = 0;
@@ -2684,11 +2679,6 @@ void CAnimEntityNode::AnimateLookAt(CLookAtTrack* pTrack, SAnimContext& animCont
 			{
 				pIPoseBlenderLook->SetState(false);
 			}
-		}
-
-		if (pAIActor)
-		{
-			pAIActor->ResetLookAt();
 		}
 	}
 }

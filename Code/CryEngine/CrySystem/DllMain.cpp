@@ -16,10 +16,6 @@
 extern bool g_bCrashRptInstalled;
 #endif // CRY_USE_CRASHRPT
 
-#if defined(INCLUDE_SCALEFORM_SDK) || defined(CRY_FEATURE_SCALEFORM_HELPER)
-	#include <CrySystem/Scaleform/IScaleformHelper.h>
-#endif
-
 HMODULE gDLLHandle = nullptr;
 
 #if !defined(_LIB) && !CRY_PLATFORM_LINUX && !CRY_PLATFORM_ANDROID && !CRY_PLATFORM_APPLE && !CRY_PLATFORM_ORBIS
@@ -103,12 +99,6 @@ public:
 		case ESYSTEM_EVENT_LEVEL_LOAD_START:
 		case ESYSTEM_EVENT_LEVEL_LOAD_END:
 			{
-#if defined(INCLUDE_SCALEFORM_SDK) || defined(CRY_FEATURE_SCALEFORM_HELPER)
-				if (!gEnv->IsDedicated() && gEnv->pScaleformHelper)
-				{
-					gEnv->pScaleformHelper->ResetMeshCache();
-				}
-#endif
 				CryCleanup();
 				break;
 			}

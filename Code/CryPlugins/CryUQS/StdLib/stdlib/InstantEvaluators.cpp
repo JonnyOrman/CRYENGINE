@@ -122,8 +122,6 @@ namespace UQS
 
 		CInstantEvaluator_TestLocationInNavMesh::CInstantEvaluator_TestLocationInNavMesh()
 		{
-			m_pNavSys = gEnv->pAISystem->GetNavigationSystem();
-			CRY_ASSERT(m_pNavSys);
 		}
 
 		Client::IInstantEvaluator::ERunStatus CInstantEvaluator_TestLocationInNavMesh::DoRun(const SRunContext& runContext, const SParams& params) const

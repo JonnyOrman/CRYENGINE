@@ -2006,9 +2006,6 @@ void CRenderView::UpdateModifiedShaderItems()
 
 		if (pShaderResources->HasDynamicUpdates())
 		{
-			uint32 batchFilter = FB_GENERAL;
-			bool bUpdated = false;
-
 			// update dynamic texture sources based on a shared RT only
 			if (GetCurrentEye() == CCamera::eEye_Left)
 			{
@@ -2021,13 +2018,6 @@ void CRenderView::UpdateModifiedShaderItems()
 						IDynTextureSourceImpl* pDynTexSrc = (IDynTextureSourceImpl*)pTex->m_Sampler.m_pDynTexSource;
 						if (pDynTexSrc)
 						{
-							if (pDynTexSrc->GetSourceType() == IDynTextureSource::DTS_I_FLASHPLAYER)
-							{
-								if (batchFilter & (FB_GENERAL | FB_TRANSPARENT))
-								{
-									bUpdated = bUpdated | pDynTexSrc->Update();
-								}
-							}
 						}
 					}
 				}

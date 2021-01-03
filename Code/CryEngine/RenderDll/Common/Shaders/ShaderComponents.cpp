@@ -514,7 +514,6 @@ bool CShaderMan::mfParseFXSampler(SShaderFXParams& FXParams, SFXSampler* pr, con
 }
 
 // TM_  - material slots
-// TSF_ - scaleform slots
 // TS_  - global engine RT's
 static STextureDB sTextures[] =
 {
@@ -532,14 +531,6 @@ static STextureDB sTextures[] =
 	STextureDB(PARAM(TM_Opacity,                      ECGT_MatSlot_Opacity),              0),
 	STextureDB(PARAM(TM_Smoothness,                   ECGT_MatSlot_Smoothness),           0),
 	STextureDB(PARAM(TM_Emittance,                    ECGT_MatSlot_Emittance),            0),
-
-	STextureDB(PARAM(TSF_ScaleformInput0,             ECGT_ScaleformInput0),              0),
-	STextureDB(PARAM(TSF_ScaleformInput1,             ECGT_ScaleformInput1),              0),
-	STextureDB(PARAM(TSF_ScaleformInput2,             ECGT_ScaleformInput2),              0),
-	STextureDB(PARAM(TSF_ScaleformInputY,             ECGT_ScaleformInputY),              0),
-	STextureDB(PARAM(TSF_ScaleformInputU,             ECGT_ScaleformInputU),              0),
-	STextureDB(PARAM(TSF_ScaleformInputV,             ECGT_ScaleformInputV),              0),
-	STextureDB(PARAM(TSF_ScaleformInputA,             ECGT_ScaleformInputA),              0),
 
 	STextureDB(PARAM(TS_Shadow0,                      ECGT_Shadow0),                      0),
 	STextureDB(PARAM(TS_Shadow1,                      ECGT_Shadow1),                      0),

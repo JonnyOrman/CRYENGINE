@@ -10,7 +10,6 @@ add_sources("NoUberFile"
 end_sources()
 
 CryUnitTestSuite(CryAnimationUnitTest SOLUTION_FOLDER "UnitTests")
-use_scaleform()
 include_directories("${CRYENGINE_DIR}/Code/CryEngine/CryCommon")
 include_directories("${CRYENGINE_DIR}/Code/CryEngine/CryAnimation")
 target_compile_definitions(${THIS_PROJECT} PRIVATE _LIB CRY_IS_MONOLITHIC_BUILD _LAUNCHER)

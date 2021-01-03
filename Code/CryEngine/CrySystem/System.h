@@ -309,7 +309,6 @@ public:
 	CryAudio::IAudioSystem*      GetIAudioSystem() override      { return m_env.pAudioSystem; }
 	IPhysicalWorld*              GetIPhysicalWorld() override    { return m_env.pPhysicalWorld; }
 	IMovieSystem*                GetIMovieSystem() override      { return m_env.pMovieSystem; }
-	IAISystem*                   GetAISystem() override          { return m_env.pAISystem; }
 	IMemoryManager*              GetIMemoryManager() override    { return m_pMemoryManager; }
 	IEntitySystem*               GetIEntitySystem() override     { return m_env.pEntitySystem; }
 	LiveCreate::IHost*           GetLiveCreateHost()             { return m_env.pLiveCreateHost; }
@@ -328,7 +327,6 @@ public:
 	virtual IDiskProfiler*       GetIDiskProfiler() override          { return m_pDiskProfiler; }
 	INameTable*                  GetINameTable() override             { return m_env.pNameTable; }
 	IBudgetingSystem*            GetIBudgetingSystem() override       { return(m_pIBudgetingSystem); }
-	IFlowSystem*                 GetIFlowSystem() override            { return m_env.pFlowSystem; }
 	IDialogSystem*               GetIDialogSystem() override          { return m_env.pDialogSystem; }
 	DRS::IDynamicResponseSystem* GetIDynamicResponseSystem()          { return m_env.pDynamicResponseSystem; }
 	IHardwareMouse*              GetIHardwareMouse() override         { return m_env.pHardwareMouse; }
@@ -367,15 +365,12 @@ public:
 		return m_pProgressListener;
 	}
 
-	void         SetIFlowSystem(IFlowSystem* pFlowSystem) override                              { m_env.pFlowSystem = pFlowSystem; }
 	void         SetIDialogSystem(IDialogSystem* pDialogSystem) override                        { m_env.pDialogSystem = pDialogSystem; }
 	void         SetIDynamicResponseSystem(DRS::IDynamicResponseSystem* pDynamicResponseSystem) { m_env.pDynamicResponseSystem = pDynamicResponseSystem; }
 	void         SetIMaterialEffects(IMaterialEffects* pMaterialEffects) override               { m_env.pMaterialEffects = pMaterialEffects; }
 	void         SetIParticleManager(IParticleManager* pParticleManager) override               { m_env.pParticleManager = pParticleManager; }
 	void         SetIOpticsManager(IOpticsManager* pOpticsManager) override                     { m_env.pOpticsManager = pOpticsManager; }
 	void         SetIFileChangeMonitor(IFileChangeMonitor* pFileChangeMonitor) override         { m_env.pFileChangeMonitor = pFileChangeMonitor; }
-	void         SetIFlashUI(IFlashUI* pFlashUI) override                                       { m_env.pFlashUI = pFlashUI; }
-	void         SetIUIFramework(UIFramework::IUIFramework* pUIFramework) override              { m_env.pUIFramework = pUIFramework; }
 	void         ChangeUserPath(const char* sUserPath) override;
 	void         DetectGameFolderAccessRights();
 
@@ -493,8 +488,6 @@ public:
 	virtual void          RegisterWindowMessageHandler(IWindowMessageHandler* pHandler) override;
 	virtual void          UnregisterWindowMessageHandler(IWindowMessageHandler* pHandler) override;
 	virtual int           PumpWindowMessage(bool bAll, CRY_HWND hWnd) override;
-	virtual bool          IsImeSupported() const override;
-	virtual IImeManager*  GetImeManager() const override { return m_pImeManager; }
 
 	// IWindowMessageHandler
 #if CRY_PLATFORM_WINDOWS
@@ -524,8 +517,6 @@ private:
 	bool InitPhysicsRenderer(const SSystemInitParams& startupParams);
 
 	bool InitFont(const SSystemInitParams& startupParams);
-	bool InitFlash();
-	bool InitAISystem(const SSystemInitParams& startupParams);
 	bool InitScriptSystem(const SSystemInitParams& startupParams);
 	bool InitFileSystem(const SSystemInitParams& startupParams);
 	void InitLog(const SSystemInitParams& startupParams);
@@ -1002,7 +993,6 @@ protected: // -------------------------------------------------------------
 	friend struct SCryEngineFoldersLoader;
 	
 	std::vector<IWindowMessageHandler*> m_windowMessageHandlers;
-	IImeManager*                        m_pImeManager;
 
 	class CWatchdogThread*              m_pWatchdog = nullptr;
 	static void WatchDogTimeOutChanged(ICVar* cvar);

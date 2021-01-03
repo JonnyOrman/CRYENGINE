@@ -8,7 +8,6 @@
 #endif
 
 #include <CryLobby/ICryStats.h>
-#include <CryFlowGraph/IFlowSystem.h>
 
 struct IPlayerProfile;
 struct IActionMap;
@@ -366,7 +365,7 @@ struct IPlayerProfile
 	virtual IActionMap* GetActionMap(const char* name) = 0;
 
 	// set the value of an attribute
-	virtual bool SetAttribute(const char* name, const TFlowInputData& value) = 0;
+	//virtual bool SetAttribute(const char* name, const TFlowInputData& value) = 0;
 
 	// re-set attribute to default value (basically removes it from this profile)
 	virtual bool ResetAttribute(const char* name) = 0;
@@ -375,20 +374,24 @@ struct IPlayerProfile
 	virtual void DeleteAttribute(const char* name) = 0;
 
 	// get the value of an attribute. if not specified optionally lookup in default profile
-	virtual bool              GetAttribute(const char* name, TFlowInputData& val, bool bUseDefaultFallback = true) const = 0;
+	//virtual bool              GetAttribute(const char* name, TFlowInputData& val, bool bUseDefaultFallback = true) const = 0;
 
 	template<typename T> bool GetAttribute(const char* name, T& outVal, bool bUseDefaultFallback = true) const
 	{
-		TFlowInputData val;
+		/*TFlowInputData val;
 		if (GetAttribute(name, val, bUseDefaultFallback) == false)
 			return false;
-		return val.GetValueWithConversion(outVal);
+		return val.GetValueWithConversion(outVal);*/
+
+		return false;
 	}
 
 	template<typename T> bool SetAttribute(const char* name, const T& val)
 	{
-		TFlowInputData data(val);
-		return SetAttribute(name, data);
+		/*TFlowInputData data(val);
+		return SetAttribute(name, data);*/
+
+		return false;
 	}
 
 	// get name all attributes available

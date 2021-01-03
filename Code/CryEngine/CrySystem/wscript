@@ -5,17 +5,10 @@ from waflib import Logs
 
 def build(bld):
 
-	scaleform_file_list = []
-	if os.path.isdir(Path('Code/SDKs/Scaleform')):
-		# If Scaleform SDK is available, compile the integration into CrySystem.
-		# If not, we still support loading it dynamically from a dedicated helper library.
-		scaleform_file_list = ['Scaleform/scaleform.waf_files']
-		bld.recurse(['Scaleform'])
-
 	bld.CryEngineModule(
 		target      = 'CrySystem',
 		vs_filter   = 'CryEngine',
-		file_list   = ['crysystem.waf_files'] + scaleform_file_list,
+		file_list   = ['crysystem.waf_files'],
 		win_file_list     = ['platformos.waf_files', 'crysystem_win32.waf_files'],
 		durango_file_list = ['platformos.waf_files', 'platformos_durango.waf_files', 'crysystem_win32.waf_files', 'crysystem_durango.waf_files'],
 		linux_file_list   = ['platformos.waf_files', 'crysystem_posix.waf_files'],
@@ -25,7 +18,7 @@ def build(bld):
 
 		pch  = 'StdAfx.cpp',
 
-		module_extensions       = [ 'scaleform' ], # If no scaleform support is needed at all, this can be removed.
+		module_extensions       = [  ],
 		linux_module_extensions = [ 'ncurses' ],
 
 		use_module = [

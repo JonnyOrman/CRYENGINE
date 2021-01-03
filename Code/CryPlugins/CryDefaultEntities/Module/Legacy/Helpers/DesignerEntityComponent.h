@@ -31,7 +31,7 @@ public:
 	virtual Cry::Entity::EventFlags GetEventMask() const override { return ENTITY_EVENT_START_LEVEL | ENTITY_EVENT_RESET | ENTITY_EVENT_EDITOR_PROPERTY_CHANGED | ENTITY_EVENT_XFORM_FINISHED_EDITOR; }
 	// ~IEntityComponent
 
-	void ActivateFlowNodeOutput(const int portIndex, const TFlowInputData& inputData)
+	/*void ActivateFlowNodeOutput(const int portIndex, const TFlowInputData& inputData)
 	{
 		SEntityEvent evnt;
 		evnt.event = ENTITY_EVENT_ACTIVATE_FLOW_NODE_OUTPUT;
@@ -39,7 +39,7 @@ public:
 
 		evnt.nParam[1] = (INT_PTR)&inputData;
 		T::GetEntity()->SendEvent(evnt);
-	}
+	}*/
 
 	// Helper for loading geometry or characters
 	void LoadMesh(int slot, const char *path)

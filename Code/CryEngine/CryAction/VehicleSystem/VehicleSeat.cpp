@@ -685,20 +685,13 @@ bool CVehicleSeat::SitDown()
 	if (CVehicleSeat* pSeat = GetSeatUsedRemotely(false))
 		pSeat->EnterRemotely(m_passengerId);
 
-	if (pActor->IsPlayer() || pActor->GetEntity()->HasAI())
+	// enable the seat actions
+	for (TVehicleSeatActionVector::iterator ite = m_seatActions.begin(); ite != m_seatActions.end(); ++ite)
 	{
-		GivesActorSeatFeatures(true);
-	}
-	else if (!pActor->GetEntity()->HasAI())
-	{
-		// enable the seat actions
-		for (TVehicleSeatActionVector::iterator ite = m_seatActions.begin(); ite != m_seatActions.end(); ++ite)
-		{
-			SSeatActionData& seatActionData = *ite;
+		SSeatActionData& seatActionData = *ite;
 
-			if (seatActionData.isEnabled)
-				seatActionData.pSeatAction->StartUsing(m_passengerId);
-		}
+		if (seatActionData.isEnabled)
+			seatActionData.pSeatAction->StartUsing(m_passengerId);
 	}
 
 	if (pActor->IsClient() && gEnv->pInput)
@@ -2046,24 +2039,6 @@ void CVehicleSeat::PostSerialize()
 			{
 				if (remote)
 					EnterRemotely(m_passengerId);
-				else if (pActor->GetEntity() && pActor->GetEntity()->HasAI())
-				{
-					bool needUpdateTM = false;
-					if (m_isRagdollingOnDeath == false)
-					{
-						if (pActor->GetGameObject()->GetAspectProfile(eEA_Physics) != eAP_Alive)
-						{
-							pActor->GetGameObject()->SetAspectProfile(eEA_Physics, eAP_Alive);
-							needUpdateTM = true;
-						}
-					}
-					Enter(m_passengerId, false);
-					if (needUpdateTM)
-						UpdatePassengerLocalTM(pActor);
-
-					if (pActor->IsDead())
-						OnPassengerDeath();
-				}
 				else
 				{
 					pActor->HolsterItem(true);
@@ -2327,7 +2302,6 @@ void CVehicleSeat::GetMovementState(SMovementState& movementState)
 		return;
 
 	IActor* pActor = CCryAction::GetCryAction()->GetIActorSystem()->GetActor(m_passengerId);
-	IEntity* pActorEntity = pActor ? pActor->GetEntity() : NULL;
 
 	const Matrix34& worldTM = pVehicleEntity->GetWorldTM();
 
@@ -2373,16 +2347,7 @@ void CVehicleSeat::GetMovementState(SMovementState& movementState)
 		}
 	}
 
-	if (m_pAIVisionHelper && pActorEntity && pActorEntity->HasAI())
-	{
-		const Vec3 vAIVisionHelperPos = m_pAIVisionHelper->GetWorldSpaceTranslation();
-		movementState.eyePosition = vAIVisionHelperPos;
-		movementState.weaponPosition = vAIVisionHelperPos;
-	}
-	else
-	{
-		movementState.weaponPosition = movementState.eyePosition;
-	}
+	movementState.weaponPosition = movementState.eyePosition;
 
 	// this is needed for AI LookAt to work correctly
 	movementState.animationEyeDirection = movementState.eyeDirection;

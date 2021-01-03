@@ -556,7 +556,6 @@ void CConsoleHelpGen::CreateMainPages()
 		{"FT_", "Feature Test"},
 		{"DEMO_", "Time Demo"},
 		{"FT_", "Feature Test"},
-		{"GFX_", "Scaleform GFx"},
 		{"GL_", "Game Lobby"},
 		{"HUD_", "Heads Up Display"},
 		{"KC_", "Kill Cam"},

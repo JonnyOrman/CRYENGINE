@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include <CryFlowGraph/IFlowSystem.h> // <> required for Interfuscator
-
 enum EGameTokenFlags
 {
 	EGAME_TOKEN_MODIFIED      = BIT(0),    //!< If the token has been modified at least once for this game run.
@@ -32,15 +30,12 @@ struct IGameToken
 	//! Retrieve game token flags.
 	virtual uint32 GetFlags() const = 0;
 
-	//! Retrieve current data type of the game token.
-	virtual EFlowDataTypes GetType() const = 0;
-
 	//! Assign a new value to the game token.
-	virtual void SetValue(const TFlowInputData& val) = 0;
+	//virtual void SetValue(const TFlowInputData& val) = 0;
 
 	//! Retrieve a value of the game token.
 	//! Returns false if a value cannot be retrieved.
-	virtual bool GetValue(TFlowInputData& val) const = 0;
+	//virtual bool GetValue(TFlowInputData& val) const = 0;
 
 	//! Set token value from a string.
 	virtual void SetValueFromString(const char* sValue) = 0;
@@ -57,11 +52,11 @@ struct IGameToken
 	template<typename T>
 	bool GetValueAs(T& value)
 	{
-		TFlowInputData data;
+		/*TFlowInputData data;
 		if (GetValue(data))
 		{
 			return data.GetValueWithConversion(value);
-		}
+		}*/
 		return false;
 	}
 };
@@ -123,7 +118,7 @@ struct IGameTokenSystem
 	virtual void GetMemoryStatistics(ICrySizer*) = 0;
 
 	//! Create a new token.
-	virtual IGameToken* SetOrCreateToken(const char* sTokenName, const TFlowInputData& defaultValue) = 0;
+	//virtual IGameToken* SetOrCreateToken(const char* sTokenName, const TFlowInputData& defaultValue) = 0;
 
 	//! Deletes existing game token.
 	virtual void DeleteToken(IGameToken* pToken) = 0;

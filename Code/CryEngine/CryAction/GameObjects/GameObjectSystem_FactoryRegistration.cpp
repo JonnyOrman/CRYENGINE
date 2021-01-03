@@ -51,8 +51,8 @@
 void CGameObjectSystem::RegisterFactories(IGameFramework* pFrameWork)
 {
 	CRY_PROFILE_FUNCTION(PROFILE_LOADING_ONLY);
-	REGISTER_FACTORY(pFrameWork, "WorldQuery", CWorldQuery, false);
-	REGISTER_FACTORY(pFrameWork, "Interactor", CInteractor, false);
+	/*REGISTER_FACTORY(pFrameWork, "WorldQuery", CWorldQuery, false);
+	REGISTER_FACTORY(pFrameWork, "Interactor", CInteractor, false);*/
 
 	CCryFile file;
 	if (file.Open("Scripts/Entities/Environment/WaterVolume.lua", "r"))

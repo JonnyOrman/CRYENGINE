@@ -29,7 +29,6 @@ class CScriptBind_Vehicle;
 class CScriptBind_VehicleSeat;
 class CScriptBind_Inventory;
 class CScriptBind_MaterialEffects;
-class CScriptBind_UIAction;
 
 class CFlowSystem;
 class CDevMode;
@@ -78,7 +77,6 @@ struct ITimeDemoRecorder;
 
 class CNetMessageDistpatcher;
 class CEntityContainerMgr;
-class CEntityAttachmentExNodeRegistry;
 
 namespace BehaviorTree
 {
@@ -110,10 +108,10 @@ public:
 
 	virtual uint32                        GetPreUpdateTicks();
 
-	virtual void                          RegisterFactory(const char* name, IActorCreator* pCreator, bool isAI);
+	/*virtual void                          RegisterFactory(const char* name, IActorCreator* pCreator, bool isAI);
 	virtual void                          RegisterFactory(const char* name, IItemCreator* pCreator, bool isAI);
 	virtual void                          RegisterFactory(const char* name, IVehicleCreator* pCreator, bool isAI);
-	virtual void                          RegisterFactory(const char* name, IGameObjectExtensionCreator* pCreator, bool isAI);
+	virtual void                          RegisterFactory(const char* name, IGameObjectExtensionCreator* pCreator, bool isAI);*/
 	virtual void                          RegisterFactory(const char* name, ISaveGame*(*func)(), bool);
 	virtual void                          RegisterFactory(const char* name, ILoadGame*(*func)(), bool);
 
@@ -147,8 +145,6 @@ public:
 	virtual IGameplayRecorder*            GetIGameplayRecorder();
 	virtual IGameRulesSystem*             GetIGameRulesSystem();
 	virtual IGameObjectSystem*            GetIGameObjectSystem();
-	virtual IFlowSystem*                  GetIFlowSystem();
-	virtual IGameTokenSystem*             GetIGameTokenSystem();
 	virtual IEffectSystem*                GetIEffectSystem();
 	virtual IMaterialEffects*             GetIMaterialEffects();
 	virtual IBreakableGlassSystem*        GetIBreakableGlassSystem();
@@ -310,7 +306,6 @@ public:
 
 	CNetMessageDistpatcher*     GetNetMessageDispatcher()      { return m_pNetMsgDispatcher; }
 	CEntityContainerMgr&         GetEntityContainerMgr()       { return *m_pEntityContainerMgr; }
-	CEntityAttachmentExNodeRegistry& GetEntityAttachmentExNodeRegistry() { return *m_pEntityAttachmentExNodeRegistry; }
 
 	//	INetQueryListener* GetLanQueryListener() {return m_pLanQueryListener;}
 	bool                          LoadingScreenEnabled() const;
@@ -461,6 +456,7 @@ private:
 	// type - nothing that will need its constructor called when CryAction's
 	// constructor is called (we don't have access to malloc() at that stage)
 
+private:
 	bool                          m_paused;
 	bool                          m_forcedpause;
 
@@ -541,7 +537,6 @@ private:
 	CScriptBind_VehicleSeat*      m_pScriptBindVehicleSeat;
 	CScriptBind_Inventory*        m_pScriptInventory;
 	CScriptBind_MaterialEffects*  m_pScriptBindMFX;
-	CScriptBind_UIAction*         m_pScriptBindUIAction;
 	CTimeOfDayScheduler*          m_pTimeOfDayScheduler;
 	CPersistantDebug*             m_pPersistantDebug;
 
@@ -651,7 +646,6 @@ private:
 
 	CNetMessageDistpatcher*                m_pNetMsgDispatcher;
 	CEntityContainerMgr*                   m_pEntityContainerMgr;
-	CEntityAttachmentExNodeRegistry*       m_pEntityAttachmentExNodeRegistry;
 
 	CTimeValue                             m_levelStartTime;
 

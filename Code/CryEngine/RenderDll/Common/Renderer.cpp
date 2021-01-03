@@ -21,7 +21,6 @@
 #include "RendElements/CRELensOptics.h"
 
 #include "RendElements/OpticsFactory.h"
-#include "IntroMovieRenderer.h"
 
 #include <Cry3DEngine/IGeomCache.h>
 #include <Cry3DEngine/ITimeOfDay.h>
@@ -31,7 +30,6 @@
 
 #include "RenderView.h"
 #include "CompiledRenderObject.h"
-#include "../Scaleform/ScaleformRender.h"
 
 #include "Shaders/ShaderPublicParams.h"
 
@@ -142,8 +140,6 @@ void CRenderer::InitRenderer()
 		gRenDev = this;
 	m_cEF.m_Bin.m_pCEF = &m_cEF;
 
-	m_pIntroMovieRenderer = 0;
-
 	m_bShaderCacheGen      = false;
 	m_bSystemResourcesInit = 0;
 
@@ -177,10 +173,6 @@ void CRenderer::InitRenderer()
 	m_pSpriteInds  = NULL;
 
 	CRendererCVars::InitCVars();
-#if RENDERER_SUPPORT_SCALEFORM
-	CScaleformPlayback::InitCVars();
-#endif
-
 	// need to do this because the registering process can modify the default value (getting it from the .cfg) and will not notify the call back
 	SetShadowJittering(CV_r_shadow_jittering);
 
@@ -351,7 +343,6 @@ void CRenderer::StartRenderIntroMovies()
 {
 	CRY_PROFILE_FUNCTION(PROFILE_LOADING_ONLY);
 	MEMSTAT_CONTEXT(EMemStatContextType::Other, "Staer Render Intro Movie");
-	assert(m_pIntroMovieRenderer == 0);
 
 #if USE_INTRO_MOVIES
 	// Make sure intro pak is valid and excistion else don't bother rendering them
@@ -361,24 +352,10 @@ void CRenderer::StartRenderIntroMovies()
 
 	gEnv->pCryPak->LoadPakToMemory(INTRO_MOVIES_PAK, ICryPak::eInMemoryPakLocale_GPU);
 #endif
-	m_pIntroMovieRenderer = new CIntroMovieRenderer;
-	m_pIntroMovieRenderer->Initialize();
-
-	StartLoadtimeFlashPlayback(m_pIntroMovieRenderer);
 }
 
 void CRenderer::StopRenderIntroMovies(bool bWaitForFinished)
 {
-	if (m_pIntroMovieRenderer == 0)
-		return;
-
-	if (bWaitForFinished)
-	{
-		m_pIntroMovieRenderer->WaitForCompletion();
-	}
-
-	StopLoadtimeFlashPlayback();
-	SAFE_DELETE(m_pIntroMovieRenderer);
 #if USE_INTRO_MOVIES
 	// we don't need the intro movies in memory anymore
 	gEnv->pCryPak->LoadPakToMemory(INTRO_MOVIES_PAK, ICryPak::eInMemoryPakLocale_Unload);
@@ -388,7 +365,7 @@ void CRenderer::StopRenderIntroMovies(bool bWaitForFinished)
 
 bool CRenderer::IsRenderingIntroMovies() const
 {
-	return (m_pIntroMovieRenderer != NULL);
+	return false;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -1084,8 +1061,6 @@ void CRenderer::FreeSystemResources(int nFlags)
 
 	CTimeValue tBegin = gEnv->pTimer->GetAsyncTime();
 
-	StopLoadtimeFlashPlayback();
-
 #if !defined(_RELEASE)
 	ClearDrawCallsInfo();
 #endif
@@ -1519,14 +1494,6 @@ ITexture* CRenderer::EF_LoadTexture(const char* szName, const uint32 flags)
 	}
 
 	return NULL;
-}
-
-IDynTextureSource* CRenderer::EF_LoadDynTexture(const char* dynsourceName, bool sharedRT)
-{
-	if (sharedRT)
-		return new CFlashTextureSourceSharedRT(dynsourceName, NULL);
-
-	return new CFlashTextureSource(dynsourceName, NULL);
 }
 
 bool SShaderItem::Update()
@@ -2614,17 +2581,6 @@ void CRenderer::EF_QueryImpl(ERenderQueryTypes eQuery, void* pInOut0, uint32 nIn
 	case EFQ_SetDynTexSourceLayerInfo:
 		{
 			CDynTextureSourceLayerActivator::LoadLevelInfo();
-		}
-		break;
-
-	case EFQ_SetDynTexSourceSharedRTDim:
-		{
-			if (pInOut0)
-			{
-				int p0 = ReadQueryParameter<int>(pInOut0, nInOutSize0);
-				int p1 = ReadQueryParameter<int>(pInOut1, nInOutSize1);
-				CFlashTextureSourceSharedRT::SetSharedRTDim(p0, p1);
-			}
 		}
 		break;
 

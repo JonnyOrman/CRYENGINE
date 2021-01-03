@@ -3,7 +3,6 @@
 #pragma once
 
 #include "LevelIndependentFileMan.h"
-#include "HyperGraph/HyperGraph.h"
 
 class CMaterialFXGraphMan : public ILevelIndependentFileModule
 {
@@ -18,13 +17,7 @@ public:
 	void SaveChangedGraphs();
 	bool HasModifications();
 
-	bool NewMaterialFx(CString& filename, CHyperGraph** pHyperGraph = NULL);
-
 	//ILevelIndependentFileModule
 	virtual bool PromptChanges();
 	//~ILevelIndependentFileModule
-
-private:
-	typedef std::list<IFlowGraphPtr> TGraphList;
-	TGraphList m_matFxGraphs;
 };

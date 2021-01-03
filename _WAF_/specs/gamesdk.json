@@ -31,7 +31,6 @@
 		"CryAudioCommon",
 		"CryAudioImplWwise",
 		"CrySystem",
-		"CryScaleformHelper",
 		"CryAction",
 		"CrySchematyc",
 		"CryGamePlatform",
@@ -83,14 +82,11 @@
 		
 		"CryRenderD3D11",
 		"CryRenderD3D12",
-		"CryRenderVulkan",
-
-		"CryScaleformHelper"
+		"CryRenderVulkan"
 	],
 	
 	"durango_force_shared_monolithic_build_modules" : 
 	[
-		"CryScaleformHelper"
 	],
 
 	"win_modules": [

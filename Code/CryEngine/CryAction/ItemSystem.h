@@ -116,7 +116,6 @@ public:
 
 	bool ScanXML(XmlNodeRef& root, const char* xmlFile);
 
-	void RegisterItemClass(const char* name, IGameFramework::IItemCreator* pCreator);
 	void PrecacheLevel();
 
 	void GetMemoryUsage(ICrySizer* s) const;

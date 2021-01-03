@@ -87,7 +87,6 @@ public:
 		gEnv->p3DEngine->ResetParticlesAndDecals();
 		gEnv->pGameFramework->ResetBrokenGameObjects();
 		gEnv->pPhysicalWorld->ResetDynamicEntities();
-		gEnv->pFlowSystem->Reset(false);
 		if (gEnv->pGameFramework->GetIItemSystem())
 		{
 			gEnv->pGameFramework->GetIItemSystem()->Reset();
@@ -95,24 +94,6 @@ public:
 		if (gEnv->pGameFramework->GetIMaterialEffects())
 		{
 			gEnv->pGameFramework->GetIMaterialEffects()->Reset(false);
-		}
-
-		if (gEnv->pAISystem)
-		{
-			ILevelInfo* pLevel = gEnv->pGameFramework->GetILevelSystem()->GetCurrentLevel();
-			if (pLevel)
-			{
-				gEnv->pAISystem->FlushSystem();
-
-				// Don't waste time reloading the current level's navigation data
-				// if we're about to load a new level and throw this data away
-				if (!m_loadingNewLevel)
-				{
-					const ILevelInfo::SGameTypeInfo* pGameTypeInfo = pLevel->GetDefaultGameType();
-					const char* const szGameTypeName = pGameTypeInfo ? pGameTypeInfo->name.c_str() : "";
-					gEnv->pAISystem->LoadLevelData(pLevel->GetPath(), szGameTypeName);
-				}
-			}
 		}
 
 		//m_pPersistantDebug->Reset();

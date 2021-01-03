@@ -4,7 +4,6 @@
 #include "LevelLayerModel.h"
 
 #include "CryIcon.h"
-#include "HyperGraph/FlowGraphHelpers.h"
 #include "IEditorImpl.h"
 #include "Material/Material.h"
 #include "Objects/BrushObject.h"
@@ -1031,7 +1030,6 @@ void CLevelLayerModel::UpdateCachedDataForObject(const CBaseObject* pObject)
 		const CEntityObject* pEntity = static_cast<const CEntityObject*>(pObject);
 		std::vector<CHyperFlowGraph*> flowgraphs;
 		CHyperFlowGraph* pEntityFG = nullptr;
-		FlowGraphHelpers::FindGraphsForEntity(pEntity, flowgraphs, pEntityFG);
 
 		for (CHyperFlowGraph* pFlowGraph : flowgraphs)
 		{
@@ -1040,7 +1038,6 @@ void CLevelLayerModel::UpdateCachedDataForObject(const CBaseObject* pObject)
 				flowGraphName += ",";
 			}
 			string name;
-			FlowGraphHelpers::GetHumanName(pFlowGraph, name);
 			flowGraphName += name;
 			if (pFlowGraph == pEntityFG)
 			{

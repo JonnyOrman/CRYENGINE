@@ -6,10 +6,6 @@
 
 #include <CryEntitySystem/IEntitySystem.h>
 
-#include "HyperGraph/FlowGraph.h"
-#include "HyperGraph/FlowGraphManager.h"
-#include "HyperGraph/Controls/HyperGraphEditorWnd.h"
-
 #include "SplashScreen.h"
 #include "Objects/EntityObject.h"
 #include <CryAction/ICustomActions.h>
@@ -98,17 +94,6 @@ void CCustomActionsEditorManager::SaveAndReloadCustomActionGraphs()
 	CWnd* pWnd = GetIEditorImpl()->FindView("Flow Graph");
 	if (pWnd && pWnd->IsKindOf(RUNTIME_CLASS(CHyperGraphDialog)))
 	{
-		CHyperGraphDialog* pHGDlg = (CHyperGraphDialog*) pWnd;
-		CHyperGraph* pGraph = pHGDlg->GetGraphView()->GetGraph();
-		if (pGraph)
-		{
-			ICustomAction* pCustomAction = pGraph->GetCustomAction();
-			if (pCustomAction)
-			{
-				actionName = pCustomAction->GetCustomActionGraphName();
-				pHGDlg->GetGraphView()->SetGraph(NULL);
-			}
-		}
 	}
 
 	SaveCustomActionGraphs();

@@ -850,12 +850,6 @@ public:
 	//! Need to force as no_inline, else on xbox(if cstr and dstr are inlined), we get totally wrong numbers.
 	NO_INLINE ~CAILightProfileSection()
 	{
-		IAISystem* pAISystem = gEnv->pAISystem;
-		uint64 nTicks = CryGetTicks();
-		IF (pAISystem != NULL, 1)
-		{
-			pAISystem->AddFrameTicks(nTicks - m_nTicks);
-		}
 	}
 private:
 	uint64 m_nTicks;

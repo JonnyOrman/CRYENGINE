@@ -633,12 +633,6 @@ protected:
 	//! <description>Returns entityId in raw numeric format.</description>
 	int GetRawId(IFunctionHandler* pH);
 
-	//! <code>Entity.SetAIName()</code>
-	int SetAIName(IFunctionHandler* pH);
-
-	//! <code>Entity.GetAIName()</code>
-	int GetAIName(IFunctionHandler* pH);
-
 	//! <code>Entity.SetFlags( flags, mode )</code>
 	//! <description>Mode: 0: or  1: and  2: xor</description>
 	int SetFlags(IFunctionHandler* pH, int flags, int mode);

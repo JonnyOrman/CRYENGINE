@@ -1,8 +1,6 @@
 #include "StdAfx.h"
 #include "GeomEntity.h"
 
-#include "Legacy/Helpers/EntityFlowNode.h"
-
 #include <CryPhysics/physinterface.h>
 #include <CryAnimation/ICryAnimation.h>
 
@@ -23,35 +21,12 @@ class CGeomEntityRegistrator
 
 		IEntityClass* pClass = RegisterEntityWithDefaultComponent<CGeomEntity>("GeomEntity", "Geometry", "physicsobject.bmp", true);
 		pClass->SetFlags(pClass->GetFlags() | ECLF_INVISIBLE);
-
-		// Register flow node
-		// Factory will be destroyed by flowsystem during shutdown
-		pFlowNodeFactory = new CEntityFlowNodeFactory("entity:GeomEntity");
-
-		pFlowNodeFactory->m_inputs.push_back(InputPortConfig<bool>("Hide", ""));
-		pFlowNodeFactory->m_inputs.push_back(InputPortConfig<bool>("UnHide", ""));
-		pFlowNodeFactory->m_inputs.push_back(InputPortConfig<string>("LoadGeometry", ""));
-		pFlowNodeFactory->m_activateCallback = CGeomEntity::OnFlowgraphActivation;
-
-		pFlowNodeFactory->m_outputs.push_back(OutputPortConfig_Void("OnHide"));
-		pFlowNodeFactory->m_outputs.push_back(OutputPortConfig_Void("OnUnHide"));
-		pFlowNodeFactory->m_outputs.push_back(OutputPortConfig<EntityId>("OnCollision"));
-		pFlowNodeFactory->m_outputs.push_back(OutputPortConfig<string>("CollisionSurfaceName"));
-		pFlowNodeFactory->m_outputs.push_back(OutputPortConfig<string>("OnGeometryChanged"));
-
-		pFlowNodeFactory->Close();
 	}
 
 public:
 	~CGeomEntityRegistrator()
 	{
-		if (pFlowNodeFactory)
-			pFlowNodeFactory->UnregisterFactory();
-		pFlowNodeFactory = nullptr;
 	}
-
-protected:
-	_smart_ptr<CEntityFlowNodeFactory> pFlowNodeFactory = nullptr;
 };
 
 CGeomEntityRegistrator g_geomEntityRegistrator;
@@ -89,12 +64,10 @@ void CGeomEntity::ProcessEvent(const SEntityEvent& event)
 	{
 		case ENTITY_EVENT_HIDE:
 			{
-				ActivateFlowNodeOutput(eOutputPort_OnHide, TFlowInputData());
 			}
 			break;
 		case ENTITY_EVENT_UNHIDE:
 			{
-				ActivateFlowNodeOutput(eOutputPort_OnUnHide, TFlowInputData());
 			}
 			break;
 		case ENTITY_EVENT_COLLISION:
@@ -106,16 +79,6 @@ void CGeomEntity::ProcessEvent(const SEntityEvent& event)
 				if (ISurfaceType* pSurfaceType = pSurfaceTypeManager->GetSurfaceType(physCollision->idmat[1]))
 				{
 					string surfaceTypeName = pSurfaceType->GetName();
-					ActivateFlowNodeOutput(eOutputPort_CollisionSurfaceName, TFlowInputData(surfaceTypeName));
-				}
-
-				if (IEntity* pOtherEntity = gEnv->pEntitySystem->GetEntityFromPhysics(physCollision->pEntity[1]))
-				{
-					ActivateFlowNodeOutput(eOutputPort_OnCollision, TFlowInputData(pOtherEntity->GetId()));
-				}
-				else
-				{
-					ActivateFlowNodeOutput(eOutputPort_OnCollision, TFlowInputData());
 				}
 			}
 			break;
@@ -136,7 +99,6 @@ void CGeomEntity::OnResetState()
 		GetEntity()->UpdateSlotForComponent(this);
 		const int geometrySlot = GetEntitySlotId();
 		LoadMesh(geometrySlot, m_model.value.c_str());
-		ActivateFlowNodeOutput(eOutputPort_OnGeometryChanged, TFlowInputData(m_model.value));
 
 		SEntityPhysicalizeParams physicalizationParams;
 		SEntityPhysicalizeParams::AreaDefinition areaDef;
@@ -185,24 +147,6 @@ void CGeomEntity::OnResetState()
 	else if (GetEntitySlotId() != EmptySlotId)
 	{
 		FreeEntitySlot();
-	}
-}
-
-void CGeomEntity::OnFlowgraphActivation(EntityId entityId, IFlowNode::SActivationInfo* pActInfo, const class CEntityFlowNode* pNode)
-{
-	if (auto* pEntity = gEnv->pEntitySystem->GetEntity(entityId))
-	{
-		if (IsPortActive(pActInfo, eInputPort_UnHide) || IsPortActive(pActInfo, eInputPort_Hide))
-		{
-			pEntity->Hide(IsPortActive(pActInfo, eInputPort_Hide));
-		}
-		else if (IsPortActive(pActInfo, eInputPort_Geometry))
-		{
-			auto* pGeomEntity = pEntity->GetComponent<CGeomEntity>();
-
-			pGeomEntity->m_model.value = GetPortString(pActInfo, eInputPort_Geometry);
-			pGeomEntity->OnResetState();
-		}
 	}
 }
 

@@ -11,7 +11,6 @@
 #include <CryAnimation/ICryAnimation.h>
 #include <CryGame/IGameFramework.h>
 #include <CrySystem/Profilers/IStatoscope.h>
-#include <CrySystem/Scaleform/IFlashPlayer.h>
 #include <CryThreading/IThreadManager.h>
 
 #include <cstring>
@@ -342,52 +341,6 @@ void SRenderThread::RC_TryFlush()
 	FlushAndWait();
 }
 
-void SRenderThread::RC_FlashRenderPlayer(std::shared_ptr<IFlashPlayer>&& pPlayer)
-{
-	assert(IsRenderThread());
-	gcpRendD3D->RT_FlashRenderInternal(std::move(pPlayer));
-}
-
-void SRenderThread::RC_FlashRender(std::shared_ptr<IFlashPlayer_RenderProxy>&& pPlayer)
-{
-	if (IsRenderThread())
-	{
-		// NOTE: bypasses time measurement!
-		gcpRendD3D->RT_FlashRenderInternal(std::move(pPlayer), true);
-		return;
-	}
-
-	byte* p = AddCommand(eRC_FlashRender, sizeof(std::shared_ptr<IFlashPlayer_RenderProxy>));
-
-	// Write the shared_ptr without releasing a reference.
-	StoreUnaligned<std::shared_ptr<IFlashPlayer_RenderProxy>>(p, pPlayer);
-	p += sizeof(std::shared_ptr<IFlashPlayer_RenderProxy>);
-	std::memset(&pPlayer, 0, sizeof(std::shared_ptr<IFlashPlayer_RenderProxy>));
-
-	EndCommand(p);
-}
-
-void SRenderThread::RC_FlashRenderPlaybackLockless(std::shared_ptr<IFlashPlayer_RenderProxy>&& pPlayer, int cbIdx, bool finalPlayback)
-{
-	if (IsRenderThread())
-	{
-		// NOTE: bypasses time measurement!
-		gcpRendD3D->RT_FlashRenderPlaybackLocklessInternal(std::move(pPlayer), cbIdx, finalPlayback, true);
-		return;
-	}
-
-	byte* p = AddCommand(eRC_FlashRenderLockless, 12 + sizeof(std::shared_ptr<IFlashPlayer_RenderProxy>));
-
-	// Write the shared_ptr without releasing a reference.
-	StoreUnaligned<std::shared_ptr<IFlashPlayer_RenderProxy>>(p, pPlayer);
-	p += sizeof(std::shared_ptr<IFlashPlayer_RenderProxy>);
-	std::memset(&pPlayer, 0, sizeof(std::shared_ptr<IFlashPlayer_RenderProxy>));
-
-	AddDWORD(p, (uint32) cbIdx);
-	AddDWORD(p, finalPlayback ? 1 : 0);
-	EndCommand(p);
-}
-
 void SRenderThread::RC_StartVideoThread()
 {
 	byte* p = AddCommandTo(eRC_LambdaCall, sizeof(void*), m_Commands[m_nCurThreadFill]);
@@ -543,27 +496,6 @@ void SRenderThread::ProcessCommands()
 					gcpRendD3D->m_nFrameSwapID++;
 				}
 				END_PROFILE_PLUS_RT(SRenderStatistics::Write().m_Summary.renderTime);
-			}
-			break;
-
-		case eRC_FlashRender:
-			{
-				MEMSTAT_CONTEXT(EMemStatContextType::Other, "eRC_FlashRender");
-				START_PROFILE_RT();
-				std::shared_ptr<IFlashPlayer_RenderProxy> pPlayer = ReadCommand<std::shared_ptr<IFlashPlayer_RenderProxy>>(n);
-				gcpRendD3D->RT_FlashRenderInternal(std::move(pPlayer), m_eVideoThreadMode == eVTM_Disabled);
-				END_PROFILE_PLUS_RT(SRenderStatistics::Write().m_Summary.flashTime);
-			}
-			break;
-		case eRC_FlashRenderLockless:
-			{
-				MEMSTAT_CONTEXT(EMemStatContextType::Other, "eRC_FlashRenderLockless");
-				START_PROFILE_RT();
-				std::shared_ptr<IFlashPlayer_RenderProxy> pPlayer = ReadCommand<std::shared_ptr<IFlashPlayer_RenderProxy>>(n);
-				int cbIdx = ReadCommand<int>(n);
-				bool finalPlayback = ReadCommand<int>(n) != 0;
-				gcpRendD3D->RT_FlashRenderPlaybackLocklessInternal(std::move(pPlayer), cbIdx, finalPlayback, m_eVideoThreadMode == eVTM_Disabled);
-				END_PROFILE_PLUS_RT(SRenderStatistics::Write().m_Summary.flashTime);
 			}
 			break;
 

@@ -114,7 +114,6 @@
             "HWScripts/CryFX/NoDraw.cfx",
             "HWScripts/CryFX/OcclusionTest.cfx",
             "HWScripts/CryFX/ReferenceImage.cfx",
-            "HWScripts/CryFX/Scaleform.cfx",
             "HWScripts/CryFX/SoftOcclusionQuery.cfx"
         ],
         "CryFX/Particles": [

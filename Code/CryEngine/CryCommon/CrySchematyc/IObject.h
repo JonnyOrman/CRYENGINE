@@ -13,6 +13,8 @@
 #include "CrySchematyc/Utils/Any.h"
 #include "CrySchematyc/Utils/Delegate.h"
 #include "CrySchematyc/Utils/EnumFlags.h"
+#include "CrySchematyc/IObject.h"
+#include "CryEntitySystem/IEntityComponent.h"
 
 // Forward declare structures.
 struct SRendParams;

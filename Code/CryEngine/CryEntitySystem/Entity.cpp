@@ -7,7 +7,6 @@
 #include <CryEntitySystem/IEntityClass.h>
 #include "EntityAudioProxy.h"
 #include "AreaProxy.h"
-#include "FlowGraphProxy.h"
 #include <CryNetwork/ISerialize.h>
 #include "NetEntity.h"
 #include "TriggerProxy.h"
@@ -1670,7 +1669,6 @@ IEntityComponent* CEntity::CreateProxy(EEntityProxy proxy)
 		return CreateComponent<CEntityComponentArea>();
 		break;
 	case ENTITY_PROXY_FLOWGRAPH:
-		return CreateComponent<CEntityComponentFlowGraph>();
 		break;
 	case ENTITY_PROXY_SUBSTITUTION:
 		return CreateComponent<CEntityComponentSubstitution>();
@@ -3042,15 +3040,6 @@ void CEntity::GetMemoryUsage(ICrySizer* pSizer) const
 	m_components.GetMemoryStatistics(pSizer);
 
 	pSizer->AddContainer(m_simpleEventListeners);
-}
-
-//////////////////////////////////////////////////////////////////////////
-IAIObject* CEntity::GetAIObject() const
-{
-	if (gEnv->pAISystem == nullptr)
-		return nullptr;
-
-	return (m_aiObjectID ? gEnv->pAISystem->GetAIObjectManager()->GetAIObject(m_aiObjectID) : nullptr);
 }
 
 //////////////////////////////////////////////////////////////////////////

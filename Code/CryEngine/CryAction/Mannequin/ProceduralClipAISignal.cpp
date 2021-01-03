@@ -52,11 +52,6 @@ public:
 		{
 			return;
 		}
-
-		if (!onEnterSignalName.empty())
-		{
-			gEnv->pAISystem->SendSignal(AISignals::ESignalFilter::SIGNALFILTER_SENDER, gEnv->pAISystem->GetSignalManager()->CreateSignal_DEPRECATED(AISIGNAL_DEFAULT, onEnterSignalName, entityId));
-		}
 	}
 
 	virtual void OnExit(float blendTime)
@@ -71,7 +66,6 @@ public:
 		{
 			return;
 		}
-		gEnv->pAISystem->SendSignal(AISignals::ESignalFilter::SIGNALFILTER_SENDER, gEnv->pAISystem->GetSignalManager()->CreateSignal_DEPRECATED(AISIGNAL_DEFAULT, m_onExitSignalName, entityId));
 	}
 
 	virtual void Update(float timePassed) {}
@@ -84,10 +78,10 @@ private:
 		{
 			return INVALID_ENTITYID;
 		}
-		IF_UNLIKELY (!m_entity->HasAI())
-		{
+		//IF_UNLIKELY (!m_entity->HasAI())
+		//{
 			return INVALID_ENTITYID;
-		}
+		//}
 		return m_entity->GetId();
 	}
 

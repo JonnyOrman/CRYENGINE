@@ -14,7 +14,6 @@
 #include "D3DPostProcess.h"
 #include "D3DStereo.h"
 #include "GraphicsPipeline/PostEffects.h"
-#include <CrySystem/Scaleform/IFlashPlayer.h>
 
 #pragma warning(push)
 #pragma warning(disable: 4244)
@@ -41,15 +40,6 @@ void SHudData::Init()
 	IDynTextureSource* pDynTexSrc = pDiffuse ? pDiffuse->m_Sampler.m_pDynTexSource : NULL;
 	if (pDynTexSrc)
 	{
-		pFlashPlayer = (IFlashPlayer*) pDynTexSrc->GetSourceTemp(IDynTextureSource::DTS_I_FLASHPLAYER);
-		if (pFlashPlayer)
-		{
-			nFlashWidth = pFlashPlayer->GetWidth();
-			nFlashHeight = pFlashPlayer->GetHeight();
-
-			s_nFlashWidthMax = max(nFlashWidth, s_nFlashWidthMax);
-			s_nFlashHeightMax = max(nFlashHeight, s_nFlashHeightMax);
-		}
 	}
 
 	if (CRenderer::CV_r_PostProcessHUD3D != 2)

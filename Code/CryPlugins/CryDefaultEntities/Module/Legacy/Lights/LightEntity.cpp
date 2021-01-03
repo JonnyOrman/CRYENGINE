@@ -1,8 +1,6 @@
 #include "StdAfx.h"
 #include "LightEntity.h"
 
-#include "Legacy/Helpers/EntityFlowNode.h"
-
 #include <CrySerialization/Enum.h>
 
 class CLightRegistrator
@@ -19,32 +17,13 @@ public:
 		}
 
 		RegisterEntityWithDefaultComponent<CDefaultLightEntity>("Light", "Lights", "Light.bmp");
-	
-		// Register flow node
-		// Factory will be destroyed by flowsystem during shutdown
-		pFlowNodeFactory = new CEntityFlowNodeFactory("entity:Light");
-
-		pFlowNodeFactory->m_inputs.push_back(InputPortConfig<bool>("Active", ""));
-		pFlowNodeFactory->m_inputs.push_back(InputPortConfig<bool>("Enable", ""));
-		pFlowNodeFactory->m_inputs.push_back(InputPortConfig<bool>("Disable", ""));
-
-		pFlowNodeFactory->m_activateCallback = CDefaultLightEntity::OnFlowgraphActivation;
-
-		pFlowNodeFactory->m_outputs.push_back(OutputPortConfig<bool>("Active"));
-
-		pFlowNodeFactory->Close();
 	}
 
 public:
 	~CLightRegistrator()
 	{
-		if (pFlowNodeFactory)
-			pFlowNodeFactory->UnregisterFactory();
-		pFlowNodeFactory = nullptr;
 	}
 
-protected:
-	_smart_ptr<CEntityFlowNodeFactory> pFlowNodeFactory = nullptr;
 };
 
 CLightRegistrator g_lightRegistrator;
@@ -80,11 +59,8 @@ void CDefaultLightEntity::OnResetState()
 	// Check if the light is active
 	if (!m_bActive)
 	{
-		ActivateFlowNodeOutput(eOutputPorts_Active, TFlowInputData(true));
 		return;
 	}
-
-	ActivateFlowNodeOutput(eOutputPorts_Active, TFlowInputData(true));
 
 	m_light.SetPosition(ZERO);
 	m_light.m_fLightFrustumAngle = 45;
@@ -148,15 +124,15 @@ void CDefaultLightEntity::OnResetState()
 
 	if (m_projectorTexturePath.size() > 0)
 	{
-		const char* pExt = PathUtil::GetExt(m_projectorTexturePath);
+		/*const char* pExt = PathUtil::GetExt(m_projectorTexturePath);
 		if (!stricmp(pExt, "swf") || !stricmp(pExt, "gfx") || !stricmp(pExt, "usm") || !stricmp(pExt, "ui"))
 		{
 			m_light.m_pLightDynTexSource = gEnv->pRenderer->EF_LoadDynTexture(m_projectorTexturePath, false);
 		}
 		else
-		{
+		{*/
 			m_light.m_pLightImage = gEnv->pRenderer->EF_LoadTexture(m_projectorTexturePath, 0);
-		}
+		//}
 
 		if ((!m_light.m_pLightImage || !m_light.m_pLightImage->IsTextureLoaded()) && !m_light.m_pLightDynTexSource)
 		{
@@ -212,23 +188,4 @@ void CDefaultLightEntity::OnResetState()
 
 	// Load the light source into the entity
 	m_lightSlot = entity.LoadLight(1, &m_light);
-}
-
-void CDefaultLightEntity::OnFlowgraphActivation(EntityId entityId, IFlowNode::SActivationInfo* pActInfo, const class CEntityFlowNode* pNode)
-{
-	auto* pEntity = gEnv->pEntitySystem->GetEntity(entityId);
-	auto* pLightEntity = pEntity->GetComponent<CDefaultLightEntity>();
-
-	if (IsPortActive(pActInfo, eInputPorts_Active))
-	{
-		pLightEntity->SetActive(GetPortBool(pActInfo, eInputPorts_Active));
-	}
-	else if (IsPortActive(pActInfo, eInputPorts_Enable))
-	{
-		pLightEntity->SetActive(true);
-	}
-	else if (IsPortActive(pActInfo, eInputPorts_Disable))
-	{
-		pLightEntity->SetActive(false);
-	}
 }

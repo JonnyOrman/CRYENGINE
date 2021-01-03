@@ -7,7 +7,6 @@
 	#pragma once
 #endif
 
-#include <CryFlowGraph/IFlowSystem.h>
 #include <CryAction/ICustomActions.h>
 #include <CryCore/Containers/CryListenerSet.h>
 #include "CustomAction.h"

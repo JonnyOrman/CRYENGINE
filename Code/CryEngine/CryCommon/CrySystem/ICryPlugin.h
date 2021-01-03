@@ -7,7 +7,6 @@
 #include <CryExtension/ClassWeaver.h>
 #include <CryExtension/ICryUnknown.h>
 #include <CryExtension/ICryFactoryRegistryImpl.h>
-#include <CryFlowGraph/IFlowBaseNode.h>
 
 namespace Cry
 {
@@ -101,9 +100,6 @@ protected:
 			}
 		}
 	}
-
-protected:
-	std::vector<TFlowNodeTypeId> m_registeredFlowNodeIds;
 
 private:
 	uint8 m_updateFlags = 0;

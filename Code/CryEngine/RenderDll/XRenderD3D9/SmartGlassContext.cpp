@@ -21,8 +21,6 @@
 	#include "inspectable.h"
 	#include <wrl/client.h>
 
-	#include <CrySystem/Scaleform/IFlashPlayer.h>
-
 using Windows::Foundation::TypedEventHandler;
 
 // WinRT wrapper class required to receive callbacks from SmartGlass

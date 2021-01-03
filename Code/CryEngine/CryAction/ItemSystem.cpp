@@ -127,12 +127,6 @@ void CItemSystem::OnUnloadComplete(ILevelInfo* pLevel)
 }
 
 //------------------------------------------------------------------------
-void CItemSystem::RegisterItemClass(const char* name, IGameFramework::IItemCreator* pCreator)
-{
-	m_classes.insert(TItemClassMap::value_type(name, SItemClassDesc(pCreator)));
-}
-
-//------------------------------------------------------------------------
 void CItemSystem::Update()
 {
 	CRY_PROFILE_FUNCTION(PROFILE_ACTION);
@@ -691,16 +685,6 @@ EntityId CItemSystem::GiveItem(IActor* pActor, const char* item, bool sound, boo
 		{
 			// this may remove the entity
 			pItem->PickUp(pActor->GetEntityId(), sound, select, keepHistory, setup);
-
-			//[kirill] make sure AI gets notified about new item
-			if (gEnv->pAISystem)
-			{
-				if (pActor->GetEntity()->HasAI())
-				{
-					const AISignals::SignalSharedPtr pSignal = gEnv->pAISystem->GetSignalManager()->CreateSignal(AISIGNAL_INCLUDE_DISABLED, gEnv->pAISystem->GetSignalManager()->GetBuiltInSignalDescriptions().GetOnUpdateItems(), pActor->GetEntityId());
-					gEnv->pAISystem->SendSignal(AISignals::ESignalFilter::SIGNALFILTER_SENDER, pSignal);
-				}
-			}
 
 			if ((pItemEnt = gEnv->pEntitySystem->GetEntity(itemEntId)) && !pItemEnt->IsGarbage())
 			{

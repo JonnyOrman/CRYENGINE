@@ -6,6 +6,7 @@
 #include "Common/TypedConstantBuffer.h"
 #include "GraphicsPipelineStateSet.h"
 #include "RenderPassScheduler.h"
+#include "UtilityPasses.h"
 
 enum EGraphicsPipelineStage
 {

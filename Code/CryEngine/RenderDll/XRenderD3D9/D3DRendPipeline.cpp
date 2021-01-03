@@ -586,8 +586,6 @@ void CD3D9Renderer::RT_RenderScene(CRenderView* pRenderView)
 	std::shared_ptr<CGraphicsPipeline> pActiveGraphicsPipeline = pRenderView->GetGraphicsPipeline();
 	uint32 shaderRenderingFlags = pActiveGraphicsPipeline->GetRenderFlags();
 
-	CFlashTextureSourceSharedRT::SetupSharedRenderTargetRT();
-
 	if (!pRenderView->IsRecursive())
 	{
 		D3D11_VIEWPORT viewport = RenderViewportToD3D11Viewport(pRenderView->GetViewport());

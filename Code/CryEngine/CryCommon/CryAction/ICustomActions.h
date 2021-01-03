@@ -51,9 +51,6 @@ struct ICustomAction
 	//! \return Name of the custom action graph.
 	virtual const char* GetCustomActionGraphName() const = 0;
 
-	//! \return The Flow Graph associated to this Action.
-	virtual IFlowGraph* GetFlowGraph() const = 0;
-
 	//! \return The Object entity associated to this Action.
 	virtual IEntity* GetObjectEntity() const = 0;
 
@@ -80,9 +77,6 @@ struct ICustomAction
 
 	//! Terminates execution of this Action.
 	virtual void TerminateAction() = 0;
-
-	//! Marks this Action as modified.
-	virtual void               Invalidate() = 0;
 
 	virtual ECustomActionState GetCurrentState() const = 0;
 

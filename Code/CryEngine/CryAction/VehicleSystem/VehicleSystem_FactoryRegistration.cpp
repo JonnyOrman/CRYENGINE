@@ -5,7 +5,6 @@
 
 #include "Vehicle.h"
 
-#include "VehicleDamageBehaviorAISignal.h"
 #include "VehicleDamageBehaviorDestroy.h"
 #include "VehicleDamageBehaviorDetachPart.h"
 #include "VehicleDamageBehaviorEffect.h"
@@ -72,18 +71,12 @@ void CVehicleSystem::RegisterVehicles(IGameFramework* gameFramework)
 	serializerClass.sScriptFile = "";
 	serializerClass.flags = ECLF_INVISIBLE;
 
-	static IGameFramework::CGameObjectExtensionCreator<CVehicleSeatSerializer> createVehicleSeatSerializer;
-	CCryAction::GetCryAction()->GetIGameObjectSystem()->RegisterExtension(serializerClass.sName, &createVehicleSeatSerializer, &serializerClass);
-
 	// register the detached part entity
 
 	IEntityClassRegistry::SEntityClassDesc detachedPartClass;
 	detachedPartClass.sName = "VehiclePartDetached";
 	detachedPartClass.sScriptFile = "Scripts/Entities/Vehicles/VehiclePartDetached.lua";
 	detachedPartClass.flags = ECLF_INVISIBLE;
-
-	static IGameFramework::CGameObjectExtensionCreator<CVehiclePartDetachedEntity> createVehicleDetachedPartEntity;
-	CCryAction::GetCryAction()->GetIGameObjectSystem()->RegisterExtension(detachedPartClass.sName, &createVehicleDetachedPartEntity, &detachedPartClass);
 
 	// register all the vehicles
 
@@ -131,10 +124,6 @@ void CVehicleSystem::RegisterVehicles(IGameFramework* gameFramework)
 						}
 
 						vehicleClass.sScriptFile = scriptName;
-
-						static IGameFramework::CGameObjectExtensionCreator<CVehicle> vehicleCreator;
-						CCryAction::GetCryAction()->GetIGameObjectSystem()->RegisterExtension(name, &vehicleCreator, &vehicleClass);
-						m_classes.insert(TVehicleClassMap::value_type(name, &vehicleCreator));
 					}
 					else
 						CryLog("Vehicle <%s> already registered", name);
@@ -183,7 +172,6 @@ void CVehicleSystem::RegisterVehicles(IGameFramework* gameFramework)
 	REGISTER_VEHICLEOBJECT("WaterRipplesGenerator", CVehiclePartWaterRipplesGenerator);
 
 	// vehicle damage behaviors
-	REGISTER_VEHICLEOBJECT("AISignal", CVehicleDamageBehaviorAISignal);
 	REGISTER_VEHICLEOBJECT("Destroy", CVehicleDamageBehaviorDestroy);
 	REGISTER_VEHICLEOBJECT("DetachPart", CVehicleDamageBehaviorDetachPart);
 	REGISTER_VEHICLEOBJECT("Effect", CVehicleDamageBehaviorEffect);

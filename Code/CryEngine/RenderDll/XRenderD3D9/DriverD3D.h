@@ -39,11 +39,6 @@ struct SGraphicsPipelinePassContext;
 #include "Common/ShadowUtils.h"
 #include "Common/Textures/Texture.h"
 
-#if RENDERER_SUPPORT_SCALEFORM
-	#include "../Scaleform/ScaleformPlayback.h"
-	#include "../Scaleform/ScaleformRender.h"
-#endif
-
 #include <memory>
 
 //=====================================================
@@ -112,8 +107,6 @@ class CD3D9Renderer final : public CRenderer, public ISystemEventListener
 	friend class CTexture;
 	friend class CShadowMapStage;
 	friend class CSceneRenderPass;
-	friend struct IScaleformPlayback;
-	friend class CScaleformPlayback;
 
 	using CRenderer::EF_PrecacheResource;	// We want to override CRenderer functions *and* allow the overloads.
 
@@ -189,9 +182,6 @@ public:
 	bool                             EF_PrepareShadowGenForLight(CRenderView* pRenderView, SRenderLight* pLight, int nLightID);
 	bool                             PrepareShadowGenForFrustum(CRenderView* pRenderView, CRenderView* pShadowView, ShadowMapFrustum* pCurFrustum, const SRenderLight* pLight, int nLightID);
 
-	void                             InvokeShadowMapRenderJobs(ShadowMapFrustum* pCurFrustum, SRenderingPassInfo passInfo);
-	void                             StartInvokeShadowMapRenderJobs(ShadowMapFrustum* pCurFrustum, const SRenderingPassInfo& passInfo);
-
 	void                             GetReprojectionMatrix(Matrix44A& matReproj, const Matrix44A& matView, const Matrix44A& matProj, const Matrix44A& matPrevView, const Matrix44A& matPrevProj, float fFarPlane) const;
 
 	void                             CreateDeferredUnitBox(t_arrDeferredMeshIndBuff& indBuff, t_arrDeferredMeshVertBuff& vertBuff);
@@ -264,12 +254,6 @@ public:
 	virtual void RT_RenderDebug(bool bRenderStats = true) final;
 
 	virtual void RT_PresentFast() final;
-
-	//===============================================================================
-
-	virtual void RT_FlashRenderInternal(std::shared_ptr<IFlashPlayer>&& pPlayer) final;
-	virtual void RT_FlashRenderInternal(std::shared_ptr<IFlashPlayer_RenderProxy>&& pPlayer, bool bDoRealRender) final;
-	virtual void RT_FlashRenderPlaybackLocklessInternal(std::shared_ptr<IFlashPlayer_RenderProxy>&& pPlayer, int cbIdx, bool bFinalPlayback, bool bDoRealRender) final;
 
 	//===============================================================================
 
@@ -465,35 +449,13 @@ public:
 	virtual bool FontUpdateTexture(int nTexId, int X, int Y, int USize, int VSize, const byte* pData) override;
 	virtual void FontReleaseTexture(class CFBitmap* pBmp) override;
 
-#if RENDERER_SUPPORT_SCALEFORM
-	void                     SF_CreateResources();
-	void                     SF_PrecacheShaders();
-	void                     SF_DestroyResources();
-	void                     SF_ResetResources();
-	struct SSF_ResourcesD3D& SF_GetResources();
-
-	void                     SF_HandleClear(const SSF_GlobalDrawParams& __restrict params);
-
-	void                     SF_DrawIndexedTriList(int baseVertexIndex, int minVertexIndex, int numVertices, int startIndex, int triangleCount, const SSF_GlobalDrawParams& __restrict params);
-	void                     SF_DrawLineStrip(int baseVertexIndex, int lineCount, const SSF_GlobalDrawParams& __restrict params);
-	void                     SF_DrawGlyphClear(const IScaleformPlayback::DeviceData* vtxData, int baseVertexIndex, const SSF_GlobalDrawParams& __restrict params);
-	void                     SF_DrawBlurRect(const IScaleformPlayback::DeviceData* vtxData, const SSF_GlobalDrawParams& __restrict params);
-
-	virtual bool             SF_UpdateTexture(int texId, int mipLevel, int numRects, const SUpdateRect* pRects, const unsigned char* pData, size_t pitch, size_t size, ETEX_Format eTF) override;
-	virtual bool             SF_ClearTexture(int texId, int mipLevel, int numRects, const SUpdateRect* pRects, const unsigned char* pData) override;
-#else // #if RENDERER_SUPPORT_SCALEFORM
-	// These dummy functions are required when the feature is disabled, do not remove without testing the RENDERER_SUPPORT_SCALEFORM=0 case!
-	virtual bool SF_UpdateTexture(int texId, int mipLevel, int numRects, const SUpdateRect* pRects, const unsigned char* pData, size_t pitch, size_t size, ETEX_Format eTF) override { return false; }
-	virtual bool SF_ClearTexture(int texId, int mipLevel, int numRects, const SUpdateRect* pRects, const unsigned char* pData) override                                              { return false; }
-#endif // #if RENDERER_SUPPORT_SCALEFORM
-
 	virtual void SetProfileMarker(const char* label, ESPM mode) const override;
 
 	//! Render a frame from the RenderView
 	//! nSceneRenderingFlags @see EShaderRenderingFlags
 	void RenderFrame(int nSceneRenderingFlags, const SRenderingPassInfo& passInfo);
 
-	bool CheckSSAAChange();
+	//bool CheckSSAAChange();
 
 	bool FX_DrawToRenderTarget(CShader* pShader, CShaderResources* pRes, CRenderObject* pObj, SShaderTechnique* pTech, SHRenderTarget* pTarg, int nPreprType, CRenderElement* pRE, const SRenderingPassInfo& passInfo);
 
@@ -519,8 +481,8 @@ public:
 
 	bool CreateUnitVolumeMesh(t_arrDeferredMeshIndBuff& arrDeferredInds, t_arrDeferredMeshVertBuff& arrDeferredVerts, D3DIndexBuffer*& pUnitFrustumIB, D3DVertexBuffer*& pUnitFrustumVB);
 
-	void FX_DeferredShadowsNearFrustum(int maskRTWidth, int maskRTHeight);
-	void FX_SetDeferredShadows();
+	//void FX_DeferredShadowsNearFrustum(int maskRTWidth, int maskRTHeight);
+	//void FX_SetDeferredShadows();
 
 	void PrepareShadowPool(CRenderView* pRenderView) const override final;
 
@@ -619,9 +581,6 @@ public:
 	virtual CVrProjectionManager* GetVrProjectionManager() override;
 
 	virtual IStereoRenderer*      GetIStereoRenderer() const override;
-
-	virtual void                  StartLoadtimeFlashPlayback(ILoadtimeCallback* pCallback) override;
-	virtual void                  StopLoadtimeFlashPlayback() override;
 
 	CD3DStereoRenderer& GetS3DRend() const { return *m_pStereoRenderer; }
 	virtual bool        IsStereoEnabled() const override;
@@ -837,10 +796,6 @@ private:
 
 #if defined(SUPPORT_DEVICE_INFO)
 	DeviceInfo m_devInfo;
-#endif
-
-#if RENDERER_SUPPORT_SCALEFORM
-	struct SSF_ResourcesD3D* m_pSFResD3D;
 #endif
 
 #if defined(ENABLE_RENDER_AUX_GEOM)

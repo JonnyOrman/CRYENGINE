@@ -9,7 +9,6 @@ add_sources("NoUberFile"
 end_sources()
 
 CryUnitTestSuite(CryEntitySystemUnitTest SOLUTION_FOLDER "UnitTests")
-use_scaleform()
 include_directories("${CRYENGINE_DIR}/Code/CryEngine/CrySystem")
 include_directories("${CRYENGINE_DIR}/Code/CryEngine/CryEntitySystem")
 target_compile_definitions(${THIS_PROJECT} PRIVATE _LIB CRY_IS_MONOLITHIC_BUILD _LAUNCHER)
@@ -24,7 +23,7 @@ if (ORBIS OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 		-Wno-unknown-pragmas #See usages of raw #pragma warning
 		-Wno-unused-private-field #See CScopedWireFrameMode
 		-Wno-multichar #CryNetwork uses multichar constants such as 'bool'
-		-Wno-unused-function # See ScaleformRecording and CrySocks_sce
+		-Wno-unused-function # See CrySocks_sce
 	)
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 	target_compile_options(${THIS_PROJECT} PRIVATE

@@ -465,14 +465,6 @@ enum ECGTexture : uint8
 	ECGT_MatSlot_Translucency,
 	ECGT_MatSlot_Emittance,
 
-	ECGT_ScaleformInput0,
-	ECGT_ScaleformInput1,
-	ECGT_ScaleformInput2,
-	ECGT_ScaleformInputY,
-	ECGT_ScaleformInputU,
-	ECGT_ScaleformInputV,
-	ECGT_ScaleformInputA,
-
 	ECGT_Shadow0,
 	ECGT_Shadow1,
 	ECGT_Shadow2,

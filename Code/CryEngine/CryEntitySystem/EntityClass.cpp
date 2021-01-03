@@ -5,7 +5,6 @@
 #include "EntityScript.h"
 
 #include <CrySchematyc/ICore.h>
-#include <CryFlowGraph/IFlowSystem.h>
 
 //////////////////////////////////////////////////////////////////////////
 CEntityClass::CEntityClass()
@@ -22,7 +21,6 @@ CEntityClass::CEntityClass()
 //////////////////////////////////////////////////////////////////////////
 CEntityClass::~CEntityClass()
 {
-	SAFE_RELEASE(m_pIFlowNodeFactory);
 	SAFE_RELEASE(m_pEntityScript);
 }
 
@@ -179,16 +177,6 @@ void CEntityClass::SetClassDesc(const IEntityClassRegistry::SEntityClassDesc& cl
 	m_pScriptFileHandler = classDesc.pScriptFileHandler;
 	m_EditorClassInfo = classDesc.editorClassInfo;
 	m_pEventHandler = classDesc.pEventHandler;
-
-	if (m_pIFlowNodeFactory)
-	{
-		m_pIFlowNodeFactory->Release();
-	}
-	m_pIFlowNodeFactory = classDesc.pIFlowNodeFactory;
-	if (m_pIFlowNodeFactory)
-	{
-		m_pIFlowNodeFactory->AddRef();
-	}
 }
 
 void CEntityClass::SetName(const char* sName)

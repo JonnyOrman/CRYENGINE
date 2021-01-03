@@ -52,7 +52,6 @@ if(ANDROID)
 	configure_android_launcher(AndroidLauncher)
 
 	if(OPTION_STATIC_LINKING)
-		use_scaleform()
 		target_compile_definitions(${THIS_PROJECT} PRIVATE _LIB -DCRY_IS_MONOLITHIC_BUILD)
 	endif()
 

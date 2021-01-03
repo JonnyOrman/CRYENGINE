@@ -27,7 +27,6 @@
 #include <IUndoObject.h>
 
 #include "Controls/QuestionDialog.h"
-#include <CrySystem/Scaleform/IFlashUI.h>
 #include <Cry3DEngine/ISurfaceType.h>
 
 #define IDW_MTL_BROWSER_PANE    AFX_IDW_CONTROLBAR_FIRST + 10
@@ -863,17 +862,6 @@ static bool IsFlashUIFile(const char* pFlashFileName)
 
 static bool DestroyTexOfFlashFile(const char* name)
 {
-	if (gEnv->pFlashUI)
-	{
-		IUIElement* pElement = gEnv->pFlashUI->GetUIElementByInstanceStr(name);
-		if (pElement)
-		{
-			pElement->Unload();
-			pElement->DestroyThis();
-
-		}
-	}
-
 	return false;
 }
 

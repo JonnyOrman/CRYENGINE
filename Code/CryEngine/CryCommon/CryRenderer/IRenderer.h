@@ -44,7 +44,6 @@ struct IOpticsManager;
 struct IPhysicalEntity;
 struct IRenderAuxGeom;
 struct IRenderMesh;
-struct IScaleformPlayback;
 struct IStatObj;
 struct IStereoRenderer;
 struct ISystem;
@@ -1177,11 +1176,6 @@ struct IRenderer//: public IRendererCallbackServer
 	virtual bool FlushRTCommands(bool bWait, bool bImmediatelly, bool bForce) = 0;
 	virtual int  CurThreadList() = 0;
 
-	virtual void FlashRender(std::shared_ptr<IFlashPlayer_RenderProxy>&& pPlayer) = 0;
-	virtual void FlashRenderPlaybackLockless(std::shared_ptr<IFlashPlayer_RenderProxy>&& pPlayer, int cbIdx, bool finalPlayback) = 0;
-	virtual void FlashRenderPlayer(std::shared_ptr<IFlashPlayer>&& pPlayer) = 0;
-	virtual void FlashRemoveTexture(ITexture* pTexture) = 0;
-
 	/////////////////////////////////////////////////////////////////////////////////
 	// External interface for shaders
 	/////////////////////////////////////////////////////////////////////////////////
@@ -1265,9 +1259,6 @@ struct IRenderer//: public IRendererCallbackServer
 
 	//! Load the texture for name(nameTex).
 	virtual ITexture* EF_LoadTexture(const char* nameTex, const uint32 flags = 0) = 0;
-
-	//! Load the texture for name(nameTex).
-	virtual IDynTextureSource* EF_LoadDynTexture(const char* dynsourceName, bool sharedRT = false) = 0;
 
 	//! Load lightmap for name.
 	virtual int  EF_LoadLightmap(const char* name) = 0;
@@ -1547,14 +1538,6 @@ struct IRenderer//: public IRendererCallbackServer
 		}
 	};
 
-	virtual IScaleformPlayback*                       SF_CreatePlayback() const = 0;
-	virtual int                                       SF_CreateTexture(int width, int height, int numMips, const unsigned char* pData, ETEX_Format eTF, int flags) = 0;
-	virtual bool                                      SF_UpdateTexture(int texId, int mipLevel, int numRects, const SUpdateRect* pRects, const unsigned char* pData, size_t pitch, size_t size, ETEX_Format eTF) = 0;
-	virtual bool                                      SF_ClearTexture(int texId, int mipLevel, int numRects, const SUpdateRect* pRects, const unsigned char* pData) = 0;
-	virtual void                                      SF_Playback(IScaleformPlayback* pRenderer, GRendererCommandBufferReadOnly* pBuffer) const = 0;
-	virtual void                                      SF_Drain(GRendererCommandBufferReadOnly* pBuffer) const = 0;
-	virtual void                                      SF_GetMeshMaxSize(int& numVertices, int& numIndices) const = 0;
-
 	virtual ITexture*                                 CreateTexture(const char* name, int width, int height, int numMips, unsigned char* pData, ETEX_Format eTF, int flags) = 0;
 	virtual ITexture*                                 CreateTextureArray(const char* name, ETEX_Type eType, uint32 nWidth, uint32 nHeight, uint32 nArraySize, int nMips, uint32 nFlags, ETEX_Format eTF, int nCustomID) = 0;
 
@@ -1563,9 +1546,6 @@ struct IRenderer//: public IRendererCallbackServer
 	virtual const DynArray<RPProfilerDetailedStats>*  GetRPPDetailedStatsArray(bool bCalledFromMainThread = true) = 0;
 
 	virtual int                                       GetPolygonCountByType(uint32 EFSList, EVertexCostTypes vct, uint32 z, bool bCalledFromMainThread = true) = 0;
-
-	virtual void                                      StartLoadtimeFlashPlayback(ILoadtimeCallback* pCallback) = 0;
-	virtual void                                      StopLoadtimeFlashPlayback() = 0;
 
 	virtual void                                      SetCloudShadowsParams(int nTexID, const Vec3& speed, float tiling, bool invert, float brightness) = 0;
 	virtual void                                      SetVolumetricCloudParams(int nTexID) = 0;

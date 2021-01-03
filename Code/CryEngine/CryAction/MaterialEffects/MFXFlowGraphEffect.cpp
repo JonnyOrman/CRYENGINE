@@ -13,22 +13,8 @@
 #include "StdAfx.h"
 #include "MFXFlowGraphEffect.h"
 #include "MaterialEffects.h"
-#include "MaterialFGManager.h"
 #include "MaterialEffectsCVars.h"
 #include "CryAction.h"
-
-namespace
-{
-CMaterialFGManager* GetFGManager()
-{
-	CMaterialEffects* pMFX = static_cast<CMaterialEffects*>(CCryAction::GetCryAction()->GetIMaterialEffects());
-	if (pMFX == 0)
-		return 0;
-	CMaterialFGManager* pMFXFGMgr = pMFX->GetFGManager();
-	CRY_ASSERT(pMFXFGMgr != 0);
-	return pMFXFGMgr;
-}
-};
 
 CMFXFlowGraphEffect::CMFXFlowGraphEffect()
 	: CMFXEffectBase(eMFXPF_Flowgraph)
@@ -37,9 +23,9 @@ CMFXFlowGraphEffect::CMFXFlowGraphEffect()
 
 CMFXFlowGraphEffect::~CMFXFlowGraphEffect()
 {
-	CMaterialFGManager* pMFXFGMgr = GetFGManager();
+	/*CMaterialFGManager* pMFXFGMgr = GetFGManager();
 	if (pMFXFGMgr && m_flowGraphParams.fgName.empty() == false)
-		pMFXFGMgr->EndFGEffect(m_flowGraphParams.fgName);
+		pMFXFGMgr->EndFGEffect(m_flowGraphParams.fgName);*/
 }
 
 void CMFXFlowGraphEffect::LoadParamsFromXml(const XmlNodeRef& paramsNode)
@@ -73,8 +59,8 @@ void CMFXFlowGraphEffect::Execute(const SMFXRunTimeEffectParams& params)
 	//Check max distance
 	if (m_flowGraphParams.maxdistSq == 0.f || distToCameraSq <= m_flowGraphParams.maxdistSq)
 	{
-		CMaterialFGManager* pMFXFGMgr = GetFGManager();
-		pMFXFGMgr->StartFGEffect(m_flowGraphParams, sqrt_tpl(distToCameraSq));
+		/*CMaterialFGManager* pMFXFGMgr = GetFGManager();
+		pMFXFGMgr->StartFGEffect(m_flowGraphParams, sqrt_tpl(distToCameraSq));*/
 		//if(pMFXFGMgr->StartFGEffect(m_flowGraphParams.fgName))
 		//	CryLogAlways("Starting FG HUD effect %s (player distance %f)", m_flowGraphParams.fgName.c_str(),distToPlayer);
 	}
@@ -87,8 +73,8 @@ void CMFXFlowGraphEffect::SetCustomParameter(const char* customParameter, const 
 	if (CMaterialEffectsCVars::Get().mfx_EnableFGEffects == 0)
 		return;
 
-	CMaterialFGManager* pMFXFGMgr = GetFGManager();
-	pMFXFGMgr->SetFGCustomParameter(m_flowGraphParams, customParameter, customParameterValue);
+	/*CMaterialFGManager* pMFXFGMgr = GetFGManager();
+	pMFXFGMgr->SetFGCustomParameter(m_flowGraphParams, customParameter, customParameterValue);*/
 }
 
 void CMFXFlowGraphEffect::GetResources(SMFXResourceList& resourceList) const

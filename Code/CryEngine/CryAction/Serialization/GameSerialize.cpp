@@ -382,9 +382,6 @@ bool CGameSerialize::SaveGame(CCryAction* pCryAction, const char* method, const 
 		return false;
 	}
 
-	// AI final serialize (needs to be after both the AI and entity serialization)
-	if (gEnv->pAISystem)
-		gEnv->pAISystem->SerializeObjectIDs(saveEnvironment.m_pSaveGame->AddSection(SAVEGAME_AIOBJECTID_SECTION));
 	checkpoint.Check("AI_FinalSerialize");
 
 	Clean();
@@ -797,24 +794,9 @@ ELoadGameResult CGameSerialize::LoadGame(CCryAction* pCryAction, const char* met
 	}
 	else
 	{
-		// ai system data
-		// let's reset first
-		if (gEnv->pAISystem)
-			gEnv->pAISystem->FlushSystem();
-
 		// Flushing the system clears the navagation data, so reload it.
 		const ILevelInfo* pLevelInfo = GetLevelInfo();
 		CRY_ASSERT(CCryAction::GetCryAction()->StartedGameContext() == false || (pLevelInfo != 0), "Can't find level info: This might break AI");
-		if (pLevelInfo)
-		{
-			const ILevelInfo::SGameTypeInfo* pGameTypeInfo = pLevelInfo->GetDefaultGameType();
-			const char* const szGameTypeName = pGameTypeInfo ? pGameTypeInfo->name.c_str() : "";
-			if (gEnv->pAISystem)
-			{
-				const EAILoadDataFlags loadDataFlags = eAILoadDataFlag_AllSystems | (bIsQuickLoading ? eAILoadDataFlag_QuickLoad : eAILoadDataFlag_None);
-				gEnv->pAISystem->LoadLevelData(pLevelInfo->GetPath(), szGameTypeName, loadDataFlags);
-			}
-		}
 
 		checkpoint.Check("AIFlush");
 	}
@@ -836,8 +818,6 @@ ELoadGameResult CGameSerialize::LoadGame(CCryAction* pCryAction, const char* met
 
 		if (loadEnvironment.m_pSer.get())
 		{
-			if (gEnv->pAISystem)
-				gEnv->pAISystem->SerializeObjectIDs(*loadEnvironment.m_pSer);
 		}
 		else
 		{
@@ -890,11 +870,6 @@ ELoadGameResult CGameSerialize::LoadGame(CCryAction* pCryAction, const char* met
 		GameWarning("No AI section in save game");
 		//return failure;
 		loadEnvironment.m_bLoadingErrors = true;
-	}
-	else
-	{
-		if (gEnv->pAISystem)
-			gEnv->pAISystem->Serialize(*loadEnvironment.m_pSer);
 	}
 	checkpoint.Check("AI System");
 
@@ -966,13 +941,6 @@ ELoadGameResult CGameSerialize::LoadGame(CCryAction* pCryAction, const char* met
 		}
 	}
 
-	if (gEnv->pFlowSystem != NULL)
-	{
-		// this guarantees that the values sent by the scripts in OnPostLoad
-		// through their FG nodes get delivered to all of the connected nodes
-		gEnv->pFlowSystem->Update();
-	}
-
 	CryGetIMemReplay()->AddLabel("Loadgame_end");
 
 	return eLGR_Ok;
@@ -1033,26 +1001,16 @@ void CGameSerialize::SaveEngineSystems(SSaveEnvironment& savEnv)
 	{
 		// game tokens
 		MEMSTAT_CONTEXT(EMemStatContextType::Other, "Game token serialization");
-		savEnv.m_pCryAction->GetIGameTokenSystem()->Serialize(savEnv.m_pSaveGame->AddSection(SAVEGAME_GAMETOKEN_SECTION));
 		savEnv.m_checkpoint.Check("GameToken");
 	}
 	// view system
 	savEnv.m_pCryAction->GetIViewSystem()->Serialize(savEnv.m_pSaveGame->AddSection(SAVEGAME_VIEWSYSTEM_SECTION));
 	savEnv.m_checkpoint.Check("ViewSystem");
-	// ai system data
-	if (gEnv->pAISystem)
-		gEnv->pAISystem->Serialize(savEnv.m_pSaveGame->AddSection(SAVEGAME_AISTATE_SECTION));
-	savEnv.m_checkpoint.Check("AISystem");
 
 	//itemsystem - LTL inventory only
 	if (savEnv.m_pCryAction->GetIItemSystem())
 		savEnv.m_pCryAction->GetIItemSystem()->Serialize(savEnv.m_pSaveGame->AddSection(SAVEGAME_LTLINVENTORY_SECTION));
 	savEnv.m_checkpoint.Check("Inventory");
-
-	//FlowSystem data
-	if (savEnv.m_pCryAction->GetIFlowSystem())
-		savEnv.m_pCryAction->GetIFlowSystem()->Serialize(savEnv.m_pSaveGame->AddSection(SAVEGAME_FLOWSYSTEM_SECTION));
-	savEnv.m_checkpoint.Check("FlowSystem");
 
 	CMaterialEffects* pMatFX = static_cast<CMaterialEffects*>(savEnv.m_pCryAction->GetIMaterialEffects());
 	if (pMatFX)
@@ -1118,8 +1076,6 @@ bool CGameSerialize::SaveEntities(SSaveEnvironment& savEnv)
 							bed.ignorePosRotScl = true;
 					}
 				}
-
-				bed.aiObjectId = pEntity->GetAIObjectID();
 
 				IEntity* pParentEntity = pEntity->GetParent();
 				IPhysicalEntity* pPhysEnt;
@@ -1332,11 +1288,6 @@ bool CGameSerialize::SaveGameData(SSaveEnvironment& savEnv, TSerialize& gameStat
 //////////////////////////////////////////////////////////////////////////
 void CGameSerialize::LoadEngineSystems(SLoadEnvironment& loadEnv)
 {
-	// Reset the flowsystem here (sending eFE_Initialize) to all FGs
-	// also makes sure, that nodes present in the level.pak but not in the
-	// savegame loaded afterwards get initialized correctly
-	gEnv->pFlowSystem->Reset(false);
-
 	loadEnv.m_checkpoint.Check("DestroyedState");
 
 	loadEnv.m_failure = eLGR_FailedAndDestroyedState;
@@ -1365,29 +1316,6 @@ void CGameSerialize::LoadEngineSystems(SLoadEnvironment& loadEnv)
 	loadEnv.m_pSer = loadEnv.m_pLoadGame->GetSection(SAVEGAME_GAMETOKEN_SECTION);
 	if (!loadEnv.m_pSer.get())
 		GameWarning("No game token data in save game");
-	else
-	{
-		IGameTokenSystem* pGTS = CCryAction::GetCryAction()->GetIGameTokenSystem();
-		if (pGTS)
-		{
-			if (gEnv->IsEditor())
-			{
-				char* sLevelName;
-				char* levelFolder;
-				loadEnv.m_pCryAction->GetEditorLevel(&sLevelName, &levelFolder);
-				string tokenPath = levelFolder;
-				tokenPath += "/GameTokens/*.xml";
-				pGTS->Reset();
-				pGTS->LoadLibs(tokenPath);
-				pGTS->Serialize(*loadEnv.m_pSer);
-			}
-			else
-			{
-				// no need to reload token libraries
-				pGTS->Serialize(*loadEnv.m_pSer);
-			}
-		}
-	}
 
 	loadEnv.m_checkpoint.Check("GameTokens");
 
@@ -1433,15 +1361,6 @@ void CGameSerialize::LoadEngineSystems(SLoadEnvironment& loadEnv)
 	}
 	loadEnv.m_checkpoint.Check("ItemSystem");
 
-	// load flowsystem data
-	if (loadEnv.m_pCryAction->GetIFlowSystem())
-	{
-		loadEnv.m_pSer = loadEnv.m_pLoadGame->GetSection(SAVEGAME_FLOWSYSTEM_SECTION);
-		if (loadEnv.m_pSer.get())
-			loadEnv.m_pCryAction->GetIFlowSystem()->Serialize(*loadEnv.m_pSer);
-		else
-			GameWarning("Unable to open section %s", SAVEGAME_FLOWSYSTEM_SECTION);
-	}
 	loadEnv.m_checkpoint.Check("FlowSystem");
 }
 
@@ -1522,22 +1441,10 @@ bool CGameSerialize::LoadLevel(SLoadEnvironment& loadEnv, SGameStartParams& star
 	// Remove all AI objects created during the level load too (to avoid collisions with ones in the save file).
 	//	For quickloads this flush/reload happens earlier.
 	CRY_ASSERT(!bIsQuickLoading);
-	if (gEnv->pAISystem)
-		gEnv->pAISystem->FlushSystem();
 
 	// Flushing the system clears the navagation data, so reload it.
 	const ILevelInfo* pLevelInfo = GetLevelInfo();
 	CRY_ASSERT(CCryAction::GetCryAction()->StartedGameContext() == false || (pLevelInfo != 0), "Can't find level info: This might break AI");
-	if (pLevelInfo)
-	{
-		const ILevelInfo::SGameTypeInfo* pGameTypeInfo = pLevelInfo->GetDefaultGameType();
-		const char* const szGameTypeName = pGameTypeInfo ? pGameTypeInfo->name.c_str() : "";
-		if (gEnv->pAISystem)
-		{
-			const EAILoadDataFlags loadDataFlags = eAILoadDataFlag_AllSystems | (bIsQuickLoading ? eAILoadDataFlag_QuickLoad : eAILoadDataFlag_None);
-			gEnv->pAISystem->LoadLevelData(pLevelInfo->GetPath(), szGameTypeName, loadDataFlags);
-		}
-	}
 
 	loadEnv.m_bHaveReserved = true;
 	ReserveEntityIds(loadEnv.m_basicEntityData);
@@ -1759,7 +1666,7 @@ void CGameSerialize::LoadGameData(SLoadEnvironment& loadEnv)
 		//  removed by the AI flush). Essentially, between this point and the AI serialize
 		//	it is not safe to call GetAI() on the entity.
 		// Fixing this properly would probably mean making the entity serialize it's own AI object as it does with other proxies.
-		pEntity->SetAIObjectID(iter->aiObjectId);
+		//pEntity->SetAIObjectID(iter->aiObjectId);
 
 		// extra sanity check for matching class
 		if (!(pEntity->GetFlags() & ENTITY_FLAG_UNREMOVABLE) && iter->className != pEntity->GetClass()->GetName())

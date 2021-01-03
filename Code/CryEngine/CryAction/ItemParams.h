@@ -21,6 +21,8 @@
 #include "IItemSystem.h"
 #include <CryCore/StlUtils.h>
 
+#include "CryAction/ICustomEvents.h"
+
 template<class F, class T>
 struct SItemParamConversion
 {
@@ -200,18 +202,18 @@ private:
 	struct SAttribute
 	{
 		CCryName        first; // Using CryName to save memory on duplicate strings
-		TItemParamValue second;
+		//TItemParamValue second;
 
 		SAttribute() {}
 		SAttribute(const char* key, const TItemParamValue& val)
 			: first(key)
-			, second(val)
+			//, second(val)
 		{
 		}
 
 		void GetMemoryUsage(ICrySizer* pSizer) const
 		{
-			pSizer->AddObject(second);
+			//pSizer->AddObject(second);
 		}
 	};
 
@@ -253,8 +255,8 @@ private:
 		{
 			m_attributes.push_back(SAttribute(name, val));
 		}
-		else
-			it->second = val;
+		/*else
+			it->second = val;*/
 	}
 
 	CCryName       m_name;

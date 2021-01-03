@@ -114,7 +114,7 @@ enum class EPlatform
 	#define NDEBUG
 #endif
 
-#if CRY_PLATFORM_ORBIS && !defined(_LIB) && !defined(CRY_IS_SCALEFORM_HELPER)
+#if CRY_PLATFORM_ORBIS && !defined(_LIB)
 	#error _LIB is expected to be set for Orbis
 #endif
 

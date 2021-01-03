@@ -11,15 +11,8 @@
 	#define USING_VARIABLE_COLLECTION_XML_DESCRIPTION_CREATION
 #endif
 
-#ifdef DEBUG_VARIABLE_COLLECTION
-	#include <CryAISystem/IAISystem.h>
-	#include <CryAISystem/IAIDebugRenderer.h>
-#endif // DEBUG_VARIABLE_COLLECTION
-
 #include <CryNetwork/ISerialize.h>
-#include <CryAISystem/BehaviorTree/SerializationSupport.h>
 #include <CryString/StringUtils.h>
-#include <CryAISystem/ISignal.h>
 #include <CrySerialization/SerializationUtils.h>
 
 #if defined(USING_VARIABLE_COLLECTION_SERIALIZATION)
@@ -822,7 +815,6 @@ class EventsDeclaration
 public:
 	EventsDeclaration()
 	{
-		LoadBuiltInEvents();
 	}
 
 #ifdef USING_BEHAVIOR_TREE_SERIALIZATION
@@ -886,24 +878,6 @@ public:
 	{
 		Events events;
 
-		if (m_eventsFlags.test(BehaviorTree::NodeSerializationHints::EEventsFlags_CryEngine))
-		{
-			events.reserve(m_eventsCryEngine.size());
-			events.insert(events.end(), m_eventsCryEngine.begin(), m_eventsCryEngine.end());
-		}
-
-		if (m_eventsFlags.test(BehaviorTree::NodeSerializationHints::EEventsFlags_GameSDK))
-		{
-			events.reserve(events.size() + m_eventsGameSDK.size());
-			events.insert(events.end(), m_eventsGameSDK.begin(), m_eventsGameSDK.end());
-		}
-
-		if (m_eventsFlags.test(BehaviorTree::NodeSerializationHints::EEventsFlags_Deprecated))
-		{
-			events.reserve(events.size() + m_eventsDeprecated.size());
-			events.insert(events.end(), m_eventsDeprecated.begin(), m_eventsDeprecated.end());
-		}
-
 		events.reserve(events.size() + m_eventsGame.size());
 		events.insert(events.end(), m_eventsGame.begin(), m_eventsGame.end());
 
@@ -927,17 +901,17 @@ public:
 
 		bool isDeclared = std::find(m_eventsGame.begin(), m_eventsGame.end(), tempEvent) != m_eventsGame.end();
 
-		if (!isDeclared && (!isLoadingFromEditor || m_eventsFlags.test(BehaviorTree::NodeSerializationHints::EEventsFlags_CryEngine)))
+		if (!isDeclared && (!isLoadingFromEditor))
 		{
 			isDeclared = std::find(m_eventsCryEngine.begin(), m_eventsCryEngine.end(), tempEvent) != m_eventsCryEngine.end();
 		}
 
-		if (!isDeclared && (!isLoadingFromEditor || m_eventsFlags.test(BehaviorTree::NodeSerializationHints::EEventsFlags_GameSDK)))
+		if (!isDeclared && (!isLoadingFromEditor))
 		{
 			isDeclared = std::find(m_eventsGameSDK.begin(), m_eventsGameSDK.end(), tempEvent) != m_eventsGameSDK.end();
 		}
 
-		if (!isDeclared && (!isLoadingFromEditor || m_eventsFlags.test(BehaviorTree::NodeSerializationHints::EEventsFlags_Deprecated)))
+		if (!isDeclared && (!isLoadingFromEditor))
 		{
 			isDeclared = std::find(m_eventsDeprecated.begin(), m_eventsDeprecated.end(), tempEvent) != m_eventsDeprecated.end();
 		}
@@ -947,38 +921,6 @@ public:
 #endif // USING_BEHAVIOR_TREE_SERIALIZATION
 
 #ifdef USING_BEHAVIOR_TREE_SERIALIZATION
-	void Serialize(Serialization::IArchive& archive)
-	{
-		const BehaviorTree::NodeSerializationHints* pHintsContext = archive.context<BehaviorTree::NodeSerializationHints>();
-
-		IF_LIKELY(pHintsContext)
-		{
-			SetEventsFlags(pHintsContext->eventsFlags);
-		}
-
-		if (m_eventsFlags.test(BehaviorTree::NodeSerializationHints::EEventsFlags_CryEngine))
-		{
-			SerializeEventsList(archive, "eventsCryEngine", "!CryEngine Events", m_eventsCryEngine);
-		}
-
-		if (m_eventsFlags.test(BehaviorTree::NodeSerializationHints::EEventsFlags_GameSDK))
-		{
-			SerializeEventsList(archive, "eventsGameSDK", "!GameSDK Events", m_eventsGameSDK);
-		}
-
-		if (m_eventsFlags.test(BehaviorTree::NodeSerializationHints::EEventsFlags_Deprecated))
-		{
-			SerializeEventsList<Events>(archive, "eventsDeprecated", "!Deprecated Events", m_eventsDeprecated);
-		}
-
-		SerializeEventsList(archive, "gameEvents", "+Game Events", m_eventsGame);
-
-		LookForEventGamesDuplicates(archive, m_eventsCryEngine, "CryEngine");
-		LookForEventGamesDuplicates(archive, m_eventsGameSDK, "GameSDK");
-		LookForEventGamesDuplicates(archive, m_eventsDeprecated, "Deprecated");
-
-	}
-
 	void LookForEventGamesDuplicates(Serialization::IArchive& archive, const Events& events, const char* eventsCategory)
 	{
 		Events::const_iterator itEvents = events.begin();
@@ -1047,47 +989,7 @@ public:
 	}
 #endif
 
-#if defined(USING_BEHAVIOR_TREE_SERIALIZATION)
-	const BehaviorTree::NodeSerializationHints::EventsFlags& GetEventsFlags() const
-	{
-		return m_eventsFlags;
-	}
-
-	void SetEventsFlags(const BehaviorTree::NodeSerializationHints::EventsFlags& eventsFlags)
-	{
-		m_eventsFlags = eventsFlags;
-	}
-#endif // USING_BEHAVIOR_TREE_SERIALIZATION
-
 private:
-	void LoadBuiltInEvents()
-	{
-		const size_t signalDescriptionsCount = gEnv->pAISystem->GetSignalManager()->GetSignalDescriptionsCount();
-		for (size_t i = 0; i < signalDescriptionsCount; ++i)
-		{
-			const AISignals::ISignalDescription& signalDesc = gEnv->pAISystem->GetSignalManager()->GetSignalDescription(i);
-
-			switch (signalDesc.GetTag())
-			{
-			case AISignals::ESignalTag::CRY_ENGINE:
-				m_eventsCryEngine.emplace_back(signalDesc.GetName());
-				break;
-			case AISignals::ESignalTag::GAME_SDK:
-				m_eventsGameSDK.emplace_back(signalDesc.GetName());
-				break;
-			case AISignals::ESignalTag::DEPRECATED:
-				m_eventsDeprecated.emplace_back(signalDesc.GetName());
-				break;
-			case AISignals::ESignalTag::GAME:
-			case AISignals::ESignalTag::NONE:
-				// Nothing
-				break;
-			default:
-				CRY_ASSERT(false, "Missing case label for Signal Tag");
-			}
-		}
-	}
-
 #if defined (USING_BEHAVIOR_TREE_SERIALIZATION) || defined(USING_VARIABLE_COLLECTION_SERIALIZATION)
 	template <class T>
 	void SerializeEventsList(Serialization::IArchive& archive, const char* szKey, const char* szLabel, T& events)
@@ -1106,10 +1008,6 @@ private:
 	Events m_eventsGameSDK;
 	Events m_eventsDeprecated;
 	Events m_eventsGame;
-
-#ifdef USING_BEHAVIOR_TREE_SERIALIZATION
-	BehaviorTree::NodeSerializationHints::EventsFlags m_eventsFlags;
-#endif //USING_BEHAVIOR_TREE_SERIALIZATION
 };
 
 /*
@@ -1131,7 +1029,6 @@ struct SignalHandle
 		IF_LIKELY (!eventsDeclaration)
 			return;
 
-		BehaviorTree::SerializeContainerAsSortedStringList(archive, "signalName", "^On event", eventsDeclaration->GetEventsWithFlags(), "Event", signalName);
 		archive.doc("Event that triggers the change in the value of the Variable");
 
 		// Serialize Variables
@@ -1140,14 +1037,6 @@ struct SignalHandle
 		if (!pDeclarations)
 			return;
 
-		BehaviorTree::SerializeContainerAsSortedStringList(
-			archive, 
-			"variableName", 
-			"^Switch variable", 
-			pDeclarations->GetVariableDescriptionVector(),
-			"Switch variable", 
-			variableName
-		);
 		archive.doc("Variable that gets changed to the specified value when the Event is triggered");
 
 		// Serialize bool switch
@@ -1446,13 +1335,11 @@ struct DebugHelper
 		if (sorted.empty())
 			return;
 
-		gEnv->pAISystem->GetAIDebugRenderer()->Draw2dLabel(x, y, fontSize, Col_Yellow, false, "Variables");
 		y += lineHeight;
 
 		uint32 variableCount = sorted.size();
 		for (uint32 i = 0; i < variableCount; ++i)
 		{
-			gEnv->pAISystem->GetAIDebugRenderer()->Draw2dLabel(x, y, fontSize, sorted[i].value ? trueColor : falseColor, false, "%s", sorted[i].name);
 			y += lineHeight;
 
 			if (y > maxY)
@@ -1486,7 +1373,6 @@ struct DebugHelper
 					falseColor.a = (uint8)(alpha * 255.5f);
 
 					text = description.name;
-					gEnv->pAISystem->GetAIDebugRenderer()->Draw2dLabel(x + columnWidth + 2.0f, y, fontSize, changeEvent.value ? trueColor : falseColor, false, "%s", text.c_str());
 
 					y += lineHeight;
 				}

@@ -96,9 +96,6 @@ public:
 	void OnCVarsChanged(const CCVarUpdateRecorder& cvarUpdater) final;
 
 private:
-	void Execute3DHudFlashUpdate();
-
-private:
 	CPostEffectsMgr*   m_pPostMgr;
 	std::array<std::unique_ptr<IPostEffectPass>, EPostEffectID::Num> m_postEffectArray;
 	CPostEffectContext m_context;
@@ -326,8 +323,6 @@ public:
 
 	virtual void Init(CPostEffectContext* p) final;
 	virtual void Execute() final;
-
-	void ExecuteFlashUpdate(class CHud3D & hud3d);
 
 private:
 	void ExecuteDownsampleHud4x4(class CHud3D & hud3d, CTexture * pDstRT);

@@ -11,7 +11,6 @@
 #include "RenderPipeline.h"
 #include "RenderDisplayContext.h"
 #include "RenderThread.h"
-#include "../Scaleform/ScaleformRender.h"
 #include "ElementPool.h"
 
 typedef void (PROCRENDEF)(SShaderPass* l, int nPrimType);
@@ -61,7 +60,6 @@ struct SShaderPass;
 class CREParticle;
 class CD3DStereoRenderer;
 class CTextureManager;
-class CIntroMovieRenderer;
 class CDeviceResourceSet;
 class CVertexBuffer;
 class CIndexBuffer;
@@ -800,16 +798,9 @@ public:
 	virtual void RT_PrecacheDefaultShaders() = 0;
 	virtual bool RT_ReadTexture(void* pDst, int destinationWidth, int destinationHeight, EReadTextureFormat dstFormat, CTexture* pSrc) = 0;
 	virtual bool RT_StoreTextureToFile(const char* szFilePath, CTexture* pSrc) = 0;
-	virtual void FlashRenderPlayer(std::shared_ptr<IFlashPlayer>&& pPlayer) override;
-	virtual void FlashRender(std::shared_ptr<IFlashPlayer_RenderProxy>&& pPlayer) override;
-	virtual void FlashRenderPlaybackLockless(std::shared_ptr<IFlashPlayer_RenderProxy>&& pPlayer, int cbIdx, bool finalPlayback) override;
-	virtual void FlashRemoveTexture(ITexture* pTexture) override;
 
 	virtual void RT_RenderDebug(bool bRenderStats = true) = 0;
 
-	virtual void RT_FlashRenderInternal(std::shared_ptr<IFlashPlayer>&& pPlayer) = 0;
-	virtual void RT_FlashRenderInternal(std::shared_ptr<IFlashPlayer_RenderProxy>&& pPlayer, bool doRealRender) = 0;
-	virtual void RT_FlashRenderPlaybackLocklessInternal(std::shared_ptr<IFlashPlayer_RenderProxy>&& pPlayer, int cbIdx, bool finalPlayback, bool doRealRender) = 0;
 	virtual bool FlushRTCommands(bool bWait, bool bImmediatelly, bool bForce) override;
 	virtual bool ForceFlushRTCommands();
 	virtual void WaitForParticleBuffer(int frameId) = 0;
@@ -1084,7 +1075,6 @@ public:
 	virtual ITexture*              EF_GetTextureByID(int Id) override;
 	virtual ITexture*              EF_GetTextureByName(const char* name, uint32 flags = 0) override;
 	virtual ITexture*              EF_LoadTexture(const char* nameTex, const uint32 flags = 0) override;
-	virtual IDynTextureSource*     EF_LoadDynTexture(const char* dynsourceName, bool sharedRT = false) override;
 	virtual const SShaderProfile&  GetShaderProfile(EShaderType eST) const override;
 	virtual void                   EF_SetShaderQuality(EShaderType eST, EShaderQuality eSQ) override;
 
@@ -1179,23 +1169,6 @@ public:
 
 	virtual void                 SetLevelLoadingThreadId(threadID threadId) override;
 	virtual void                 GetThreadIDs(threadID& mainThreadID, threadID& renderThreadID) const override;
-
-#if RENDERER_SUPPORT_SCALEFORM
-	void                        SF_ConfigMask(int st, uint32 ref);
-	virtual int                 SF_CreateTexture(int width, int height, int numMips, const unsigned char* pSrcData, ETEX_Format eSrcFormat, int flags) override;
-	virtual void                SF_GetMeshMaxSize(int& numVertices, int& numIndices) const override;
-
-	virtual IScaleformPlayback* SF_CreatePlayback() const override;
-	virtual void                SF_Playback(IScaleformPlayback* pRenderer, GRendererCommandBufferReadOnly* pBuffer) const override;
-	virtual void                SF_Drain(GRendererCommandBufferReadOnly* pBuffer) const override;
-#else // #if RENDERER_SUPPORT_SCALEFORM
-	// These dummy functions are required when the feature is disabled, do not remove without testing the RENDERER_SUPPORT_SCALEFORM=0 case!
-	virtual int                 SF_CreateTexture(int width, int height, int numMips, const unsigned char* pSrcData, ETEX_Format eSrcFormat, int flags) override { return 0; }
-	virtual void                SF_GetMeshMaxSize(int& numVertices, int& numIndices) const override                                                             { numVertices = 0; numIndices = 0; }
-	virtual IScaleformPlayback* SF_CreatePlayback() const override;
-	virtual void                SF_Playback(IScaleformPlayback* pRenderer, GRendererCommandBufferReadOnly* pBuffer) const override                              {}
-	virtual void                SF_Drain(GRendererCommandBufferReadOnly* pBuffer) const override                                                                {}
-#endif // #if RENDERER_SUPPORT_SCALEFORM
 
 	virtual ITexture* CreateTexture(const char* name, int width, int height, int numMips, unsigned char* pSrcData, ETEX_Format eSrcFormat, int flags) override;
 	virtual ITexture* CreateTextureArray(const char* name, ETEX_Type eType, uint32 nWidth, uint32 nHeight, uint32 nArraySize, int nMips, uint32 nFlags, ETEX_Format eSrcFormat, int nCustomID) override;
@@ -1449,8 +1422,6 @@ public:
 	//=============================================================================================================
 	CDeviceBufferManager  m_DevBufMan;
 	//=============================================================================================================
-
-	CIntroMovieRenderer* m_pIntroMovieRenderer;
 
 	int                  m_CurVertBufferSize;
 	int                  m_CurIndexBufferSize;

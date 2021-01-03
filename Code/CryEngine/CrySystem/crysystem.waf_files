@@ -238,10 +238,6 @@
             "Interprocess/StatsAgentPipe.cpp",
             "Interprocess/StatsAgentPipe.h"
         ],
-        "Source Files": [
-            "ImeManager.h",
-            "ImeManager.cpp"
-        ],
         "TestSystem": [
             "ExcelExport.cpp",
             "Statistics.cpp",

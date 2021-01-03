@@ -47,9 +47,6 @@ enum ERenderCommand
 	eRC_BeginFrame,
 	eRC_EndFrame,
 
-	eRC_FlashRender,
-	eRC_FlashRenderLockless,
-
 	eRC_LambdaCall,
 };
 
@@ -344,10 +341,6 @@ struct CRY_ALIGN(128) SRenderThread
 #endif
 
 	void RC_PrecacheResource(ITexture* pTP, float fMipFactor, float fTimeToReady, int Flags, int nUpdateId);
-
-	void RC_FlashRender(std::shared_ptr<IFlashPlayer_RenderProxy> && pPlayer);
-	void RC_FlashRenderPlayer(std::shared_ptr<IFlashPlayer> && pPlayer);
-	void RC_FlashRenderPlaybackLockless(std::shared_ptr<IFlashPlayer_RenderProxy> && pPlayer, int cbIdx, bool finalPlayback);
 
 	void RC_BeginFrame(const SDisplayContextKey &displayContextKey, const SGraphicsPipelineKey &graphicsPipelineKey);
 	void RC_EndFrame(bool bWait);

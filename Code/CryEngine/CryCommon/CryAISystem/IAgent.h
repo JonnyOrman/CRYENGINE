@@ -1571,7 +1571,6 @@ struct SOBJECTSTATE
 			const AISignals::SignalSharedPtr pSignal = vSignals[idx];
 			if (pSignal->GetExtraData())
 			{
-				gEnv->pAISystem->FreeSignalExtraData(pSignal->GetExtraData());
 				pSignal->SetExtraData(nullptr);
 			}
 		}

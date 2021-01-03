@@ -30,7 +30,6 @@ CShader* CShaderMan::s_ShaderDeferredSnow;
 
 CShader* CShaderMan::s_ShaderFPEmu;
 CShader* CShaderMan::s_ShaderFallback;
-CShader* CShaderMan::s_ShaderScaleForm;
 CShader* CShaderMan::s_ShaderStars;
 CShader* CShaderMan::s_ShaderShadowBlur;
 CShader* CShaderMan::s_ShaderShadowMaskGen;
@@ -1415,7 +1414,6 @@ void CShaderMan::mfReleaseSystemShaders()
 	SAFE_RELEASE_FORCE(s_ShaderDeferredSnow);
 	SAFE_RELEASE_FORCE(s_ShaderFPEmu);
 	SAFE_RELEASE_FORCE(s_ShaderFallback);
-	SAFE_RELEASE_FORCE(s_ShaderScaleForm);
 	SAFE_RELEASE_FORCE(s_ShaderStars);
 	SAFE_RELEASE_FORCE(s_ShaderShadowBlur);
 	SAFE_RELEASE_FORCE(s_ShaderShadowMaskGen);
@@ -1455,7 +1453,6 @@ void CShaderMan::mfLoadBasicSystemShaders()
 	{
 		sLoadShader("Fallback", s_ShaderFallback);
 		sLoadShader("FixedPipelineEmu", s_ShaderFPEmu);
-		sLoadShader("Scaleform", s_ShaderScaleForm);
 
 		mfRefreshSystemShader("Stereo", CShaderMan::s_ShaderStereo);
 	}
@@ -1478,7 +1475,6 @@ void CShaderMan::mfLoadDefaultSystemShaders()
 
 		sLoadShader("Fallback", s_ShaderFallback);
 		sLoadShader("FixedPipelineEmu", s_ShaderFPEmu);
-		sLoadShader("Scaleform", s_ShaderScaleForm);
 		sLoadShader("Light", s_ShaderLightStyles);
 
 		sLoadShader("ShadowMaskGen", s_ShaderShadowMaskGen);

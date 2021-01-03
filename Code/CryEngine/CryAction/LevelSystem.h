@@ -7,6 +7,7 @@
 	#pragma once
 #endif
 
+#include "CryAction/ICustomEvents.h"
 #include "ILevelSystem.h"
 
 #define LEVEL_ROTATION_DEBUG 0
@@ -58,7 +59,7 @@ public:
 	virtual const char*                      GetDefaultGameRules() const override     { return m_gamerules.empty() ? nullptr : m_gamerules[0].c_str(); }
 	virtual size_t                           GetGameRulesCount() const override       { return m_gamerules.size(); }
 	virtual size_t                           GetGameRules(const char** pszGameRules, size_t numGameRules) const override;
-	virtual bool                             GetAttribute(const char* name, TFlowInputData& val) const override;
+	//virtual bool                             GetAttribute(const char* name, TFlowInputData& val) const override;
 	// ~ILevelInfo
 
 	void GetMemoryUsage(ICrySizer*) const;
@@ -90,8 +91,8 @@ private:
 	std::vector<ILevelInfo::SGameTypeInfo> m_gameTypes;
 	bool                                   m_isModLevel;
 	SMinimapInfo                           m_minimapInfo;
-	typedef std::map<string, TFlowInputData, stl::less_stricmp<string>> TAttributeList;
-	TAttributeList                         m_levelAttributes;
+	//typedef std::map<string, TFlowInputData, stl::less_stricmp<string>> TAttributeList;
+	//TAttributeList                         m_levelAttributes;
 
 	DynArray<string>                       m_levelTypeList;
 };

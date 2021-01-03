@@ -13,6 +13,8 @@
 #include <CryMono/IMonoRuntime.h>
 
 #include <CryCore/Platform/CryLibrary.h>
+
+#include "CrySerialization/IArchiveHost.h"
 #include "CrySystem/Testing/CryTest.h"
 #include "CrySystem/Testing/CryTestCommands.h"
 

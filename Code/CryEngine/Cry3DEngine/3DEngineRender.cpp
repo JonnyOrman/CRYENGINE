@@ -28,7 +28,6 @@
 #include "Brush.h"
 #include "ClipVolumeManager.h"
 #include <Cry3DEngine/ITimeOfDay.h>
-#include <CrySystem/Scaleform/IScaleformHelper.h>
 #include <CrySystem/CryVersion.h>
 #include <CryGame/IGameFramework.h>
 #include <CryAnimation/ICryAnimation.h>
@@ -3001,19 +3000,6 @@ void C3DEngine::DisplayInfo(float& fTextPosX, float& fTextPosY, float& fTextStep
 			                     DISPLAY_INFO_SCALE_SMALL, fTimeMS > maxVal ? Col_Red : Col_White, "%.2f(%.2f) ms(%2d)      Anim", fTimeMS, fTimeSyncMS, nNumCharacters);
 		}
 
-		IAISystem* pAISystem = gEnv->pAISystem;
-		IF (pAISystem != NULL, 1)
-		{
-	#if CRY_PLATFORM_MOBILE
-			const float maxVal = 6.f;
-	#else
-			const float maxVal = 50.f;
-	#endif
-			float fTimeMS = 1000.0f * gEnv->pTimer->TicksToSeconds(pAISystem->NumFrameTicks());
-			DrawTextRightAligned(fTextPosX, fTextPosY += (fTextStepY - STEP_SMALL_DIFF),
-			                     DISPLAY_INFO_SCALE_SMALL, fTimeMS > maxVal ? Col_Red : Col_White, "%.2f ms        AI", fTimeMS);
-		}
-
 		if (gEnv->pGameFramework)
 		{
 	#if CRY_PLATFORM_MOBILE
@@ -3024,15 +3010,6 @@ void C3DEngine::DisplayInfo(float& fTextPosX, float& fTextPosY, float& fTextStep
 			float fTimeMS = 1000.0f * gEnv->pTimer->TicksToSeconds(gEnv->pGameFramework->GetPreUpdateTicks());
 			DrawTextRightAligned(fTextPosX, fTextPosY += (fTextStepY - STEP_SMALL_DIFF),
 			                     DISPLAY_INFO_SCALE_SMALL, fTimeMS > maxVal ? Col_Red : Col_White, "%.2f ms    Action", fTimeMS);
-		}
-
-		{
-			const float flashCost = gEnv->pScaleformHelper ? gEnv->pScaleformHelper->GetFlashProfileResults() : -1.0f;
-			if (flashCost >= 0.0f)
-			{
-				float flashCostInMs = flashCost * 1000.0f;
-				DrawTextRightAligned(fTextPosX, fTextPosY += (fTextStepY - STEP_SMALL_DIFF), DISPLAY_INFO_SCALE_SMALL, flashCostInMs > 4.0f ? Col_Red : Col_White, "%.2f ms     Flash", flashCostInMs);
-			}
 		}
 
 		{
@@ -3433,9 +3410,6 @@ void C3DEngine::DisplayInfo(float& fTextPosX, float& fTextPosY, float& fTextStep
 
 	if (ICharacterManager* pCharManager = gEnv->pCharacterManager)
 		pCharManager->ResetFrameTicks();
-
-	if (IAISystem* pAISystem = gEnv->pAISystem)
-		pAISystem->ResetFrameTicks();
 }
 
 void C3DEngine::DrawFarTrees(const SRenderingPassInfo& passInfo)

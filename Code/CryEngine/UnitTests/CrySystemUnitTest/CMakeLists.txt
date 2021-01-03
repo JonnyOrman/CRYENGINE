@@ -12,7 +12,6 @@ end_sources()
 
 CryUnitTestSuite(CrySystemUnitTest SOLUTION_FOLDER "UnitTests")
 
-use_scaleform()
 include_directories("${CRYENGINE_DIR}/Code/CryEngine/CrySystem")
 target_compile_definitions(${THIS_PROJECT} PRIVATE _LIB CRY_IS_MONOLITHIC_BUILD _LAUNCHER)
 if (NOT OPTION_STATIC_LINKING)

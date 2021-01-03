@@ -3,6 +3,7 @@
 #include <CryMath/ISplines.h>
 #include <CrySerialization/IArchive.h>
 #include <CrySerialization/STL.h>
+#include "CrySystem/XML/IXml.h"
 
 //////////////////////////////////////////////////////////////////////////
 inline string& operator<<(string& str, const char* s)

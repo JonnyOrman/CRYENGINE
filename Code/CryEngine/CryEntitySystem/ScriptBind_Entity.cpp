@@ -26,7 +26,6 @@
 #include <CryString/CryPath.h>
 #include <CrySystem/File/CryFile.h>
 #include "EntitySlot.h"
-#include <CrySystem/Scaleform/IFlashPlayer.h>
 #include "AreaManager.h"
 #include "Area.h"
 #include <CryAnimation/IFacialAnimation.h>
@@ -203,8 +202,6 @@ CScriptBind_Entity::CScriptBind_Entity(IScriptSystem* pSS, ISystem* pSystem)
 
 	SCRIPT_REG_FUNC(GetArchetype);
 
-	SCRIPT_REG_FUNC(SetAIName);
-	SCRIPT_REG_FUNC(GetAIName);
 	SCRIPT_REG_TEMPLFUNC(SetFlags, "flags, mode");
 	SCRIPT_REG_TEMPLFUNC(GetFlags, "");
 	SCRIPT_REG_TEMPLFUNC(HasFlags, "flags");
@@ -920,21 +917,6 @@ int CScriptBind_Entity::GetLocalScale(IFunctionHandler* pH)
 	return pH->EndFunction(fScale);
 }
 
-//////////////////////////////////////////////////////////////////////////
-int CScriptBind_Entity::SetAIName(IFunctionHandler* pH)
-{
-	const char* sName;
-	if (!pH->GetParams(sName))
-		return pH->EndFunction();
-
-	GET_ENTITY;
-
-	if (pEntity->HasAI() && pEntity->GetAI())
-		pEntity->GetAI()->SetName(sName);
-
-	return pH->EndFunction();
-}
-
 /*! Set the name of the entity
    @param sName String containing the new entity name
  */
@@ -947,21 +929,6 @@ int CScriptBind_Entity::SetName(IFunctionHandler* pH)
 	pH->GetParam(1, sName);
 	pEntity->SetName(sName);
 	return pH->EndFunction();
-}
-
-/*! Get the AI name of the entity. Can be different than entity name.
-   @return AI Name of the entity
- */
-int CScriptBind_Entity::GetAIName(IFunctionHandler* pH)
-{
-	GET_ENTITY;
-
-	SCRIPT_CHECK_PARAMETERS(0);
-	const char* sName = "";
-	if (pEntity->HasAI())
-		sName = pEntity->GetAI()->GetName();
-
-	return pH->EndFunction(sName);
 }
 
 int CScriptBind_Entity::SetFlags(IFunctionHandler* pH, int flags, int mode)
@@ -4529,13 +4496,6 @@ int CScriptBind_Entity::TriggerEvent(IFunctionHandler* pH)
 			}
 		}
 		break;
-	case AIEVENT_DROPBEACON:
-		{
-			IPuppet* pPuppet = CastToIPuppetSafe(pEntity->GetAI());
-			if (pPuppet)
-				pPuppet->UpdateBeacon();
-			break;
-		}
 	case AIEVENT_SLEEP:
 	case AIEVENT_WAKEUP:
 	case AIEVENT_ENABLE:
@@ -4549,9 +4509,6 @@ int CScriptBind_Entity::TriggerEvent(IFunctionHandler* pH)
 	default:
 		return pH->EndFunction();
 	}
-
-	if (IAIObject* aiObject = pEntity->GetAI())
-		aiObject->Event(eventType, &eventParams);
 
 	return pH->EndFunction();
 }
@@ -4947,20 +4904,6 @@ int CScriptBind_Entity::SelectPipe(IFunctionHandler* pH)
 {
 	GET_ENTITY;
 
-	IAIObject* pAIObject = pEntity->GetAI();
-	if (!pAIObject)
-	{
-		EntityWarning("SelectPipe: The entity does not have AI");
-		return pH->EndFunction();
-	}
-
-	IPipeUser* pPipeUser = pAIObject->CastToIPipeUser();
-	if (!pPipeUser)
-	{
-		EntityWarning("SelectPipe: The entity's AI is not a pipe user");
-		return pH->EndFunction();
-	}
-
 	int nParamCount = pH->GetParamCount();
 	if (nParamCount < 2)
 	{
@@ -4982,7 +4925,6 @@ int CScriptBind_Entity::SelectPipe(IFunctionHandler* pH)
 
 	int targetEntityId = 0;
 	const char* szTargetName = 0;
-	IAIObject* pTargetAI = 0;
 	bool bResetAlways = false;
 
 	int eventId = 0;
@@ -5008,9 +4950,6 @@ int CScriptBind_Entity::SelectPipe(IFunctionHandler* pH)
 
 		default:
 			pH->GetParam(3, szTargetName);
-			pTargetAI = pPipeUser->GetSpecialAIObject(szTargetName);
-			if (pTargetAI)
-				szTargetName = 0;
 		}
 
 		if ((nParamCount > 3) && (pH->GetParamType(4) == svtNumber))
@@ -5024,31 +4963,12 @@ int CScriptBind_Entity::SelectPipe(IFunctionHandler* pH)
 		}
 	}
 
-	if (targetEntityId)
-	{
-		CEntity* pTargetEntity = g_pIEntitySystem->GetEntityFromID(targetEntityId);
-		if (pTargetEntity)
-			pTargetAI = pTargetEntity->GetAI();
-	}
-	else if (szTargetName)
-	{
-		pTargetAI = gEnv->pAISystem->GetAIObjectManager()->GetAIObjectByName(0, szTargetName);
-	}
-
 	bool bResult = false;
 
 	if (nParamCount > 5)
 	{
 		GoalParams node;
 		GoalParamsHelper(pH, 6, node);
-		if (node)
-		{
-			bResult = pPipeUser->SelectPipe(id, szPipeName, pTargetAI, eventId, bResetAlways, &node);
-		}
-	}
-	else
-	{
-		bResult = pPipeUser->SelectPipe(id, szPipeName, pTargetAI, eventId, bResetAlways);
 	}
 
 	if (!bResult)
@@ -5134,20 +5054,6 @@ int CScriptBind_Entity::InsertSubpipe(IFunctionHandler* pH)
 {
 	GET_ENTITY;
 
-	IAIObject* pAIObject = pEntity->GetAI();
-	if (!pAIObject)
-	{
-		EntityWarning("InsertSubpipe: The entity does not have AI");
-		return pH->EndFunction();
-	}
-
-	IPipeUser* pPipeUser = pAIObject->CastToIPipeUser();
-	if (!pPipeUser)
-	{
-		EntityWarning("InsertSubpipe: The entity's AI is not a pipe user");
-		return pH->EndFunction();
-	}
-
 	int nParamCount = pH->GetParamCount();
 	if (nParamCount < 2)
 	{
@@ -5169,7 +5075,6 @@ int CScriptBind_Entity::InsertSubpipe(IFunctionHandler* pH)
 
 	int targetEntityId = 0;
 	const char* szTargetName = 0;
-	IAIObject* pTargetAI = 0;
 
 	int eventId = 0;
 
@@ -5194,9 +5099,6 @@ int CScriptBind_Entity::InsertSubpipe(IFunctionHandler* pH)
 
 		default:
 			pH->GetParam(3, szTargetName);
-			pTargetAI = pPipeUser->GetSpecialAIObject(szTargetName);
-			if (pTargetAI)
-				szTargetName = 0;
 		}
 
 		if ((nParamCount > 3) && (pH->GetParamType(4) == svtNumber))
@@ -5205,43 +5107,13 @@ int CScriptBind_Entity::InsertSubpipe(IFunctionHandler* pH)
 		}
 	}
 
-	if (targetEntityId)
-	{
-		CEntity* pTargetEntity = g_pIEntitySystem->GetEntityFromID(targetEntityId);
-		if (pTargetEntity)
-			pTargetAI = pTargetEntity->GetAI();
-	}
-	else if (szTargetName)
-	{
-		pTargetAI = gEnv->pAISystem->GetAIObjectManager()->GetAIObjectByName(0, szTargetName);
-	}
-
 	bool bResult = false;
 
 	if (nParamCount > 4)
 	{
 		GoalParams node;
 		GoalParamsHelper(pH, 5, node);
-		if (node)
-		{
-			bResult = pPipeUser->InsertSubPipe(id, szPipeName, pTargetAI, eventId, &node) != 0;
-		}
 	}
-	else
-	{
-		bResult = pPipeUser->InsertSubPipe(id, szPipeName, pTargetAI, eventId) != 0;
-	}
-
-	//bool bResult = pPipeUser->InsertSubPipe(id, szPipeName, pTargetAI, eventId) != 0;
-
-	/*
-	   gEnv->pLog->SetFileName("AILOG.txt");
-	   if (bResult)
-	   gEnv->pLog->LogToFile("[%d]	%s	SELECT_PIPE	%s",gEnv->pAISystem->GetAITickCount(),pObject->GetName(),pName);
-	   else
-	   gEnv->pLog->LogToFile("[%d]	%s	PIPE_SELECTION_FAILED	%s",gEnv->pAISystem->GetAITickCount(),pObject->GetName(),pName);
-	   gEnv->pLog->SetFileName("Log.txt");
-	 */
 
 	return pH->EndFunction(bResult);
 }
@@ -5250,7 +5122,6 @@ int CScriptBind_Entity::CancelSubpipe(IFunctionHandler* pH)
 {
 	GET_ENTITY;
 
-	IAIObject* pObject = pEntity->GetAI();
 	int eventId = 0;
 	if (pH->GetParamCount() > 1)
 	{
@@ -5268,9 +5139,6 @@ int CScriptBind_Entity::CancelSubpipe(IFunctionHandler* pH)
 	}
 
 	bool res = false;
-	IPipeUser* pPipeUser = CastToIPipeUserSafe(pObject);
-	if (pPipeUser)
-		res = pPipeUser->CancelSubPipe(eventId);
 
 	return pH->EndFunction(res);
 }
@@ -5278,26 +5146,6 @@ int CScriptBind_Entity::CancelSubpipe(IFunctionHandler* pH)
 int CScriptBind_Entity::PassParamsToPipe(IFunctionHandler* pH)
 {
 	GET_ENTITY;
-
-	if (IAIObject* pAIObject = pEntity->GetAI())
-	{
-		if (IPipeUser* pipeuser = pAIObject->CastToIPipeUser())
-		{
-			if (pH->GetParamCount() == 1)
-			{
-				GoalParams node;
-				GoalParamsHelper(pH, 1, node);
-				if (node)
-				{
-					IGoalPipe* pipe = pipeuser->GetCurrentGoalPipe();
-					if (pipe)
-					{
-						pipe->ParseParams(node);
-					}
-				}
-			}
-		}
-	}
 
 	return pH->EndFunction();
 }
@@ -5319,12 +5167,6 @@ int CScriptBind_Entity::IsUsingPipe(IFunctionHandler* pH)
 
 	const char* pName;
 	pH->GetParam(1, pName);
-
-	IAIObject* pObject = pEntity->GetAI();
-
-	IPipeUser* pPipeUser = CastToIPipeUserSafe(pObject);
-	if (pPipeUser)
-		return pH->EndFunction(pPipeUser->IsUsingPipe(pName));
 
 	return pH->EndFunction();
 }
@@ -6103,127 +5945,8 @@ int CScriptBind_Entity::GetMaterialVec3(IFunctionHandler* pH, int slot, int nSub
 //////////////////////////////////////////////////////////////////////////
 int CScriptBind_Entity::MaterialFlashInvoke(IFunctionHandler* pH)
 {
-	SFlashVarValue res(SFlashVarValue::CreateUndefined());
-
-	//////////////////////////////////////////////////////////////////////////
-	// prepare invocation
-
-	if (pH->GetParamCount() < 4)
-		return pH->EndFunction();
-
-	// get parameters
-	int slot(0);
-	pH->GetParam(1, slot);
-
-	int subMtlId(0);
-	pH->GetParam(2, subMtlId);
-
-	int texSlot(0);
-	pH->GetParam(3, texSlot);
-
-	const char* pMethodName(0);   // AS method name to be called
-	pH->GetParam(4, pMethodName);
-
-	int numArgs(pH->GetParamCount() - 4); // number of arguments to AS script call
-	CRY_ASSERT(numArgs >= 0);
-
-	// build variable argument list
-	if (numArgs == 0)
-		return pH->EndFunction();
-
-	std::vector<SFlashVarValue> arguments;
-	arguments.resize(numArgs, SFlashVarValue::CreateUndefined());
-
-	if (numArgs)
-	{
-		for (int i = 0; i < numArgs; ++i)
-		{
-			ScriptAnyValue param;
-			pH->GetParamAny(5 + i, param);
-			switch (param.GetVarType())
-			{
-			case svtNumber:
-				{
-					float arg(0);
-					param.CopyTo(arg);
-					arguments[i] = arg;
-					break;
-				}
-			case svtString:
-				{
-					const char* arg(0);
-					param.CopyTo(arg);
-					arguments[i] = arg;
-					break;
-				}
-			default:
-				{
-					CRY_ASSERT(0); // unsupported type
-					arguments[i] = SFlashVarValue::CreateUndefined();
-				}
-			}
-		}
-	}
-	//////////////////////////////////////////////////////////////////////////
-
-	GET_ENTITY;
-	IEntityRender* pIEntityRender = pEntity->GetRenderInterface();
-
-	{
-		IMaterial* pMtl(pIEntityRender->GetRenderMaterial(slot));
-		if (pMtl)
-		{
-			pMtl = pMtl->GetSafeSubMtl(subMtlId);
-			if (pMtl)
-			{
-				const SShaderItem& shaderItem(pMtl->GetShaderItem());
-				if (shaderItem.m_pShaderResources)
-				{
-					SEfResTexture* pTex = shaderItem.m_pShaderResources->GetTexture(texSlot);
-					if (pTex)
-					{
-						IDynTextureSource* pDynTexSrc = pTex->m_Sampler.m_pDynTexSource;
-						if (pDynTexSrc)
-						{
-							IFlashPlayer* pFlashPlayer = (IFlashPlayer*) pDynTexSrc->GetSourceTemp(IDynTextureSource::DTS_I_FLASHPLAYER);
-							if (pFlashPlayer)
-							{
-								SFlashVarValue invokeRes(SFlashVarValue::CreateUndefined());
-								if (pFlashPlayer->Invoke(pMethodName, arguments.data(), numArgs, &invokeRes))
-								{
-									res = invokeRes;
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-
-	switch (res.GetType())
-	{
-	case SFlashVarValue::eBool:
-		return pH->EndFunction(res.GetBool());
-	case SFlashVarValue::eInt:
-		return pH->EndFunction(res.GetInt());
-	case SFlashVarValue::eUInt:
-		return pH->EndFunction(res.GetUInt());
-	case SFlashVarValue::eDouble:
-		return pH->EndFunction((float)res.GetDouble());
-	case SFlashVarValue::eFloat:
-		return pH->EndFunction(res.GetFloat());
-	case SFlashVarValue::eConstStrPtr:
-		return pH->EndFunction(res.GetConstStrPtr());
-
-	case SFlashVarValue::eConstWstrPtr:
-	case SFlashVarValue::eObject:
-	case SFlashVarValue::eNull:
-	case SFlashVarValue::eUndefined:
-	default:
-		break;
-	}
-
+	throw "removing flash";
+	
 	return pH->EndFunction();
 }
 
@@ -7521,15 +7244,15 @@ bool CScriptBind_Entity::ParseLightParams(IScriptTable* pLightTable, SRenderLigh
 			if (chain.GetValue("cubemap", bProjectAllSides) && bProjectAllSides && (light.m_Flags & DLF_DEFERRED_LIGHT))
 				flags |= FT_REPLICATE_TO_ALL_SIDES;
 
-			const char* pExt = PathUtil::GetExt(projectorTexture);
+			/*const char* pExt = PathUtil::GetExt(projectorTexture);
 			if (!stricmp(pExt, "swf") || !stricmp(pExt, "gfx") || !stricmp(pExt, "usm") || !stricmp(pExt, "ui"))
 			{
 				light.m_pLightDynTexSource = gEnv->pRenderer->EF_LoadDynTexture(projectorTexture, false);
 			}
 			else
-			{
+			{*/
 				light.m_pLightImage = gEnv->pRenderer->EF_LoadTexture(projectorTexture, flags);
-			}
+			//}
 
 			if ((!light.m_pLightImage || !light.m_pLightImage->IsTextureLoaded()) && !light.m_pLightDynTexSource)
 			{

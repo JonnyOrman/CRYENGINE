@@ -1,7 +1,6 @@
 // Copyright 2001-2019 Crytek GmbH / Crytek Group. All rights reserved.
 #pragma once
 
-#include "AI/AIManager.h"
 #include "Objects/ObjectManager.h"
 #include "ViewManager.h"
 
@@ -198,69 +197,10 @@ protected:
 
 	virtual void OnTrigger(QAction* action) override
 	{
-		if (action->property("QCommandAction").isNull())
-		{
-			CAIManager* manager = GetIEditorImpl()->GetAI();
-			const size_t agentTypeCount = manager->GetNavigationAgentTypeCount();
-
-			string actionName = action->objectName().toStdString().c_str();
-
-			for (size_t i = 0; i < agentTypeCount; ++i)
-			{
-				if (0 == actionName.compare(manager->GetNavigationAgentTypeName(i)))
-				{
-					const bool shouldBeDisplayed = gAINavigationPreferences.navigationDebugAgentType() != i || !gAINavigationPreferences.navigationDebugDisplay();
-					gAINavigationPreferences.setNavigationDebugAgentType(i);
-					gAINavigationPreferences.setNavigationDebugDisplay(shouldBeDisplayed);
-					break;
-				}
-			}
-		}
-		action->setChecked(gAINavigationPreferences.navigationDebugDisplay());
 	}
 
 	virtual void OnPopulateMenu() override
 	{
-		ICommandManager* pCommandManager = GetIEditorImpl()->GetICommandManager();
-		CAIManager* pManager = GetIEditorImpl()->GetAI();
-		const size_t agentTypeCount = pManager->GetNavigationAgentTypeCount();
-
-		const string actionModule = "ai";
-		for (size_t i = 0; i < agentTypeCount; ++i)
-		{
-			const char* szAgentTypeName = pManager->GetNavigationAgentTypeName(i);
-
-			string actionName = "debug_agent_type" + ToString(i);
-			string fullActionName = actionModule + "." + actionName;
-
-			QAction* pAction = nullptr;
-			if (pCommandManager->IsRegistered(actionModule, actionName))
-			{
-				pAction = pCommandManager->GetAction(fullActionName);
-			}
-			if (pAction)
-			{
-				addAction(pAction);
-				pAction->setText(QString("Visualize %1").arg(szAgentTypeName));
-			}
-			else
-			{
-				pAction = addAction(fullActionName.c_str());
-				pAction->setObjectName(szAgentTypeName);
-				pAction->setText(QString("Visualize %1").arg(szAgentTypeName));
-			}
-			m_pActionGroup->addAction(pAction);
-			pAction->setCheckable(true);
-
-			if (i == gAINavigationPreferences.navigationDebugAgentType())
-			{
-				pAction->setChecked(gAINavigationPreferences.navigationDebugDisplay());
-			}
-			else
-			{
-				pAction->setChecked(false);
-			}
-		}
 	}
 };
 
@@ -280,18 +220,11 @@ protected:
 
 	virtual void OnTrigger(QAction* action) override
 	{
-		if (action->property("QCommandAction").isNull())
-		{
-			CAIManager* manager = GetIEditorImpl()->GetAI();
-			manager->RegenerateNavigationByTypeName(action->objectName().toStdString().c_str());
-		}
 	}
 
 	virtual void OnPopulateMenu() override
 	{
 		ICommandManager* pCommandManager = GetIEditorImpl()->GetICommandManager();
-		CAIManager* pManager = GetIEditorImpl()->GetAI();
-		const size_t agentTypeCount = pManager->GetNavigationAgentTypeCount();
 
 		QAction* pRegenerateIgnoredAction = pCommandManager->GetAction("ai.regenerate_ignored");
 		if (pRegenerateIgnoredAction)
@@ -307,32 +240,6 @@ protected:
 		{
 			addAction(pRegenerateAllAction);
 			pRegenerateAllAction->setObjectName("all");
-		}
-
-		const string actionModule = "ai";
-		for (size_t i = 0; i < agentTypeCount; ++i)
-		{
-			const char* szAgentTypeName = pManager->GetNavigationAgentTypeName(i);
-
-			string actionName = "regenerate_agent_type_layer" + ToString(i);
-			string fullActionName = actionModule + "." + actionName;
-
-			QAction* pAction = nullptr;
-			if (pCommandManager->IsRegistered(actionModule, actionName))
-			{
-				pAction = pCommandManager->GetAction(fullActionName);
-			}
-			if (pAction)
-			{
-				addAction(pAction);
-				pAction->setText(QString("Regenerate %1").arg(szAgentTypeName));
-			}
-			else
-			{
-				pAction = addAction(fullActionName.c_str());
-				pAction->setObjectName(szAgentTypeName);
-				pAction->setText(QString("Regenerate %1").arg(szAgentTypeName));
-			}
 		}
 	}
 };

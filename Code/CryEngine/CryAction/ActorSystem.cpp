@@ -229,36 +229,6 @@ IActor* CActorSystem::GetOriginalDemoSpectator()
 }
 
 //------------------------------------------------------------------------
-void CActorSystem::RegisterActorClass(const char* name, IGameFramework::IActorCreator* pCreator, bool isAI)
-{
-	IEntityClassRegistry::SEntityClassDesc actorClass;
-
-	char scriptName[1024] = { 0 };
-	if (!isAI)
-		cry_sprintf(scriptName, "Scripts/Entities/Actor/%s.lua", name);
-	else
-		cry_sprintf(scriptName, "Scripts/Entities/AI/%s.lua", name);
-
-	// Allow the name to contain relative path, but use only the name part as class name.
-	string className(PathUtil::GetFile(name));
-	actorClass.sName = className.c_str();
-	actorClass.sScriptFile = scriptName;
-	if (!isAI)
-		actorClass.flags |= ECLF_INVISIBLE;
-
-	CCryAction::GetCryAction()->GetIGameObjectSystem()->RegisterExtension(className.c_str(), pCreator, &actorClass);
-
-	SActorClassDesc classDesc;
-	classDesc.pEntityClass = gEnv->pEntitySystem->GetClassRegistry()->FindClass(className.c_str());
-	classDesc.pCreator = pCreator;
-
-	m_classes.insert(TActorClassMap::value_type(name, classDesc));
-
-	// Automatically register scheduling profile
-	gEnv->pGameFramework->GetIGameObjectSystem()->RegisterSchedulingProfile(actorClass.sName, "dude", "own");
-}
-
-//------------------------------------------------------------------------
 void CActorSystem::AddActor(EntityId entityId, IActor* pProxy)
 {
 	m_actors.insert(TActorMap::value_type(entityId, pProxy));

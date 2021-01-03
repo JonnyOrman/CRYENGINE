@@ -50,8 +50,6 @@ public:
 	}
 	// ~IEntityPropertyGroup
 
-	static void OnFlowgraphActivation(EntityId entityId, IFlowNode::SActivationInfo* pActInfo, const class CEntityFlowNode* pNode);
-
 protected:
 	bool m_bActive = true;
 };

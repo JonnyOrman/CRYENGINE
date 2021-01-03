@@ -324,8 +324,8 @@ public:
 	static const char* PLAYER_DEFAULT_PROFILE_NAME;
 
 protected:
-	bool        SetUserData(SCryLobbyUserData* data, const TFlowInputData& value);
-	bool        ReadUserData(const SCryLobbyUserData* data, TFlowInputData& val);
+	//bool        SetUserData(SCryLobbyUserData* data, const TFlowInputData& value);
+	//bool        ReadUserData(const SCryLobbyUserData* data, TFlowInputData& val);
 	uint32      UserDataSize(const SCryLobbyUserData* data);
 	bool        SetUserDataType(SCryLobbyUserData* data, const char* type);
 	void        GetDefaultValue(const char* type, XmlNodeRef attributeNode, SCryLobbyUserData* pOutData);

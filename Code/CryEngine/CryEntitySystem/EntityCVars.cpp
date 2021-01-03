@@ -400,11 +400,5 @@ void CVar::ConsoleCommandToggleLayer(IConsoleCmdArgs* pArgs)
 
 		CryLogAlways("[Info][Layers] Toggling EntitySystemLayer %s to: %s", szLayerName, bShouldBeEnabled ? "Enabled" : "Disabled");
 		g_pIEntitySystem->EnableLayer(szLayerName, bShouldBeEnabled, bSerialize);
-
-		if (bShouldBeEnabled && gEnv->pAISystem)
-		{
-			CryLogAlways("[Info][Layers] Toggling AISystemLayer %s to: %s", szLayerName, bShouldBeEnabled ? "Enabled" : "Disabled");
-			gEnv->pAISystem->LayerEnabled(szLayerName, bShouldBeEnabled, bSerialize);
-		}
 	}
 }

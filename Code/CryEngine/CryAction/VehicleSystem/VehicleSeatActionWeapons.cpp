@@ -384,7 +384,7 @@ void CVehicleSeatActionWeapons::StartUsing(EntityId passengerId)
 {
 
 	IEntity* ent = gEnv->pEntitySystem->GetEntity(passengerId);
-	m_Forced = m_Forced && (!ent || !ent->HasAI());
+	m_Forced = m_Forced && (!ent || false /*!ent->HasAI()*/);
 
 	if (!passengerId && !m_Forced)
 		return;

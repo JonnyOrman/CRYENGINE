@@ -8,6 +8,7 @@
 #include <CrySystem/TimeValue.h>
 #include <CryLobby/CommonICryMatchMaking.h>
 #include <CryNetwork/INetwork.h>
+#include "Cry3DEngine/IStatObj.h"
 
 struct EventPhysRemoveEntityParts;
 struct IActionMapManager;
@@ -598,10 +599,10 @@ struct IGameFramework
 {
 	DECLARE_GAMEOBJECT_FACTORY(ISaveGame);
 	DECLARE_GAMEOBJECT_FACTORY(ILoadGame);
-	DECLARE_GAMEOBJECTEXTENSION_FACTORY(Actor);
+	/*DECLARE_GAMEOBJECTEXTENSION_FACTORY(Actor);
 	DECLARE_GAMEOBJECTEXTENSION_FACTORY(Item);
 	DECLARE_GAMEOBJECTEXTENSION_FACTORY(Vehicle);
-	DECLARE_GAMEOBJECTEXTENSION_FACTORY(GameObjectExtension);
+	DECLARE_GAMEOBJECTEXTENSION_FACTORY(GameObjectExtension);*/
 
 	typedef uint32                   TimerID;
 	typedef Functor2<void*, TimerID> TimerCallback;
@@ -707,14 +708,6 @@ struct IGameFramework
 	//! Returns a pointer to the IGameRulesSystem interface.
 	//! \return Pointer to IGameRulesSystem interface.
 	virtual IGameRulesSystem* GetIGameRulesSystem() = 0;
-
-	//! Returns a pointer to the IFlowSystem interface.
-	//! \return Pointer to IFlowSystem interface.
-	virtual IFlowSystem* GetIFlowSystem() = 0;
-
-	//! Returns a pointer to the IGameTokenSystem interface
-	//! \return Pointer to IGameTokenSystem interface.
-	virtual IGameTokenSystem* GetIGameTokenSystem() = 0;
 
 	//! Returns a pointer to the IEffectSystem interface
 	//! \return Pointer to IEffectSystem interface.

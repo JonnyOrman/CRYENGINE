@@ -65,11 +65,11 @@ void CCustomAction::TerminateAction()
 {
 	m_currentState = CAS_Ended;
 
-	IFlowGraph* pFlowGraph = GetFlowGraph();
+	/*IFlowGraph* pFlowGraph = GetFlowGraph();
 	if (pFlowGraph)
 	{
 		pFlowGraph->SetCustomAction(0);
-	}
+	}*/
 
 	m_pObjectEntity = NULL;
 
@@ -121,24 +121,24 @@ void CCustomAction::Serialize(TSerialize ser)
 			ser.Value("m_currentState", currentState);
 		}
 
-		if (ser.BeginOptionalGroup("m_pFlowGraph", m_pFlowGraph != NULL))
-		{
-			if (ser.IsReading())
-			{
-				ICustomAction* pAction = gEnv->pGameFramework->GetICustomActionManager()->GetCustomActionFromLibrary(m_customActionGraphName);
-				CRY_ASSERT(pAction);
-				if (pAction)
-					m_pFlowGraph = pAction->GetFlowGraph()->Clone();
-				if (m_pFlowGraph)
-					m_pFlowGraph->SetCustomAction(this);
-			}
-			if (m_pFlowGraph)
-			{
-				m_pFlowGraph->SetGraphEntity(objectId, 0);
-				m_pFlowGraph->Serialize(ser);
-			}
-			ser.EndGroup(); //m_pFlowGraph
-		}
+		//if (ser.BeginOptionalGroup("m_pFlowGraph", m_pFlowGraph != NULL))
+		//{
+		//	if (ser.IsReading())
+		//	{
+		//		ICustomAction* pAction = gEnv->pGameFramework->GetICustomActionManager()->GetCustomActionFromLibrary(m_customActionGraphName);
+		//		CRY_ASSERT(pAction);
+		//		if (pAction)
+		//			m_pFlowGraph = pAction->GetFlowGraph()->Clone();
+		//		if (m_pFlowGraph)
+		//			m_pFlowGraph->SetCustomAction(this);
+		//	}
+		//	if (m_pFlowGraph)
+		//	{
+		//		m_pFlowGraph->SetGraphEntity(objectId, 0);
+		//		m_pFlowGraph->Serialize(ser);
+		//	}
+		//	ser.EndGroup(); //m_pFlowGraph
+		//}
 	}
 	ser.EndGroup();
 }
@@ -173,20 +173,20 @@ bool CCustomAction::SwitchState(const ECustomActionState newState,
 	}
 
 	// Activate action on all matching flownodes
-	if (m_pFlowGraph && szNodeToCall && szNodeToCall[0] != '\0') // Has a custom graph, otherwise its an instance custom action
-	{
-		int idNode = 0;
-		TFlowNodeTypeId nodeTypeId;
-		TFlowNodeTypeId actionTypeId = gEnv->pFlowSystem->GetTypeId(szNodeToCall);
-		while ((nodeTypeId = m_pFlowGraph->GetNodeTypeId(idNode)) != InvalidFlowNodeTypeId)
-		{
-			if (nodeTypeId == actionTypeId)
-			{
-				m_pFlowGraph->SetRegularlyUpdated(idNode, true);
-			}
-			++idNode;
-		}
-	}
+	//if (m_pFlowGraph && szNodeToCall && szNodeToCall[0] != '\0') // Has a custom graph, otherwise its an instance custom action
+	//{
+	//	int idNode = 0;
+	//	TFlowNodeTypeId nodeTypeId;
+	//	TFlowNodeTypeId actionTypeId = gEnv->pFlowSystem->GetTypeId(szNodeToCall);
+	//	while ((nodeTypeId = m_pFlowGraph->GetNodeTypeId(idNode)) != InvalidFlowNodeTypeId)
+	//	{
+	//		if (nodeTypeId == actionTypeId)
+	//		{
+	//			m_pFlowGraph->SetRegularlyUpdated(idNode, true);
+	//		}
+	//		++idNode;
+	//	}
+	//}
 
 	return true;
 }

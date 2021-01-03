@@ -131,9 +131,6 @@ public:
 		}
 	}
 
-public:
-	static void OnFlowgraphActivation(EntityId entityId, IFlowNode::SActivationInfo* pActInfo, const class CEntityFlowNode* pNode);
-
 protected:
 	// Specifies the entity geometry slot in which the light is loaded, -1 if not currently loaded
 	// We default to using slot 1 for this light sample, in case the user would want to put geometry into slot 0.

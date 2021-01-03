@@ -719,14 +719,6 @@ public:
 	//! Checks if the entity is invisible.
 	virtual bool IsInvisible() const = 0;
 
-	//////////////////////////////////////////////////////////////////////////
-	virtual const IAIObject* GetAI() const = 0;
-	virtual IAIObject*       GetAI() = 0;
-	virtual bool             HasAI() const = 0;
-	virtual tAIObjectID      GetAIObjectID() const = 0;
-	virtual void             SetAIObjectID(tAIObjectID id) = 0;
-	//////////////////////////////////////////////////////////////////////////
-
 	//! Retrieve access to the rendering functionality of the Entity.
 	IEntity* GetRenderInterface() { return this; };
 

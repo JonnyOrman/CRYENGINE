@@ -122,36 +122,6 @@ namespace UQS
 
 		Client::IGenerator::EUpdateStatus CGenerator_PointsOnNavMesh::DoUpdate(const SUpdateContext& updateContext, Client::CItemListProxy_Writable<Pos3>& itemListToPopulate)
 		{
-			INavigationSystem* pNavigationSystem = gEnv->pAISystem->GetNavigationSystem();
-
-			if (const NavigationMeshID meshID = pNavigationSystem->GetEnclosingMeshID(m_params.navigationAgentTypeID, m_params.pivot.value))
-			{
-				const MNM::aabb_t aabb(
-					m_params.pivot.value + m_params.localAABBMins.value, 
-					m_params.pivot.value + m_params.localAABBMaxs.value);
-
-				//TODO: Get Navmesh query filter from somewhere
-				const DynArray<Vec3> triangleCenters = pNavigationSystem->QueryTriangleCenterLocationsInMesh(meshID, aabb);
-
-				if (!triangleCenters.empty())
-				{
-					//
-					// populate the given item-list and install an item-monitor that checks for NavMesh changes
-					//
-
-					std::unique_ptr<CItemMonitor_NavMeshChangesInAABB> pItemMonitorNavMeshChanges(new CItemMonitor_NavMeshChangesInAABB(m_params.navigationAgentTypeID));
-					itemListToPopulate.CreateItemsByItemFactory(triangleCenters.size());
-
-					for (size_t i = 0; i < triangleCenters.size(); ++i)
-					{
-						itemListToPopulate.GetItemAtIndex(i).value = triangleCenters[i];
-						pItemMonitorNavMeshChanges->AddPointToMonitoredArea(triangleCenters[i]);
-					}
-
-					Core::IHubPlugin::GetHub().GetQueryManager().AddItemMonitorToQuery(updateContext.queryContext.queryID, std::move(pItemMonitorNavMeshChanges));
-				}
-			}
-
 			// debug-persist the AABB
 			IF_UNLIKELY(updateContext.queryContext.pDebugRenderWorldPersistent)
 			{
@@ -295,13 +265,7 @@ namespace UQS
 			//
 
 			//TODO: Get Navmesh query filter from somewhere
-			INavMeshQueryFilter* pQueryFilter = nullptr;
 			Vec3 projectdPosOnNavMesh;
-			if (gEnv->pAISystem->GetNavigationSystem()->GetClosestPointInNavigationMesh(m_params.navigationAgentTypeID, cellPos.value, m_params.verticalTolerance, 0.0f, &projectdPosOnNavMesh, pQueryFilter))
-			{
-				cellPos.value = projectdPosOnNavMesh;
-				m_successfullyProjectedPoints.push_back(cellPos);
-			}
 
 			//
 			// inspect all 8 neighbors

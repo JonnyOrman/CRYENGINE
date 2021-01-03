@@ -20,7 +20,6 @@
 	#include <CrySystem/IConsole.h>
 	#include <Cry3DEngine/I3DEngine.h>
 	#include <CrySystem/ITimer.h>
-	#include <CrySystem/Scaleform/IScaleformHelper.h>
 	#include <CryParticleSystem/IParticles.h>
 	#include "System.h"
 
@@ -2281,33 +2280,6 @@ void CRenderBatchWidget::Update_ModeBatchStats()
 	}
 
 	unknownDPs -= totalsMesh.nBatches;
-
-	//Flash
-	{
-		unsigned int numDPs = 0;
-		unsigned int numTris = 0;
-		if (gEnv->pScaleformHelper)
-		{
-			gEnv->pScaleformHelper->GetFlashRenderStats(numDPs, numTris);
-		}
-
-		if (numDPs)
-		{
-			static const char* s_strFlash = "FLASH";
-
-			static BatchInfoPerPass s_flashBatch;
-
-			s_flashBatch.Reset();
-			s_flashBatch.name = s_strFlash;
-			s_flashBatch.nBatches = numDPs;
-			s_flashBatch.nInstances = 1;
-			s_flashBatch.col.set(255, 255, 0, 255);
-
-			unknownDPs -= s_flashBatch.nBatches;
-
-			sortedBatchList.push_back(&s_flashBatch);
-		}
-	}
 
 	//Particles
 	if (gEnv->pConsole->GetCVar("e_Particles")->GetIVal() != 0)

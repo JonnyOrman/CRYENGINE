@@ -594,11 +594,7 @@ int CScriptBind_Action::DontSyncPhysics(IFunctionHandler* pH, ScriptHandle entit
 //------------------------------------------------------------------------
 int CScriptBind_Action::HasAI(IFunctionHandler* pH, ScriptHandle entityId)
 {
-	const EntityId id = (EntityId)entityId.n;
-	IEntity* pEntity = gEnv->pEntitySystem->GetEntity(id);
-	
-	const bool hasAI = pEntity ? pEntity->HasAI() : false;
-	return pH->EndFunction(hasAI);
+	return false;
 }
 
 //------------------------------------------------------------------------
@@ -674,7 +670,7 @@ int CScriptBind_Action::RegisterWithAI(IFunctionHandler* pH)
 	}
 
 	AIObjectParams params(type, 0, entityID);
-	bool autoDisable(true);
+	//bool autoDisable(true);
 
 	// For most types, we need to parse the tables
 	// For others we leave them blank
@@ -690,8 +686,6 @@ int CScriptBind_Action::RegisterWithAI(IFunctionHandler* pH)
 	case AIOBJECT_ALIENTICK:
 
 	case AIOBJECT_HELICOPTERCRYSIS2:
-		if (gEnv->pAISystem && !gEnv->pAISystem->ParseTables(3, true, pH, params, autoDisable))
-			return pH->EndFunction();
 	default:
 		;
 	}
@@ -763,25 +757,13 @@ int CScriptBind_Action::RegisterWithAI(IFunctionHandler* pH)
 
 		pTable->GetValue("groupid", params.m_sParamStruct.m_nGroup);
 
-		const char* faction = 0;
-		if (pTable->GetValue("esFaction", faction) && gEnv->pAISystem)
-		{
-			params.m_sParamStruct.factionID = gEnv->pAISystem->GetFactionMap().GetFactionID(faction);
-			if (faction && *faction && (params.m_sParamStruct.factionID == IFactionMap::InvalidFactionID))
-			{
-				GameWarning("Unknown faction '%s' being set...", faction);
-			}
-		}
-		else
-		{
-			// Márcio: backwards compatibility
-			int species = -1;
-			if (!pTable->GetValue("eiSpecies", species))
-				pTable->GetValue("species", species);
+		// Márcio: backwards compatibility
+		int species = -1;
+		if (!pTable->GetValue("eiSpecies", species))
+			pTable->GetValue("species", species);
 
-			if (species > -1)
-				params.m_sParamStruct.factionID = species;
-		}
+		if (species > -1)
+			params.m_sParamStruct.factionID = species;
 
 		pTable->GetValue("commrange", params.m_sParamStruct.m_fCommRange); //Luciano - added to use GROUPONLY signals
 
@@ -826,35 +808,6 @@ int CScriptBind_Action::RegisterWithAI(IFunctionHandler* pH)
 	}
 
 	params.name = pEntity->GetName();
-
-	// Register in AI to get a new AI object, unregistering the old one in the process
-	gEnv->pAISystem->GetAIObjectManager()->CreateAIObject(params);
-
-	// (MATT) ? {2008/02/15:19:46:29}
-	// AI object was not created (possibly AI System is disabled)
-	if (IAIObject* aiObject = pEntity->GetAI())
-	{
-		if (type == AIOBJECT_SNDSUPRESSOR)
-			aiObject->SetRadius(params.m_moveAbility.pathRadius);
-		else if (type >= AIANCHOR_FIRST) // if anchor - set radius
-		{
-			SmartScriptTable pTable;
-			// Properties table
-			if (pH->GetParamCount() > 2)
-				pH->GetParam(3, pTable);
-			else
-				return pH->EndFunction();
-			float radius(0.f);
-			pTable->GetValue("radius", radius);
-			int groupId = -1;
-			pTable->GetValue("groupid", groupId);
-			aiObject->SetGroupId(groupId);
-			aiObject->SetRadius(radius);
-		}
-
-		if (IAIActorProxy* proxy = aiObject->GetProxy())
-			proxy->UpdateMeAlways(!autoDisable);
-	}
 
 	return pH->EndFunction();
 }

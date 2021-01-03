@@ -16,7 +16,6 @@
 #include <CryAction.h>
 
 #include "MaterialEffects.h"
-#include "MaterialFGManager.h"
 #include <CrySystem/ConsoleRegistration.h>
 
 CMaterialEffectsCVars* CMaterialEffectsCVars::s_pThis = 0;
@@ -25,12 +24,6 @@ namespace
 {
 void FGEffectsReload(IConsoleCmdArgs* pArgs)
 {
-	CMaterialEffects* pMaterialFX = static_cast<CMaterialEffects*>(CCryAction::GetCryAction()->GetIMaterialEffects());
-
-	if (pMaterialFX)
-	{
-		pMaterialFX->GetFGManager()->ReloadFlowGraphs();
-	}
 }
 
 void MFXReload(IConsoleCmdArgs* pArgs)

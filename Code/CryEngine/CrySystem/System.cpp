@@ -21,7 +21,6 @@
 
 #include <CryNetwork/INetwork.h>
 #include <Cry3DEngine/I3DEngine.h>
-#include <CryAISystem/IAISystem.h>
 #include <CryRenderer/IRenderer.h>
 #include <CrySystem/File/ICryPak.h>
 #include <CrySystem/ConsoleRegistration.h>
@@ -84,7 +83,6 @@
 #include <CrySystem/ZLib/ILZ4Decompressor.h>
 #include <zlib.h>
 #include "RemoteConsole/RemoteConsole.h"
-#include "ImeManager.h"
 #include "Watchdog.h"
 #include "NullImplementation/NULLAudioSystems.h"
 #include "NullImplementation/NULLRenderAuxGeom.h"
@@ -101,7 +99,6 @@
 
 #include <CryMath/PNoise3.h>
 #include <CryString/StringUtils.h>
-#include <CrySystem/Scaleform/IFlashUI.h>
 #include "CryWaterMark.h"
 
 #include "ExtensionSystem/CryPluginManager.h"
@@ -111,10 +108,6 @@
 #include "ManualFrameStep.h"
 
 WATERMARKDATA(_m);
-
-#if defined(INCLUDE_SCALEFORM_SDK) || defined(CRY_FEATURE_SCALEFORM_HELPER)
-	#include <CrySystem/Scaleform/IScaleformHelper.h>
-#endif
 
 #include "HMDManager.h"
 
@@ -460,7 +453,6 @@ CSystem::CSystem(const SSystemInitParams& startupParams)
 
 	m_bHasRenderedErrorMessage = false;
 
-	m_pImeManager = nullptr;
 	RegisterWindowMessageHandler(this);
 
 	m_env.pConsole = new CXConsole(*this);
@@ -476,7 +468,6 @@ CSystem::~CSystem()
 {
 	ShutDown();
 
-	SAFE_DELETE(m_pImeManager);
 	UnregisterWindowMessageHandler(this);
 
 	FreeLib(m_dll.hNetwork);
@@ -711,17 +702,6 @@ void CSystem::ShutDown()
 		UnloadEngineModule(m_sys_dll_response_system->GetString());
 	}
 
-#if defined(INCLUDE_SCALEFORM_SDK) || defined(CRY_FEATURE_SCALEFORM_HELPER)
-	if (m_env.pRenderer)
-		m_env.pRenderer->FlushRTCommands(true, true, true);
-
-	if (!gEnv->IsDedicated() && gEnv->pScaleformHelper)
-	{
-		gEnv->pScaleformHelper->Destroy();
-		gEnv->pScaleformHelper = nullptr;
-	}
-#endif
-
 	//////////////////////////////////////////////////////////////////////////
 	// Clear 3D Engine resources.
 	if (m_env.p3DEngine)
@@ -737,7 +717,6 @@ void CSystem::ShutDown()
 	SAFE_RELEASE(m_env.pHardwareMouse);
 	UnloadEngineModule("CryMovie");
 	SAFE_DELETE(m_env.pServiceNetwork);
-	UnloadEngineModule("CryAISystem");
 	UnloadEngineModule("CryFont");
 	UnloadEngineModule("CryNetwork");
 	//	SAFE_RELEASE(m_env.pCharacterManager);
@@ -950,25 +929,10 @@ void CSystem::Quit()
 		// HACK! to save cvars on quit.
 		SaveConfiguration();
 
-		if (gEnv->pFlashUI)
-			gEnv->pFlashUI->Shutdown();
-
 		if (m_env.pRenderer)
 		{
 			m_env.pRenderer->StopRenderIntroMovies(false);
-			m_env.pRenderer->StopLoadtimeFlashPlayback();
 		}
-
-#if defined(INCLUDE_SCALEFORM_SDK) || defined(CRY_FEATURE_SCALEFORM_HELPER)
-		if (m_env.pRenderer)
-			m_env.pRenderer->FlushRTCommands(true, true, true);
-
-		if (gEnv->pScaleformHelper)
-		{
-			gEnv->pScaleformHelper->Destroy();
-			gEnv->pScaleformHelper = nullptr;
-		}
-#endif
 
 		if (m_env.pRenderer)
 			m_env.pRenderer->ShutDownFast();
@@ -2038,9 +2002,9 @@ bool CSystem::Update(CEnumFlags<ESystemUpdateFlags> updateFlags, int nPauseMode)
 			// intermingle physics/AI updates so that if we get a big timestep (frame rate glitch etc) the
 			// AI gets to steer entities before they travel over cliffs etc.
 			float maxTimeStep = 0.0f;
-			if (m_env.pAISystem)
+			/*if (m_env.pAISystem)
 				maxTimeStep = m_env.pAISystem->GetUpdateInterval();
-			else
+			else*/
 				maxTimeStep = 0.25f;
 			int maxSteps = 1;
 			float fCurTime = m_Time.GetCurrTime();
@@ -2112,8 +2076,8 @@ bool CSystem::Update(CEnumFlags<ESystemUpdateFlags> updateFlags, int nPauseMode)
 					CRY_PROFILE_SECTION(PROFILE_SYSTEM, "SysUpdate:AI");
 					//////////////////////////////////////////////////////////////////////
 					//update AI system - match physics
-					if (m_env.pAISystem && !m_cvAIUpdate->GetIVal() && g_cvars.sys_ai)
-						m_env.pAISystem->Update(frameStartTime, frameTime);
+					/*if (m_env.pAISystem && !m_cvAIUpdate->GetIVal() && g_cvars.sys_ai)
+						m_env.pAISystem->Update(frameStartTime, frameTime);*/
 				}
 			}
 
@@ -2165,8 +2129,8 @@ bool CSystem::Update(CEnumFlags<ESystemUpdateFlags> updateFlags, int nPauseMode)
 				CRY_PROFILE_SECTION(PROFILE_SYSTEM, "SysUpdate:AI");
 				//////////////////////////////////////////////////////////////////////
 				//update AI system
-				if (m_env.pAISystem && !m_cvAIUpdate->GetIVal())
-					m_env.pAISystem->Update(frameStartTime, frameTime);
+				/*if (m_env.pAISystem && !m_cvAIUpdate->GetIVal())
+					m_env.pAISystem->Update(frameStartTime, frameTime);*/
 			}
 		}
 		pe_params_waterman pwm;
@@ -3120,13 +3084,6 @@ void CSystem::OnLanguageCVarChanged(ICVar* const pLanguage)
 				{
 					pLocalizationManager->LoadLocalizationDataByTag(tag.c_str());
 				}
-
-#if defined(INCLUDE_SCALEFORM_SDK) || defined(CRY_FEATURE_SCALEFORM_HELPER)
-				if (gEnv->pScaleformHelper)
-				{
-					gEnv->pScaleformHelper->SetTranslatorDirty(true);
-				}
-#endif
 			}
 		}
 	}
@@ -3367,13 +3324,6 @@ int CSystem::PumpWindowMessage(bool bAll, CRY_HWND opaqueHWnd)
 	// No window message support on this platform
 	return 0;
 #endif
-}
-
-//////////////////////////////////////////////////////////////////////////
-bool CSystem::IsImeSupported() const
-{
-	assert(m_pImeManager != NULL);
-	return m_pImeManager->IsImeSupported();
 }
 
 //////////////////////////////////////////////////////////////////////////

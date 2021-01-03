@@ -7,7 +7,6 @@
 #include <CryRenderer/IRenderer.h>
 #include <CryRenderer/IRenderAuxGeom.h>
 #include <CryRenderer/IMeshBaking.h>
-#include <CrySystem/Scaleform/IFlashPlayer.h>
 #include <CryRenderer/IStereoRenderer.h>
 #include <CryRenderer/IImage.h>
 #include <CryRenderer/RenderElements/CREMesh.h>
@@ -111,6 +110,5 @@ public:
 %include "../../../../CryEngine/CryCommon/CryRenderer/IRenderAuxGeom.h"
 %include "../../../../CryEngine/CryCommon/CryRenderer/RenderElements/CREMesh.h"
 
-%include "../../../../CryEngine/CryCommon/CrySystem/Scaleform/IFlashPlayer.h"
 %include "../../../../CryEngine/CryCommon/CryRenderer/IStereoRenderer.h"
 %include "../../../../CryEngine/CryCommon/CryRenderer/IMeshBaking.h"

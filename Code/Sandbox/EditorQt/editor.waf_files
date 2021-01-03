@@ -1,19 +1,4 @@
 {
-    "Editor_Uber_AI.cpp": {
-        "AI": [
-            "AI/AiBehavior.cpp", 
-            "AI/AiBehaviorLibrary.cpp", 
-            "AI/AIManager.cpp", 
-            "AI/AIMoveSimulation.cpp", 
-            "AI/AIMoveSimulation.h", 
-            "AI/CoverSurfaceManager.cpp", 
-            "AI/EditorCommands_AI.cpp", 
-            "AI/AiBehavior.h", 
-            "AI/AiBehaviorLibrary.h", 
-            "AI/AIManager.h", 
-            "AI/CoverSurfaceManager.h"
-        ]
-    }, 
     "Editor_Uber_ControlsQt.cpp": {
         "Controls": [
             "QT/Widgets/QEditToolButton.cpp", 
@@ -192,10 +177,6 @@
             "HyperGraph/FlowGraphHelpers.cpp", 
             "HyperGraph/FlowGraphMigrationHelper.h", 
             "HyperGraph/FlowGraphMigrationHelper.cpp"
-        ], 
-        "UIEditor": [
-            "UI/UIManager.cpp", 
-            "UI/UIManager.h"
         ]
     }, 
     "Editor_Uber_HyperGraph.cpp": {
@@ -701,17 +682,7 @@
             "MissionSelectDialog.cpp", 
             "MissionSelectDialog.h"
         ]
-    }, 
-    "Editor_Uber_NavDataGeneration.cpp": {
-        "AI/NavDataGeneration": [
-            "AI/NavDataGeneration/AICollision.h", 
-            "AI/NavDataGeneration/AILog.cpp", 
-            "AI/NavDataGeneration/AILog.h", 
-            "AI/NavDataGeneration/CAISystem.h", 
-            "AI/NavDataGeneration/Navigation.cpp", 
-            "AI/NavDataGeneration/Navigation.h"
-        ]
-    }, 
+    },
     "Editor_Uber_Panels.cpp": {
         "res": [
             "res/mannequin_transition_editor_toolbar.bmp", 

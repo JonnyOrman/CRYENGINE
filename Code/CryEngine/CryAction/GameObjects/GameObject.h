@@ -212,7 +212,6 @@ public:
 	virtual void SetNetworkParent(EntityId id) override;
 
 	virtual bool IsJustExchanging() override { return m_justExchanging; };
-	virtual bool SetAIActivation(EGameObjectAIActivationMode mode) override;
 	virtual void SetAutoDisablePhysicsMode(EAutoDisablePhysicsMode mode) override;
 	virtual void EnablePrePhysicsUpdate(EPrePhysicsUpdate updateRule) override;
 	// needed for debug
@@ -416,7 +415,6 @@ private:
 	bool ShouldUpdateSlot(const SExtension* pExt, uint32 slot, uint32 slotbit, bool checkAIDisable);
 	void EvaluateUpdateActivation();
 	void DebugUpdateState();
-	bool ShouldUpdateAI();
 	void RemoveExtension(const TExtensions::iterator& iter);
 	void UpdateStateEvent(EUpdateStateEvent evt);
 	bool TestIsProbablyVisible(uint state);
@@ -426,6 +424,7 @@ private:
 	void SetPhysicsDisable(bool disablePhysics);
 	void PostRemoteSpawn();
 
+private:
 	static const float        UpdateTimeouts[eUS_COUNT_STATES];
 	static const EUpdateState UpdateTransitions[eUS_COUNT_STATES][eUSE_COUNT_EVENTS];
 	static const char*        UpdateNames[eUS_COUNT_STATES];

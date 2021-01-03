@@ -159,21 +159,6 @@ bool CVehicleSystem::IsVehicleClass(const char* name) const
 }
 
 //------------------------------------------------------------------------
-void CVehicleSystem::RegisterVehicleClass(const char* name, IGameFramework::IVehicleCreator* pCreator, bool isAI)
-{
-	IEntityClassRegistry::SEntityClassDesc vehicleClass;
-
-	// Allow the name to contain relative path, but use only the name part as class name.
-	string className(PathUtil::GetFile(name));
-	vehicleClass.sName = className.c_str();
-	vehicleClass.sScriptFile = "Scripts/Entities/Vehicles/VehiclePool.lua";
-
-	CCryAction::GetCryAction()->GetIGameObjectSystem()->RegisterExtension(name, pCreator, &vehicleClass);
-
-	m_classes.insert(TVehicleClassMap::value_type(name, pCreator));
-}
-
-//------------------------------------------------------------------------
 void CVehicleSystem::AddVehicle(EntityId entityId, IVehicle* pProxy)
 {
 	m_vehicles.insert(TVehicleMap::value_type(entityId, pProxy));

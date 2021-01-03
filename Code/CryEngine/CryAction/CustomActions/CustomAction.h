@@ -7,7 +7,6 @@
 	#pragma once
 #endif
 
-#include <CryFlowGraph/IFlowSystem.h>
 #include <CryAction/ICustomActions.h>
 #include <CryCore/Containers/CryListenerSet.h>
 
@@ -37,7 +36,6 @@ public:
 		, m_pObjectEntity(NULL)
 		, m_currentState(CAS_Ended)
 		, m_customActionGraphName("")
-		, m_pFlowGraph(NULL)
 	{}
 	virtual ~CCustomAction() {}
 
@@ -60,7 +58,6 @@ public:
 	// ICustomAction
 	virtual IEntity*           GetObjectEntity() const          { return m_pObjectEntity; }
 	virtual const char*        GetCustomActionGraphName() const { return m_customActionGraphName; }
-	virtual IFlowGraph*        GetFlowGraph() const             { return m_pFlowGraph; }
 	virtual bool               StartAction();
 	virtual bool               SucceedAction();
 	virtual bool               SucceedWaitAction();
@@ -69,7 +66,6 @@ public:
 	virtual bool               EndActionFailure();
 	virtual bool               AbortAction();
 	virtual void               TerminateAction();
-	virtual void               Invalidate()                                                              { m_pFlowGraph = NULL; }
 	virtual ECustomActionState GetCurrentState() const                                                   { return m_currentState; }
 	virtual void               RegisterListener(ICustomActionListener* pEventListener, const char* name) { m_listeners.Add(pEventListener, name); }
 	virtual void               UnregisterListener(ICustomActionListener* pEventListener)                 { m_listeners.Remove(pEventListener); }
@@ -81,7 +77,6 @@ public:
 	void GetMemoryUsage(ICrySizer* pSizer) const
 	{
 		pSizer->AddObject(m_customActionGraphName);
-		pSizer->AddObject(m_pFlowGraph);
 	}
 
 protected:
@@ -98,7 +93,6 @@ protected:
 
 	IEntity*           m_pObjectEntity;         // Entities participants in this Action
 	string             m_customActionGraphName; // Name of the custom action graph
-	IFlowGraphPtr      m_pFlowGraph;            // Points to a flow graph which would be used to execute the Action
 	ECustomActionState m_currentState;          // Current state of the action
 
 	typedef CListenerSet<ICustomActionListener*> TCustomActionListeners;

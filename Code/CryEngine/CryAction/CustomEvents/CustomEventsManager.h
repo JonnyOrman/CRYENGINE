@@ -25,7 +25,7 @@ public:
 	virtual bool           UnregisterEventListener(ICustomEventListener* pListener, const TCustomEventId eventId) override;
 	virtual bool           UnregisterEvent(TCustomEventId eventId) override;
 	virtual void           Clear() override;
-	virtual void           FireEvent(const TCustomEventId eventId, const TFlowInputData& customData) override;
+	//virtual void           FireEvent(const TCustomEventId eventId, const TFlowInputData& customData) override;
 	virtual TCustomEventId GetNextCustomEventId() override;
 	// ~ICustomEventManager
 

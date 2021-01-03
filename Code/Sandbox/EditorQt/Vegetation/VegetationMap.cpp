@@ -13,7 +13,6 @@
 
 #include "QT/Widgets/QWaitProgress.h"
 #include "Util/ImageTIF.h"
-#include "IAIManager.h"
 
 #include <IUndoObject.h>
 #include <Controls/QuestionDialog.h>

@@ -15,8 +15,6 @@
 #include "System.h"
 #include <CryThreading/IThreadManager.h>
 #include <CryThreading/IJobManager.h>
-#include <CrySystem/Scaleform/IScaleformHelper.h>
-#include <CryAISystem/IAISystem.h>
 #include <CryParticleSystem/IParticlesPfx2.h>
 #include <CryPhysics/IPhysics.h>
 #include <CrySystem/ConsoleRegistration.h>
@@ -792,27 +790,8 @@ struct SCPUTimesDG : public IStatoscopeDataGroup
 			fr.AddValue(0);
 		}
 
-		IAISystem* pAISystem = gEnv->pAISystem;
-		if (pAISystem != NULL)
-		{
-			float fTimeMS = TICKS_TO_MS(pAISystem->NumFrameTicks());
-			fr.AddValue(fTimeMS);
-		}
-		else
-		{
-			fr.AddValue(0.0f);
-		}
+		fr.AddValue(0.0f);
 
-		const float flashCost = gEnv->pScaleformHelper ? gEnv->pScaleformHelper->GetFlashProfileResults() : -1.0f;
-		if (flashCost >= 0.0f)
-		{
-			float flashCostInMS = flashCost * 1000.0f;
-			fr.AddValue(flashCostInMS);
-		}
-		else
-		{
-			fr.AddValue(0.0f);
-		}
 	#undef TICKS_TO_MS
 	}
 };
@@ -1030,24 +1009,6 @@ struct SPerCGFGPUProfilersDG : public IStatoscopeDataGroup
 				fr.AddValue(1);
 			}
 		}
-
-		//Flash
-		{
-			unsigned int numDPs = 0;
-			unsigned int numTris = 0;
-			if (gEnv->pScaleformHelper)
-			{
-				gEnv->pScaleformHelper->GetFlashRenderStats(numDPs, numTris);
-			}
-
-			if (numDPs)
-			{
-				fr.AddValue(m_cattedCGFNames.Append("Flash/Scaleform/All/", strlen("Flash/Scaleform/All/")));
-				//fr.AddValue( batchStat->nFrameID );
-				fr.AddValue((int)numDPs);
-				fr.AddValue(1);
-			}
-		}
 	#endif
 	}
 
@@ -1075,19 +1036,6 @@ struct SPerCGFGPUProfilersDG : public IStatoscopeDataGroup
 			if (pInfo.nZpass > 0)
 				drawProfilerCount++;
 			if (pInfo.nMisc > 0)
-				drawProfilerCount++;
-		}
-
-		//Flash!
-		{
-			unsigned int numDPs = 0;
-			unsigned int numTris = 0;
-			if (gEnv->pScaleformHelper)
-			{
-				gEnv->pScaleformHelper->GetFlashRenderStats(numDPs, numTris);
-			}
-
-			if (numDPs > 0)
 				drawProfilerCount++;
 		}
 	#endif

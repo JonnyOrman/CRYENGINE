@@ -44,17 +44,10 @@ struct IDialogSystem;
 struct IEntity;
 struct IEntitySystem;
 struct IFileChangeMonitor;
-struct IFlash;
-struct IFlashLoadMovieHandler;
-struct IFlashPlayer;
-struct IFlashPlayerBootStrapper;
-struct IFlashUI;
-struct IFlowSystem;
 struct IGameFramework;
 struct IGameStartup;
 struct IHardwareMouse;
 struct IHmdDevice;
-struct IImeManager;
 struct IInput;
 struct IKeyboard;
 struct ILocalizationManager;
@@ -85,7 +78,6 @@ struct IRemoteConsole;
 struct IRenderAuxGeom;
 struct IRenderer;
 struct IResourceManager;
-struct IScaleformHelper;
 struct IScriptSystem;
 struct IServiceNetwork;
 struct IStatoscope;
@@ -132,11 +124,6 @@ struct IDynamicResponseSystem;
 
 namespace CryTest {
 struct ITestSystem;
-}
-
-namespace UIFramework
-{
-struct IUIFramework;
 }
 
 namespace Serialization {
@@ -735,7 +722,6 @@ struct SSystemGlobalEnvironment
 	ICryLobby*                     pLobby = nullptr;
 	IScriptSystem*                 pScriptSystem = nullptr;
 	IPhysicalWorld*                pPhysicalWorld = nullptr;
-	IFlowSystem*                   pFlowSystem = nullptr;
 	IInput*                        pInput = nullptr;
 	IStatoscope*                   pStatoscope = nullptr;
 	ICryPak*                       pCryPak = nullptr;
@@ -751,7 +737,6 @@ struct SSystemGlobalEnvironment
 	CryAudio::IAudioSystem*        pAudioSystem = nullptr;
 	ISystem*                       pSystem = nullptr;
 	ICharacterManager*             pCharacterManager = nullptr;
-	IAISystem*                     pAISystem = nullptr;
 	ILog*                          pLog = nullptr;
 	ICodeCheckpointMgr*            pCodeCheckpointMgr = nullptr;
 	IMovieSystem*                  pMovieSystem = nullptr;
@@ -762,13 +747,10 @@ struct SSystemGlobalEnvironment
 	IMaterialEffects*              pMaterialEffects = nullptr;
 	JobManager::IJobManager*       pJobManager = nullptr;
 	IOverloadSceneManager*         pOverloadSceneManager = nullptr;
-	IFlashUI*                      pFlashUI = nullptr;
-	UIFramework::IUIFramework*     pUIFramework = nullptr;
 	IServiceNetwork*               pServiceNetwork = nullptr;
 	IRemoteCommandManager*         pRemoteCommandManager = nullptr;
 	DRS::IDynamicResponseSystem*   pDynamicResponseSystem = nullptr;
 	IThreadManager*                pThreadManager = nullptr;
-	IScaleformHelper*              pScaleformHelper = nullptr;
 	ICrySchematycCore*             pSchematyc = nullptr;
 	Schematyc2::IFramework*        pSchematyc2 = nullptr;
 	Cry::UDR::IUDRSystem*          pUDR = nullptr;
@@ -1161,7 +1143,6 @@ struct ISystem
 	virtual INotificationNetwork*   GetINotificationNetwork() = 0;
 	virtual IHardwareMouse*         GetIHardwareMouse() = 0;
 	virtual IDialogSystem*          GetIDialogSystem() = 0;
-	virtual IFlowSystem*            GetIFlowSystem() = 0;
 	virtual IBudgetingSystem*       GetIBudgetingSystem() = 0;
 	virtual INameTable*             GetINameTable() = 0;
 	virtual IDiskProfiler*          GetIDiskProfiler() = 0;
@@ -1178,7 +1159,6 @@ struct ISystem
 	virtual ICryFont*               GetICryFont() = 0;
 	virtual IEntitySystem*          GetIEntitySystem() = 0;
 	virtual IMemoryManager*         GetIMemoryManager() = 0;
-	virtual IAISystem*              GetAISystem() = 0;
 	virtual IMovieSystem*           GetIMovieSystem() = 0;
 	virtual IPhysicalWorld*         GetIPhysicalWorld() = 0;
 	virtual CryAudio::IAudioSystem* GetIAudioSystem() = 0;
@@ -1210,14 +1190,11 @@ struct ISystem
 	virtual void                               SetLoadingProgressListener(ILoadingProgressListener* pListener) = 0;
 	virtual ISystem::ILoadingProgressListener* GetLoadingProgressListener() const = 0;
 
-	virtual void                               SetIFlowSystem(IFlowSystem* pFlowSystem) = 0;
 	virtual void                               SetIDialogSystem(IDialogSystem* pDialogSystem) = 0;
 	virtual void                               SetIMaterialEffects(IMaterialEffects* pMaterialEffects) = 0;
 	virtual void                               SetIParticleManager(IParticleManager* pParticleManager) = 0;
 	virtual void                               SetIOpticsManager(IOpticsManager* pOpticsManager) = 0;
 	virtual void                               SetIFileChangeMonitor(IFileChangeMonitor* pFileChangeMonitor) = 0;
-	virtual void                               SetIFlashUI(IFlashUI* pFlashUI) = 0;
-	virtual void                               SetIUIFramework(UIFramework::IUIFramework* pUIFramework) = 0;
 
 	//! Changes current user sub path, the path is always relative to the user documents folder.
 	//! Example: "My Games\Crysis"
@@ -1484,14 +1461,6 @@ struct ISystem
 	//! Returns the number of messages pumped, or -1 if the OS indicated the application should quit
 	//! Note: Calling GetMessage or PeekMessage yourself will skip the pre-process handling required for IME support
 	virtual int PumpWindowMessage(bool bAll, CRY_HWND hWnd = 0) = 0;
-
-	//! Check if IME is supported on the current platform
-	//! Note: This flag depends on compile-time settings, it cannot be enabled or disabled at runtime
-	//! However, the support itself can typically be enabled/disabled through CVar
-	virtual bool IsImeSupported() const = 0;
-
-	//! Returns the IME manager in use.
-	virtual IImeManager* GetImeManager() const = 0;
 };
 
 //! This is a very important function for the dedicated server - it lets us run >1000 players per piece of server hardware.

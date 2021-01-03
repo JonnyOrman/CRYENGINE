@@ -177,30 +177,6 @@
 #include <CryExtension/Conversion.h>
 #include <CryExtension/RegFactoryNode.h>
 
-#include <CryRenderer/IScaleform.h> // expensive header
 #include <CryRenderer/IRenderer.h> // expensive header
-
-#ifdef INCLUDE_SCALEFORM_SDK
-	#include <GRefCount.h>
-	#include <GMemory.h>
-	#include <GMemoryHeap.h>
-	#include <GAtomic.h>
-	#include <GStats.h>
-	#include <GTimer.h>
-	#include <GList.h>
-	#include <GSysAllocMalloc.h>
-	#include <GArray.h>
-	#include <GAllocator.h>
-	#include <GMath.h>
-	#include <GFxPlayerStats.h>
-	#include <GColor.h>
-	#include <GColorMacros.h>
-	#include <GMatrix2D.h>
-	#include <GTypes2DF.h>
-	#include <GMatrix3D.h>
-	#include <GPoint3.h>
-	#include <GImage.h>
-	#include <GRendererEventHandler.h>
-#endif
 
 #endif // USE_PCH

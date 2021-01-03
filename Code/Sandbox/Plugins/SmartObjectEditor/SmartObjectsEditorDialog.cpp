@@ -11,9 +11,6 @@
 #include "SmartObjectTemplateDialog.h"
 
 // EditorQt
-#include <AI/AIManager.h>
-#include <HyperGraph/FlowGraphManager.h>
-#include <HyperGraph/FlowGraph.h>
 #include <Objects/EntityObject.h>
 #include <Objects/ObjectManager.h>
 #include <Objects/SelectionGroup.h>
@@ -27,6 +24,8 @@
 // Engine
 #include <CryAISystem/IAgent.h>
 #include <CrySystem/ConsoleRegistration.h>
+
+//#include "IAIManager.h"
 
 #define SOED_DIALOGFRAME_CLASSNAME "SmartObjectsEditorDialog"
 #define CLASS_TEMPLATES_FOLDER     "Libs/SmartObjects/ClassTemplates/"
@@ -593,17 +592,17 @@ public:
 
 	void SetConditionToUI(const SmartObjectCondition& condition, CPropertyCtrl* pPropertyCtrl)
 	{
-		const MapTemplates& mapTemplates = GetIEditor()->GetAIManager()->GetMapTemplates();
+		/*const MapTemplates& mapTemplates = GetIEditor()->GetAIManager()->GetMapTemplates();
 		MapTemplates::const_iterator find = mapTemplates.find(condition.iTemplateId);
 		if (find == mapTemplates.end())
-			find = mapTemplates.find(0);
+			find = mapTemplates.find(0);*/
 
 		// template id 0 must always exist!
 		// if doesn't then probably templates aren't loaded...
-		assert(find != mapTemplates.end());
+		/*assert(find != mapTemplates.end());
 
 		CSOTemplate* pTemplate = find->second;
-		sTemplate = pTemplate->name.GetString();
+		sTemplate = pTemplate->name.GetString();*/
 
 		sName = condition.sName.c_str();
 		sFolder = condition.sFolder.c_str();
@@ -673,7 +672,7 @@ public:
 		m_vars->AddVariable(&sTemplate);
 
 		// add template variables
-		AddVariablesFromTemplate(m_vars, pTemplate->params);
+		//AddVariablesFromTemplate(m_vars, pTemplate->params);
 
 		pPropertyCtrl->DeleteAllItems();
 		pPropertyCtrl->AddVarBlock(m_vars);
@@ -685,99 +684,99 @@ public:
 		m_collapsedItems.clear();
 	}
 
-	IVariable* ResolveVariable(const CSOParam* pParam)
-	{
-		if (pParam->sName == "bNavigationRule")
-			return &bNavigationRule;
-		else if (pParam->sName == "sEvent")
-			return &sEvent;
-		else if (pParam->sName == "sChainedUserEvent")
-			return &sChainedUserEvent;
-		else if (pParam->sName == "sChainedObjectEvent")
-			return &sChainedObjectEvent;
-		else if (pParam->sName == "userClass")
-			return &userClass;
-		else if (pParam->sName == "userState")
-			return &userState;
-		else if (pParam->sName == "userHelper")
-			return &userHelper;
-		else if (pParam->sName == "iMaxAlertness")
-			return &iMaxAlertness;
-		else if (pParam->sName == "objectClass")
-			return &objectClass;
-		else if (pParam->sName == "objectState")
-			return &objectState;
-		else if (pParam->sName == "objectHelper")
-			return &objectHelper;
-		else if (pParam->sName == "entranceHelper")
-			return &entranceHelper;
-		else if (pParam->sName == "exitHelper")
-			return &exitHelper;
-		else if (pParam->sName == "limitsDistanceFrom")
-			return &limitsDistanceFrom;
-		else if (pParam->sName == "limitsDistanceTo")
-			return &limitsDistanceTo;
-		else if (pParam->sName == "limitsOrientation")
-			return &limitsOrientation;
-		else if (pParam->sName == "horizLimitOnly")
-			return &horizLimitOnly;
-		else if (pParam->sName == "limitsOrientationToTarget")
-			return &limitsOrientationToTarget;
-		else if (pParam->sName == "delayMinimum")
-			return &delayMinimum;
-		else if (pParam->sName == "delayMaximum")
-			return &delayMaximum;
-		else if (pParam->sName == "delayMemory")
-			return &delayMemory;
-		else if (pParam->sName == "multipliersProximity")
-			return &multipliersProximity;
-		else if (pParam->sName == "multipliersOrientation")
-			return &multipliersOrientation;
-		else if (pParam->sName == "multipliersVisibility")
-			return &multipliersVisibility;
-		else if (pParam->sName == "multipliersRandomness")
-			return &multipliersRandomness;
-		else if (pParam->sName == "fLookAtOnPerc")
-			return &fLookAtOnPerc;
-		else if (pParam->sName == "userPreActionState")
-			return &userPreActionState;
-		else if (pParam->sName == "objectPreActionState")
-			return &objectPreActionState;
-		else if (pParam->sName == "actionType")
-			return &actionType;
-		else if (pParam->sName == "actionName")
-			return &actionName;
-		else if (pParam->sName == "userPostActionState")
-			return &userPostActionState;
-		else if (pParam->sName == "objectPostActionState")
-			return &objectPostActionState;
-		else if (pParam->sName == "approachSpeed")
-			return &approachSpeed;
-		else if (pParam->sName == "approachStance")
-			return &approachStance;
-		else if (pParam->sName == "animationHelper")
-			return &animationHelper;
-		else if (pParam->sName == "approachHelper")
-			return &approachHelper;
-		else if (pParam->sName == "fStartRadiusTolerance")   // backward compatibility
-			return &fStartWidth;
-		else if (pParam->sName == "fStartWidth")
-			return &fStartWidth;
-		else if (pParam->sName == "fStartDirectionTolerance")
-			return &fStartDirectionTolerance;
-		else if (pParam->sName == "fTargetRadiusTolerance")   // backward compatibility
-			return &fStartArcAngle;
-		else if (pParam->sName == "fStartArcAngle")
-			return &fStartArcAngle;
+	//IVariable* ResolveVariable(const CSOParam* pParam)
+	//{
+	//	if (pParam->sName == "bNavigationRule")
+	//		return &bNavigationRule;
+	//	else if (pParam->sName == "sEvent")
+	//		return &sEvent;
+	//	else if (pParam->sName == "sChainedUserEvent")
+	//		return &sChainedUserEvent;
+	//	else if (pParam->sName == "sChainedObjectEvent")
+	//		return &sChainedObjectEvent;
+	//	else if (pParam->sName == "userClass")
+	//		return &userClass;
+	//	else if (pParam->sName == "userState")
+	//		return &userState;
+	//	else if (pParam->sName == "userHelper")
+	//		return &userHelper;
+	//	else if (pParam->sName == "iMaxAlertness")
+	//		return &iMaxAlertness;
+	//	else if (pParam->sName == "objectClass")
+	//		return &objectClass;
+	//	else if (pParam->sName == "objectState")
+	//		return &objectState;
+	//	else if (pParam->sName == "objectHelper")
+	//		return &objectHelper;
+	//	else if (pParam->sName == "entranceHelper")
+	//		return &entranceHelper;
+	//	else if (pParam->sName == "exitHelper")
+	//		return &exitHelper;
+	//	else if (pParam->sName == "limitsDistanceFrom")
+	//		return &limitsDistanceFrom;
+	//	else if (pParam->sName == "limitsDistanceTo")
+	//		return &limitsDistanceTo;
+	//	else if (pParam->sName == "limitsOrientation")
+	//		return &limitsOrientation;
+	//	else if (pParam->sName == "horizLimitOnly")
+	//		return &horizLimitOnly;
+	//	else if (pParam->sName == "limitsOrientationToTarget")
+	//		return &limitsOrientationToTarget;
+	//	else if (pParam->sName == "delayMinimum")
+	//		return &delayMinimum;
+	//	else if (pParam->sName == "delayMaximum")
+	//		return &delayMaximum;
+	//	else if (pParam->sName == "delayMemory")
+	//		return &delayMemory;
+	//	else if (pParam->sName == "multipliersProximity")
+	//		return &multipliersProximity;
+	//	else if (pParam->sName == "multipliersOrientation")
+	//		return &multipliersOrientation;
+	//	else if (pParam->sName == "multipliersVisibility")
+	//		return &multipliersVisibility;
+	//	else if (pParam->sName == "multipliersRandomness")
+	//		return &multipliersRandomness;
+	//	else if (pParam->sName == "fLookAtOnPerc")
+	//		return &fLookAtOnPerc;
+	//	else if (pParam->sName == "userPreActionState")
+	//		return &userPreActionState;
+	//	else if (pParam->sName == "objectPreActionState")
+	//		return &objectPreActionState;
+	//	else if (pParam->sName == "actionType")
+	//		return &actionType;
+	//	else if (pParam->sName == "actionName")
+	//		return &actionName;
+	//	else if (pParam->sName == "userPostActionState")
+	//		return &userPostActionState;
+	//	else if (pParam->sName == "objectPostActionState")
+	//		return &objectPostActionState;
+	//	else if (pParam->sName == "approachSpeed")
+	//		return &approachSpeed;
+	//	else if (pParam->sName == "approachStance")
+	//		return &approachStance;
+	//	else if (pParam->sName == "animationHelper")
+	//		return &animationHelper;
+	//	else if (pParam->sName == "approachHelper")
+	//		return &approachHelper;
+	//	else if (pParam->sName == "fStartRadiusTolerance")   // backward compatibility
+	//		return &fStartWidth;
+	//	else if (pParam->sName == "fStartWidth")
+	//		return &fStartWidth;
+	//	else if (pParam->sName == "fStartDirectionTolerance")
+	//		return &fStartDirectionTolerance;
+	//	else if (pParam->sName == "fTargetRadiusTolerance")   // backward compatibility
+	//		return &fStartArcAngle;
+	//	else if (pParam->sName == "fStartArcAngle")
+	//		return &fStartArcAngle;
 
-		CQuestionDialog::SWarning(QObject::tr(""), QObject::tr(string("WARNING:\nSmart object template has a Param tag named ") + pParam->sName + " which is not recognized as valid name!\nThe Param will be ignored..."));
-		return NULL;
-	}
+	//	CQuestionDialog::SWarning(QObject::tr(""), QObject::tr(string("WARNING:\nSmart object template has a Param tag named ") + pParam->sName + " which is not recognized as valid name!\nThe Param will be ignored..."));
+	//	return NULL;
+	//}
 
 private:
 	std::vector<IVariable*> m_collapsedItems;
 
-	void AddVariablesFromTemplate(CVarBlock* var, CSOParamBase* param)
+	/*void AddVariablesFromTemplate(CVarBlock* var, CSOParamBase* param)
 	{
 		while (param)
 		{
@@ -813,9 +812,9 @@ private:
 			}
 			param = param->pNext;
 		}
-	}
+	}*/
 	
-	void AddVariablesFromTemplate(IVariable* var, CSOParamBase* param)
+	/*void AddVariablesFromTemplate(IVariable* var, CSOParamBase* param)
 	{
 		while (param)
 		{
@@ -851,7 +850,7 @@ private:
 			}
 			param = param->pNext;
 		}
-	}
+	}*/
 	
 	void AddVariable(CVariableArray& varArray, CVariableBase& var, const char* varName, unsigned char dataType = IVariable::DT_SIMPLE, const char* description = NULL)
 	{
@@ -3904,206 +3903,206 @@ bool CSOLibrary::LoadFromFile(const char* sFileName)
 
 void CSmartObjectsEditorDialog::SetTemplateDefaults(SmartObjectCondition& condition, const CSOParamBase* param, CString* message /*= NULL*/) const
 {
-	if (!param)
-		return;
+	//if (!param)
+	//	return;
 
-	if (param->bIsGroup)
-	{
-		const CSOParamGroup* pGroup = static_cast<const CSOParamGroup*>(param);
-		SetTemplateDefaults(condition, pGroup->pChildren, message);
-	}
-	else
-	{
-		const CSOParam* pParam = static_cast<const CSOParam*>(param);
+	//if (param->bIsGroup)
+	//{
+	//	const CSOParamGroup* pGroup = static_cast<const CSOParamGroup*>(param);
+	//	SetTemplateDefaults(condition, pGroup->pChildren, message);
+	//}
+	//else
+	//{
+	//	const CSOParam* pParam = static_cast<const CSOParam*>(param);
 
-		if (!message || !pParam->bEditable)
-		{
-			if (message)
-			{
-				IVariable* pVar = pParam->pVariable ? pParam->pVariable : gSmartObjectsUI.ResolveVariable(pParam);
+	//	if (!message || !pParam->bEditable)
+	//	{
+	//		if (message)
+	//		{
+	//			IVariable* pVar = pParam->pVariable ? pParam->pVariable : gSmartObjectsUI.ResolveVariable(pParam);
 
-				// Report altering on visible properties only
-				if (gSmartObjectsUI.m_vars->IsContainsVariable(pVar))
-				{
-					CString temp;
-					if (pParam->sName == "bNavigationRule")
-						temp = condition.iRuleType == 1 ? "1" : "0";
-					else if (pParam->sName == "sEvent")
-						temp = condition.sEvent;
-					else if (pParam->sName == "sChainedUserEvent")
-						temp = condition.sChainedUserEvent;
-					else if (pParam->sName == "sChainedObjectEvent")
-						temp = condition.sChainedObjectEvent;
-					else if (pParam->sName == "userClass")
-						temp = condition.sUserClass;
-					else if (pParam->sName == "userState")
-						temp = condition.sUserState;
-					else if (pParam->sName == "userHelper")
-						temp = condition.sUserHelper;
-					else if (pParam->sName == "iMaxAlertness")
-						temp.Format("%d", condition.iMaxAlertness);
-					else if (pParam->sName == "objectClass")
-						temp = condition.sObjectClass;
-					else if (pParam->sName == "objectState")
-						temp = condition.sObjectState;
-					else if (pParam->sName == "objectHelper")
-						temp = condition.sObjectHelper;
-					else if (pParam->sName == "entranceHelper")
-						temp = condition.sEntranceHelper;
-					else if (pParam->sName == "exitHelper")
-						temp = condition.sExitHelper;
-					else if (pParam->sName == "limitsDistanceFrom")
-						temp.Format("%g", condition.fDistanceFrom);
-					else if (pParam->sName == "limitsDistanceTo")
-						temp.Format("%g", condition.fDistanceTo);
-					else if (pParam->sName == "limitsOrientation")
-						temp.Format("%g", condition.fOrientationLimit);
-					else if (pParam->sName == "horizLimitOnly")
-						temp = condition.bHorizLimitOnly ? "1" : "0";
-					else if (pParam->sName == "limitsOrientationToTarget")
-						temp.Format("%g", condition.fOrientationToTargetLimit);
-					else if (pParam->sName == "delayMinimum")
-						temp.Format("%g", condition.fMinDelay);
-					else if (pParam->sName == "delayMaximum")
-						temp.Format("%g", condition.fMaxDelay);
-					else if (pParam->sName == "delayMemory")
-						temp.Format("%g", condition.fMemory);
-					else if (pParam->sName == "multipliersProximity")
-						temp.Format("%g", condition.fProximityFactor);
-					else if (pParam->sName == "multipliersOrientation")
-						temp.Format("%g", condition.fOrientationFactor);
-					else if (pParam->sName == "multipliersVisibility")
-						temp.Format("%g", condition.fVisibilityFactor);
-					else if (pParam->sName == "multipliersRandomness")
-						temp.Format("%g", condition.fRandomnessFactor);
-					else if (pParam->sName == "fLookAtOnPerc")
-						temp.Format("%g", condition.fLookAtOnPerc);
-					else if (pParam->sName == "userPreActionState")
-						temp = condition.sUserPreActionState;
-					else if (pParam->sName == "objectPreActionState")
-						temp = condition.sObjectPreActionState;
-					else if (pParam->sName == "actionType")
-						temp.Format("%d", condition.eActionType);
-					else if (pParam->sName == "actionName")
-						temp = condition.sAction;
-					else if (pParam->sName == "userPostActionState")
-						temp = condition.sUserPostActionState;
-					else if (pParam->sName == "objectPostActionState")
-						temp = condition.sObjectPostActionState;
-					else if (pParam->sName == "approachSpeed")
-						temp.Format("%g", condition.fApproachSpeed);
-					else if (pParam->sName == "approachStance")
-						temp.Format("%d", condition.iApproachStance);
-					else if (pParam->sName == "animationHelper")
-						temp = condition.sAnimationHelper;
-					else if (pParam->sName == "approachHelper")
-						temp = condition.sApproachHelper;
-					else if (pParam->sName == "fStartRadiusTolerance")   // backward compatibility
-						temp.Format("%g", condition.fStartWidth);
-					else if (pParam->sName == "fStartWidth")
-						temp.Format("%g", condition.fStartWidth);
-					else if (pParam->sName == "fStartDirectionTolerance")
-						temp.Format("%g", condition.fDirectionTolerance);
-					else if (pParam->sName == "fTargetRadiusTolerance")   // backward compatibility
-						temp.Format("%g", condition.fStartArcAngle);
-					else if (pParam->sName == "fStartArcAngle")
-						temp.Format("%g", condition.fStartArcAngle);
+	//			// Report altering on visible properties only
+	//			if (gSmartObjectsUI.m_vars->IsContainsVariable(pVar))
+	//			{
+	//				CString temp;
+	//				if (pParam->sName == "bNavigationRule")
+	//					temp = condition.iRuleType == 1 ? "1" : "0";
+	//				else if (pParam->sName == "sEvent")
+	//					temp = condition.sEvent;
+	//				else if (pParam->sName == "sChainedUserEvent")
+	//					temp = condition.sChainedUserEvent;
+	//				else if (pParam->sName == "sChainedObjectEvent")
+	//					temp = condition.sChainedObjectEvent;
+	//				else if (pParam->sName == "userClass")
+	//					temp = condition.sUserClass;
+	//				else if (pParam->sName == "userState")
+	//					temp = condition.sUserState;
+	//				else if (pParam->sName == "userHelper")
+	//					temp = condition.sUserHelper;
+	//				else if (pParam->sName == "iMaxAlertness")
+	//					temp.Format("%d", condition.iMaxAlertness);
+	//				else if (pParam->sName == "objectClass")
+	//					temp = condition.sObjectClass;
+	//				else if (pParam->sName == "objectState")
+	//					temp = condition.sObjectState;
+	//				else if (pParam->sName == "objectHelper")
+	//					temp = condition.sObjectHelper;
+	//				else if (pParam->sName == "entranceHelper")
+	//					temp = condition.sEntranceHelper;
+	//				else if (pParam->sName == "exitHelper")
+	//					temp = condition.sExitHelper;
+	//				else if (pParam->sName == "limitsDistanceFrom")
+	//					temp.Format("%g", condition.fDistanceFrom);
+	//				else if (pParam->sName == "limitsDistanceTo")
+	//					temp.Format("%g", condition.fDistanceTo);
+	//				else if (pParam->sName == "limitsOrientation")
+	//					temp.Format("%g", condition.fOrientationLimit);
+	//				else if (pParam->sName == "horizLimitOnly")
+	//					temp = condition.bHorizLimitOnly ? "1" : "0";
+	//				else if (pParam->sName == "limitsOrientationToTarget")
+	//					temp.Format("%g", condition.fOrientationToTargetLimit);
+	//				else if (pParam->sName == "delayMinimum")
+	//					temp.Format("%g", condition.fMinDelay);
+	//				else if (pParam->sName == "delayMaximum")
+	//					temp.Format("%g", condition.fMaxDelay);
+	//				else if (pParam->sName == "delayMemory")
+	//					temp.Format("%g", condition.fMemory);
+	//				else if (pParam->sName == "multipliersProximity")
+	//					temp.Format("%g", condition.fProximityFactor);
+	//				else if (pParam->sName == "multipliersOrientation")
+	//					temp.Format("%g", condition.fOrientationFactor);
+	//				else if (pParam->sName == "multipliersVisibility")
+	//					temp.Format("%g", condition.fVisibilityFactor);
+	//				else if (pParam->sName == "multipliersRandomness")
+	//					temp.Format("%g", condition.fRandomnessFactor);
+	//				else if (pParam->sName == "fLookAtOnPerc")
+	//					temp.Format("%g", condition.fLookAtOnPerc);
+	//				else if (pParam->sName == "userPreActionState")
+	//					temp = condition.sUserPreActionState;
+	//				else if (pParam->sName == "objectPreActionState")
+	//					temp = condition.sObjectPreActionState;
+	//				else if (pParam->sName == "actionType")
+	//					temp.Format("%d", condition.eActionType);
+	//				else if (pParam->sName == "actionName")
+	//					temp = condition.sAction;
+	//				else if (pParam->sName == "userPostActionState")
+	//					temp = condition.sUserPostActionState;
+	//				else if (pParam->sName == "objectPostActionState")
+	//					temp = condition.sObjectPostActionState;
+	//				else if (pParam->sName == "approachSpeed")
+	//					temp.Format("%g", condition.fApproachSpeed);
+	//				else if (pParam->sName == "approachStance")
+	//					temp.Format("%d", condition.iApproachStance);
+	//				else if (pParam->sName == "animationHelper")
+	//					temp = condition.sAnimationHelper;
+	//				else if (pParam->sName == "approachHelper")
+	//					temp = condition.sApproachHelper;
+	//				else if (pParam->sName == "fStartRadiusTolerance")   // backward compatibility
+	//					temp.Format("%g", condition.fStartWidth);
+	//				else if (pParam->sName == "fStartWidth")
+	//					temp.Format("%g", condition.fStartWidth);
+	//				else if (pParam->sName == "fStartDirectionTolerance")
+	//					temp.Format("%g", condition.fDirectionTolerance);
+	//				else if (pParam->sName == "fTargetRadiusTolerance")   // backward compatibility
+	//					temp.Format("%g", condition.fStartArcAngle);
+	//				else if (pParam->sName == "fStartArcAngle")
+	//					temp.Format("%g", condition.fStartArcAngle);
 
-					if (temp != pParam->sValue.GetString())
-					{
-						*message += "  - ";
-						*message += pVar->GetHumanName();
-						*message += ";\n";
-					}
-				}
-			}
-			else
-			{
-				if (pParam->sName == "bNavigationRule")
-					condition.iRuleType = pParam->sValue == "1";
-				else if (pParam->sName == "sEvent")
-					condition.sEvent = pParam->sValue;
-				else if (pParam->sName == "sChainedUserEvent")
-					condition.sChainedUserEvent = pParam->sValue;
-				else if (pParam->sName == "sChainedObjectEvent")
-					condition.sChainedObjectEvent = pParam->sValue;
-				else if (pParam->sName == "userClass")
-					condition.sUserClass = pParam->sValue;
-				else if (pParam->sName == "userState")
-					condition.sUserState = pParam->sValue;
-				else if (pParam->sName == "userHelper")
-					condition.sUserHelper = pParam->sValue;
-				else if (pParam->sName == "iMaxAlertness")
-					condition.iMaxAlertness = atoi(pParam->sValue);
-				else if (pParam->sName == "objectClass")
-					condition.sObjectClass = pParam->sValue;
-				else if (pParam->sName == "objectState")
-					condition.sObjectState = pParam->sValue;
-				else if (pParam->sName == "objectHelper")
-					condition.sObjectHelper = pParam->sValue;
-				else if (pParam->sName == "entranceHelper")
-					condition.sEntranceHelper = pParam->sValue;
-				else if (pParam->sName == "exitHelper")
-					condition.sExitHelper = pParam->sValue;
-				else if (pParam->sName == "limitsDistanceFrom")
-					condition.fDistanceFrom = atof(pParam->sValue);
-				else if (pParam->sName == "limitsDistanceTo")
-					condition.fDistanceTo = atof(pParam->sValue);
-				else if (pParam->sName == "limitsOrientation")
-					condition.fOrientationLimit = atof(pParam->sValue);
-				else if (pParam->sName == "horizLimitOnly")
-					condition.bHorizLimitOnly = pParam->sValue == "1";
-				else if (pParam->sName == "limitsOrientationToTarget")
-					condition.fOrientationToTargetLimit = atof(pParam->sValue);
-				else if (pParam->sName == "delayMinimum")
-					condition.fMinDelay = atof(pParam->sValue);
-				else if (pParam->sName == "delayMaximum")
-					condition.fMaxDelay = atof(pParam->sValue);
-				else if (pParam->sName == "delayMemory")
-					condition.fMemory = atof(pParam->sValue);
-				else if (pParam->sName == "multipliersProximity")
-					condition.fProximityFactor = atof(pParam->sValue);
-				else if (pParam->sName == "multipliersOrientation")
-					condition.fOrientationFactor = atof(pParam->sValue);
-				else if (pParam->sName == "multipliersVisibility")
-					condition.fVisibilityFactor = atof(pParam->sValue);
-				else if (pParam->sName == "multipliersRandomness")
-					condition.fRandomnessFactor = atof(pParam->sValue);
-				else if (pParam->sName == "fLookAtOnPerc")
-					condition.fLookAtOnPerc = atof(pParam->sValue);
-				else if (pParam->sName == "userPreActionState")
-					condition.sUserPreActionState = pParam->sValue;
-				else if (pParam->sName == "objectPreActionState")
-					condition.sObjectPreActionState = pParam->sValue;
-				else if (pParam->sName == "actionType")
-					condition.eActionType = (EActionType) atoi(pParam->sValue);
-				else if (pParam->sName == "actionName")
-					condition.sAction = pParam->sValue;
-				else if (pParam->sName == "userPostActionState")
-					condition.sUserPostActionState = pParam->sValue;
-				else if (pParam->sName == "objectPostActionState")
-					condition.sObjectPostActionState = pParam->sValue;
-				else if (pParam->sName == "approachSpeed")
-					condition.fApproachSpeed = atof(pParam->sValue);
-				else if (pParam->sName == "approachStance")
-					condition.iApproachStance = atoi(pParam->sValue);
-				else if (pParam->sName == "animationHelper")
-					condition.sAnimationHelper = pParam->sValue;
-				else if (pParam->sName == "approachHelper")
-					condition.sApproachHelper = pParam->sValue;
-				else if (pParam->sName == "fStartRadiusTolerance")   // backward compatibility
-					condition.fStartArcAngle = atof(pParam->sValue);
-				else if (pParam->sName == "fStartArcAngle")
-					condition.fStartArcAngle = atof(pParam->sValue);
-				else if (pParam->sName == "fStartDirectionTolerance")
-					condition.fDirectionTolerance = atof(pParam->sValue);
-				else if (pParam->sName == "fTargetRadiusTolerance")   // backward compatibility
-					condition.fStartArcAngle = atof(pParam->sValue);
-				else if (pParam->sName == "fStartArcAngle")
-					condition.fStartArcAngle = atof(pParam->sValue);
-			}
-		}
-	}
+	//				if (temp != pParam->sValue.GetString())
+	//				{
+	//					*message += "  - ";
+	//					*message += pVar->GetHumanName();
+	//					*message += ";\n";
+	//				}
+	//			}
+	//		}
+	//		else
+	//		{
+	//			if (pParam->sName == "bNavigationRule")
+	//				condition.iRuleType = pParam->sValue == "1";
+	//			else if (pParam->sName == "sEvent")
+	//				condition.sEvent = pParam->sValue;
+	//			else if (pParam->sName == "sChainedUserEvent")
+	//				condition.sChainedUserEvent = pParam->sValue;
+	//			else if (pParam->sName == "sChainedObjectEvent")
+	//				condition.sChainedObjectEvent = pParam->sValue;
+	//			else if (pParam->sName == "userClass")
+	//				condition.sUserClass = pParam->sValue;
+	//			else if (pParam->sName == "userState")
+	//				condition.sUserState = pParam->sValue;
+	//			else if (pParam->sName == "userHelper")
+	//				condition.sUserHelper = pParam->sValue;
+	//			else if (pParam->sName == "iMaxAlertness")
+	//				condition.iMaxAlertness = atoi(pParam->sValue);
+	//			else if (pParam->sName == "objectClass")
+	//				condition.sObjectClass = pParam->sValue;
+	//			else if (pParam->sName == "objectState")
+	//				condition.sObjectState = pParam->sValue;
+	//			else if (pParam->sName == "objectHelper")
+	//				condition.sObjectHelper = pParam->sValue;
+	//			else if (pParam->sName == "entranceHelper")
+	//				condition.sEntranceHelper = pParam->sValue;
+	//			else if (pParam->sName == "exitHelper")
+	//				condition.sExitHelper = pParam->sValue;
+	//			else if (pParam->sName == "limitsDistanceFrom")
+	//				condition.fDistanceFrom = atof(pParam->sValue);
+	//			else if (pParam->sName == "limitsDistanceTo")
+	//				condition.fDistanceTo = atof(pParam->sValue);
+	//			else if (pParam->sName == "limitsOrientation")
+	//				condition.fOrientationLimit = atof(pParam->sValue);
+	//			else if (pParam->sName == "horizLimitOnly")
+	//				condition.bHorizLimitOnly = pParam->sValue == "1";
+	//			else if (pParam->sName == "limitsOrientationToTarget")
+	//				condition.fOrientationToTargetLimit = atof(pParam->sValue);
+	//			else if (pParam->sName == "delayMinimum")
+	//				condition.fMinDelay = atof(pParam->sValue);
+	//			else if (pParam->sName == "delayMaximum")
+	//				condition.fMaxDelay = atof(pParam->sValue);
+	//			else if (pParam->sName == "delayMemory")
+	//				condition.fMemory = atof(pParam->sValue);
+	//			else if (pParam->sName == "multipliersProximity")
+	//				condition.fProximityFactor = atof(pParam->sValue);
+	//			else if (pParam->sName == "multipliersOrientation")
+	//				condition.fOrientationFactor = atof(pParam->sValue);
+	//			else if (pParam->sName == "multipliersVisibility")
+	//				condition.fVisibilityFactor = atof(pParam->sValue);
+	//			else if (pParam->sName == "multipliersRandomness")
+	//				condition.fRandomnessFactor = atof(pParam->sValue);
+	//			else if (pParam->sName == "fLookAtOnPerc")
+	//				condition.fLookAtOnPerc = atof(pParam->sValue);
+	//			else if (pParam->sName == "userPreActionState")
+	//				condition.sUserPreActionState = pParam->sValue;
+	//			else if (pParam->sName == "objectPreActionState")
+	//				condition.sObjectPreActionState = pParam->sValue;
+	//			else if (pParam->sName == "actionType")
+	//				condition.eActionType = (EActionType) atoi(pParam->sValue);
+	//			else if (pParam->sName == "actionName")
+	//				condition.sAction = pParam->sValue;
+	//			else if (pParam->sName == "userPostActionState")
+	//				condition.sUserPostActionState = pParam->sValue;
+	//			else if (pParam->sName == "objectPostActionState")
+	//				condition.sObjectPostActionState = pParam->sValue;
+	//			else if (pParam->sName == "approachSpeed")
+	//				condition.fApproachSpeed = atof(pParam->sValue);
+	//			else if (pParam->sName == "approachStance")
+	//				condition.iApproachStance = atoi(pParam->sValue);
+	//			else if (pParam->sName == "animationHelper")
+	//				condition.sAnimationHelper = pParam->sValue;
+	//			else if (pParam->sName == "approachHelper")
+	//				condition.sApproachHelper = pParam->sValue;
+	//			else if (pParam->sName == "fStartRadiusTolerance")   // backward compatibility
+	//				condition.fStartArcAngle = atof(pParam->sValue);
+	//			else if (pParam->sName == "fStartArcAngle")
+	//				condition.fStartArcAngle = atof(pParam->sValue);
+	//			else if (pParam->sName == "fStartDirectionTolerance")
+	//				condition.fDirectionTolerance = atof(pParam->sValue);
+	//			else if (pParam->sName == "fTargetRadiusTolerance")   // backward compatibility
+	//				condition.fStartArcAngle = atof(pParam->sValue);
+	//			else if (pParam->sName == "fStartArcAngle")
+	//				condition.fStartArcAngle = atof(pParam->sValue);
+	//		}
+	//	}
+	//}
 
-	SetTemplateDefaults(condition, param->pNext, message);
+	//SetTemplateDefaults(condition, param->pNext, message);
 }

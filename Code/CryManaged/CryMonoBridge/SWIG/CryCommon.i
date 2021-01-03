@@ -7,7 +7,6 @@
 #include <CryAnimation/IAttachment.h>
 #include <CryAudio/Dialog/IDialogSystem.h>
 #include <CrySystem/XML/IReadWriteXMLSink.h>
-#include <CrySystem/Scaleform/IFlashUI.h>
 #include <CrySystem/CryVersion.h>
 #include <CryAISystem/IPathfinder.h>
 #include <CryAction/IMaterialEffects.h>

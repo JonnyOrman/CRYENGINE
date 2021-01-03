@@ -79,20 +79,20 @@ void CCustomEventManager::Clear()
 }
 
 //------------------------------------------------------------------------------------------------------------------------
-void CCustomEventManager::FireEvent(const TCustomEventId eventId, const TFlowInputData& customData)
-{
-	TCustomEventsMap::iterator eventsDataIter = m_customEventsData.find(eventId);
-	if (eventsDataIter != m_customEventsData.end())
-	{
-		SCustomEventData& eventData = eventsDataIter->second;
-		TCustomEventListeners& listeners = eventData.m_listeners;
-		listeners.ForEachListener([&](ICustomEventListener* pListener){ pListener->OnCustomEvent(eventId, customData); });
-	}
-	else
-	{
-		CryWarning(VALIDATOR_MODULE_GAME, VALIDATOR_WARNING, "CCustomEventManager::FireEvent: No event data exists for event id: %u", eventId);
-	}
-}
+//void CCustomEventManager::FireEvent(const TCustomEventId eventId, const TFlowInputData& customData)
+//{
+//	TCustomEventsMap::iterator eventsDataIter = m_customEventsData.find(eventId);
+//	if (eventsDataIter != m_customEventsData.end())
+//	{
+//		SCustomEventData& eventData = eventsDataIter->second;
+//		TCustomEventListeners& listeners = eventData.m_listeners;
+//		listeners.ForEachListener([&](ICustomEventListener* pListener){ pListener->OnCustomEvent(eventId, customData); });
+//	}
+//	else
+//	{
+//		CryWarning(VALIDATOR_MODULE_GAME, VALIDATOR_WARNING, "CCustomEventManager::FireEvent: No event data exists for event id: %u", eventId);
+//	}
+//}
 
 //------------------------------------------------------------------------------------------------------------------------
 TCustomEventId CCustomEventManager::GetNextCustomEventId()

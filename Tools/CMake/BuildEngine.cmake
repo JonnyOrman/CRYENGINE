@@ -13,18 +13,6 @@ if (WINDOWS)
 	option(OPTION_ENABLE_CRASHRPT "Enable CrashRpt crash reporting library" ON)
 endif()
 
-if(NOT ANDROID AND NOT ORBIS)
-	option(OPTION_SCALEFORMHELPER "Use Scaleform Helper" ON)
-else()
-	set(OPTION_SCALEFORMHELPER ON)
-endif()
-
-
-if(OPTION_DEDICATED_SERVER)
-	set(OPTION_SCALEFORMHELPER OFF)
-endif()
-
-
 option(OPTION_DEVELOPER_CONSOLE_IN_RELEASE "Enables the developer console in Release builds" ON)
 
 #The remote console is useful in development, but it is a potential security vulnerability, therefore opt-in
@@ -392,10 +380,6 @@ include_directories("${CRYENGINE_DIR}/Code/CryEngine/CrySchematyc/Core/Interface
 #	link_libraries (Ntdll)
 #endif (WINDOWS)
 
-if (OPTION_SCALEFORMHELPER AND NOT (OPTION_ENGINE OR OPTION_SHADERCACHEGEN))
-	add_subdirectory ("Code/CryEngine/CrySystem/Scaleform")
-endif()
-
 if (OPTION_ENGINE OR OPTION_SHADERCACHEGEN OR OPTION_DOXYGEN_EXAMPLES)
 	add_subdirectory ("Code/CryEngine/CryCommon")
 endif()
@@ -414,7 +398,6 @@ endif()
 if (OPTION_ENGINE)
 	add_subdirectory ("Code/CryEngine/Cry3DEngine")
 	add_subdirectory ("Code/CryEngine/CryAction")
-	add_subdirectory ("Code/CryEngine/CryAISystem")
 	add_subdirectory ("Code/CryEngine/CryAnimation")
 	add_subdirectory ("Code/CryEngine/CryAudioSystem/Common")
 	add_subdirectory ("Code/CryEngine/CryAudioSystem")	
@@ -442,7 +425,6 @@ if (OPTION_ENGINE)
 		add_subdirectory ("Code/CryEngine/CrySchematyc2")
 	endif()
 	add_subdirectory ("Code/CryEngine/CryScriptSystem")
-	add_subdirectory ("Code/CryEngine/CryFlowGraph")
 	add_subdirectory ("Code/CryEngine/CryUDR")
 
 	if (WINDOWS)
@@ -564,7 +546,7 @@ if (OPTION_ENGINE)
     endif()
 endif()
 
-if (OPTION_SCALEFORMHELPER OR OPTION_ENGINE OR OPTION_SHADERCACHEGEN)
+if (OPTION_ENGINE OR OPTION_SHADERCACHEGEN)
 	add_subdirectory ("Code/Libs/zlib")
 	add_subdirectory ("Code/Libs/expat")
 	if (WINDOWS)

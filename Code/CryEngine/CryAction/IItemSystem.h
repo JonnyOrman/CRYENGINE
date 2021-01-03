@@ -22,16 +22,11 @@
 #include "IItem.h"
 #include "IWeapon.h"
 #include "IActorSystem.h"
-#include <CryFlowGraph/IFlowSystem.h>
 
 enum EItemParamMapTypes
 {
 	eIPT_None   = -2,
-	eIPT_Any    = -1,
-	eIPT_Float  = EFlowDataTypes::eFDT_Float,
-	eIPT_Int    = EFlowDataTypes::eFDT_Int,
-	eIPT_Vec3   = EFlowDataTypes::eFDT_Vec3,
-	eIPT_String = EFlowDataTypes::eFDT_String,
+	eIPT_Any    = -1
 };
 
 struct IItemParamsNode
@@ -98,50 +93,12 @@ private:
 		dump += "<";
 		dump += name;
 
-		char snum[64];
-
 		for (int a = 0; a < node->GetAttributeCount(); a++)
 		{
 			const char* attrName = node->GetAttributeName(a);
 			dump += " ";
 			dump += attrName;
 			dump += "=\"";
-
-			switch (node->GetAttributeType(a))
-			{
-			case eIPT_Int:
-				{
-					int attr;
-					node->GetAttribute(a, attr);
-					cry_sprintf(snum, "%d", attr);
-					dump += snum;
-				}
-				break;
-			case eIPT_Float:
-				{
-					float attr;
-					node->GetAttribute(a, attr);
-					cry_sprintf(snum, "%f", attr);
-					dump += snum;
-				}
-				break;
-			case eIPT_String:
-				{
-					const char* attr = node->GetAttribute(a);
-					dump += attr;
-				}
-				break;
-			case eIPT_Vec3:
-				{
-					Vec3 attr;
-					node->GetAttribute(a, attr);
-					cry_sprintf(snum, "%f,%f,%f", attr.x, attr.y, attr.z);
-					dump += snum;
-				}
-				break;
-			default:
-				break;
-			}
 
 			dump += "\"";
 		}

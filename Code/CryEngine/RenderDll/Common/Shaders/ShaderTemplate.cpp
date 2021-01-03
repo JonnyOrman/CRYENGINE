@@ -12,7 +12,6 @@
 #include <Cry3DEngine/I3DEngine.h>
 #include <Cry3DEngine/CGF/CryHeaders.h>
 #include <CryString/StringUtils.h>                // stristr()
-#include <CrySystem/Scaleform/IFlashUI.h>
 #include "../Common/Textures/TextureHelpers.h"
 #include "../XRenderD3D9/GraphicsPipeline/ShadowMap.h"
 #include "../XRenderD3D9/GraphicsPipeline/VolumetricClouds.h"
@@ -792,31 +791,7 @@ void CShaderMan::mfRefreshResources(CShaderResources* Res, const IRenderer::SLoa
 			{
 				SAFE_RELEASE(Tex->m_Sampler.m_pTex);
 
-				if (CFlashTextureSource::IsFlashFile(Tex->m_Name.c_str()))
-				{
-					mfSetResourceTexState(Tex);
-
-					SAFE_RELEASE(Tex->m_Sampler.m_pTarget);
-					Tex->m_Sampler.m_pTarget = new SHRenderTarget;
-
-					const bool defVal = CRenderer::CV_r_DynTexSourceUseSharedRT == 1;
-					bool useSharedRT = gEnv->pFlashUI ? gEnv->pFlashUI->UseSharedRT(Tex->m_Name.c_str(), defVal) : defVal;
-					if (useSharedRT)
-						Tex->m_Sampler.m_pDynTexSource = new CFlashTextureSourceSharedRT(Tex->m_Name.c_str(), pArgs);
-					else
-						Tex->m_Sampler.m_pDynTexSource = new CFlashTextureSource(Tex->m_Name.c_str(), pArgs);
-
-					Tex->m_Sampler.m_pTarget->m_refSamplerID = i;
-					Tex->m_Sampler.m_pTarget->m_bTempDepth = true;
-					Tex->m_Sampler.m_pTarget->m_eOrder = eRO_Managed;
-					Tex->m_Sampler.m_pTarget->m_eTF = eTF_R8G8B8A8;
-					Tex->m_Sampler.m_pTarget->m_nIDInPool = -1;
-					Tex->m_Sampler.m_pTarget->m_nFlags |= FRT_CLEAR_DEPTH | FRT_CLEAR_STENCIL | FRT_CLEAR_COLOR;
-				}
-				else
-				{
-					Tex->m_Sampler.m_pTex = mfLoadResourceTexture("%ENGINE%/EngineAssets/TextureMsg/NotFound.tif", Res->m_TexturePath.c_str(), Res->m_Textures[i]->m_Sampler.GetTexFlags() | Flags, Res->m_Textures[i]);
-				}
+				Tex->m_Sampler.m_pTex = mfLoadResourceTexture("%ENGINE%/EngineAssets/TextureMsg/NotFound.tif", Res->m_TexturePath.c_str(), Res->m_Textures[i]->m_Sampler.GetTexFlags() | Flags, Res->m_Textures[i]);
 			}
 			else if (!Tex->m_Sampler.m_pTex)
 			{

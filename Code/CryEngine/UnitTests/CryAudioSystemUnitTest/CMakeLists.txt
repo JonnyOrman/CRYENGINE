@@ -9,7 +9,6 @@ add_sources("NoUberFile"
 end_sources()
 
 CryUnitTestSuite(CryAudioSystemUnitTest SOLUTION_FOLDER "UnitTests")
-use_scaleform()
 include_directories("${CRYENGINE_DIR}/Code/CryEngine/CryAudioSystem")
 include_directories("${CRYENGINE_DIR}/Code/CryEngine/CryAudioSystem/Common")
 target_compile_definitions(${THIS_PROJECT} PRIVATE _LIB CRY_IS_MONOLITHIC_BUILD _LAUNCHER)

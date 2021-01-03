@@ -51,7 +51,7 @@ struct ICustomEventManager
 	virtual void Clear() = 0;
 
 	//! Fires custom event.
-	virtual void FireEvent(const TCustomEventId eventId, const TFlowInputData& customData) = 0;
+	//virtual void FireEvent(const TCustomEventId eventId, const TFlowInputData& customData) = 0;
 
 	//! Gets next free event id.
 	virtual TCustomEventId GetNextCustomEventId() = 0;

@@ -91,7 +91,5 @@ private:
 	OnSpawnCallback                          m_onSpawnCallback;
 	CryGUID                                  m_schematycRuntimeClassGuid;
 
-	IFlowNodeFactory*                        m_pIFlowNodeFactory = nullptr;
-
 	mutable Schematyc::IRuntimeClassConstPtr m_pSchematycRuntimeClass = nullptr;
 };

@@ -4,7 +4,6 @@
 
 #include "AudioEntitiesUtils.h"
 #include "Legacy/Helpers/DesignerEntityComponent.h"
-#include <CryFlowGraph/IFlowSystem.h>
 #include <CrySerialization/Decorators/ResourcesAudio.h>
 
 class CEntityFlowNode;
@@ -49,9 +48,6 @@ public:
 
 	virtual void        SerializeProperties(Serialization::IArchive& archive) override;
 	// ~IEntityPropertyGroup
-
-public:
-	static void OnFlowgraphActivation(EntityId entityId, IFlowNode::SActivationInfo* pActInfo, const class CEntityFlowNode* pNode);
 
 protected:
 	void SetEnvironmentId(const CryAudio::ControlId environmentId);

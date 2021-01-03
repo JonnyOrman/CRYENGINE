@@ -26,7 +26,6 @@
 #include "Util/Math.h"
 #include "Util/Variable.h"
 #include "Util/GeometryUtil.h" // To use the Andrew's algorithm in order to make convex hull from the points, this header is needed.
-#include "IAIManager.h"
 #include "IDisplayViewport.h"
 #include "IEditorMaterial.h"
 #include "IIconManager.h"
@@ -3986,7 +3985,6 @@ void CBaseObject::OnBeforeAreaChange()
 {
 	AABB aabb;
 	GetBoundBox(aabb);
-	GetIEditor()->GetAIManager()->OnAreaModified(aabb, this);
 }
 
 void CBaseObject::SetMaterialByName(const char* mtlName)

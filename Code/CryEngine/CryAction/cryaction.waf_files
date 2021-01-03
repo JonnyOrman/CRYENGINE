@@ -42,49 +42,7 @@
             "DialogSystem/DialogQueuesManager.cpp", 
             "DialogSystem/FlowDialogNode.cpp"
         ]
-    }, 
-    "CryAction_flashui_uber.cpp": {
-        "FlashUI": [
-            "FlashUI/FlashUI.cpp", 
-            "FlashUI/FlashUIAction.cpp", 
-            "FlashUI/FlashUIElement.cpp", 
-            "FlashUI/FlashUIEventSystem.cpp", 
-            "FlashUI/FlashUIActionEvents.cpp", 
-            "FlashUI/FlashUIBaseNode.cpp", 
-            "FlashUI/FlashUIArrayNodes.cpp", 
-            "FlashUI/FlashUIDisplayNodes.cpp", 
-            "FlashUI/FlashUIElementNodes.cpp", 
-            "FlashUI/FlashUIEventNodes.cpp", 
-            "FlashUI/FlashUIActionNodes.cpp", 
-            "FlashUI/FlashUIUtilNodes.cpp", 
-            "FlashUI/ScriptBind_UIAction.cpp", 
-            "FlashUI/FlashUI.h", 
-            "FlashUI/FlashUIAction.h", 
-            "FlashUI/FlashUIActionEvents.h", 
-            "FlashUI/FlashUIActionNodes.h", 
-            "FlashUI/FlashUIArrayNodes.h", 
-            "FlashUI/FlashUIBaseNode.h", 
-            "FlashUI/FlashUIDisplayNodes.h", 
-            "FlashUI/FlashUIElement.h", 
-            "FlashUI/FlashUIFlowNodeFactory.h", 
-            "FlashUI/FlashUIElementNodes.h", 
-            "FlashUI/FlashUIEventNodes.h", 
-            "FlashUI/FlashUIEventSystem.h", 
-            "FlashUI/FlashUIUtilNodes.h", 
-            "FlashUI/ScriptBind_UIAction.h"
-        ]
-    }, 
-    "CryAction_flowsystem_uber.cpp": {
-        "Flow System/Nodes": [
-            "FlowSystem/Nodes/FlowEngineCustomNodes.cpp", 
-            "FlowSystem/Nodes/FlowEntityCustomNodes.h", 
-            "FlowSystem/Nodes/FlowEntityCustomNodes.cpp", 
-            "FlowSystem/Nodes/FlowGameNodes.cpp", 
-            "FlowSystem/Nodes/FlowWeaponNodes.cpp", 
-            "FlowSystem/Nodes/FlowInventoryNodes.cpp", 
-            "FlowSystem/Nodes/FlowOnlineStatsNodes.cpp"
-        ]
-    }, 
+    },
     "CryAction_game_objects_uber.cpp": {
         "Game Objects": [
             "GameObjects/GameObject.cpp", 

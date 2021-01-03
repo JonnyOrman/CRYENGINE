@@ -28,8 +28,6 @@ void CBreakReplicator::RegisterClasses()
 		serializerClass.sName = "BreakRepGameObject";
 		serializerClass.sScriptFile = "";
 		serializerClass.flags = ECLF_INVISIBLE;
-		static IGameFramework::CGameObjectExtensionCreator<CBreakRepGameObject> creator;
-		CCryAction::GetCryAction()->GetIGameObjectSystem()->RegisterExtension(serializerClass.sName, &creator, &serializerClass);
 	}
 }
 

@@ -48,7 +48,6 @@ const char* GetCryModuleName(uint cryModuleId)
 	{
 	case eCryM_3DEngine:                 return "Cry3DEngine";
 	case eCryM_GameFramework:            return "CryAction";
-	case eCryM_AISystem:                 return "CryAISystem";
 	case eCryM_Animation:                return "CryAnimation";
 	case eCryM_DynamicResponseSystem:    return "CryDynamicResponseSystem";
 	case eCryM_EntitySystem:             return "CryEntitySystem";
@@ -67,7 +66,6 @@ const char* GetCryModuleName(uint cryModuleId)
 	case eCryM_LiveCreate:               return "CryLiveCreate";
 	case eCryM_AudioImplementation:      return "CryAudioImplementation";
 	case eCryM_MonoBridge:               return "CryMonoBridge";
-	case eCryM_ScaleformHelper:          return "CryScaleformHelper";
 	case eCryM_FlowGraph:                return "CryFlowGraph";
 	case eCryM_Legacy:                   return "Legacy";
 	case eCryM_EnginePlugin:             return "Engine Plugin";

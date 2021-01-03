@@ -23,10 +23,6 @@
 #include <locale.h>
 #include <time.h>
 
-#if defined(INCLUDE_SCALEFORM_SDK) || defined(CRY_FEATURE_SCALEFORM_HELPER)
-	#include <CrySystem/Scaleform/IScaleformHelper.h>
-#endif
-
 #include <zlib.h>
 
 #if !defined(_RELEASE)
@@ -456,13 +452,6 @@ bool CLocalizedStringsManager::SetLanguage(const char* sLanguage)
 {
 	if (m_cvarLocalizationDebug >= 2)
 		CryLog("<Localization> Set language to %s", sLanguage);
-
-#if defined(INCLUDE_SCALEFORM_SDK) || defined(CRY_FEATURE_SCALEFORM_HELPER)
-	if (gEnv->pScaleformHelper)
-	{
-		gEnv->pScaleformHelper->SetTranslatorWordWrappingMode(sLanguage);
-	}
-#endif
 
 	// Check if already language loaded.
 	for (uint32 i = 0; i < m_languages.size(); i++)

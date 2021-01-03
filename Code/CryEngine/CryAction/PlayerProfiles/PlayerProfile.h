@@ -17,7 +17,7 @@ public:
 	static const char* ACTIONMAPS_TAG; // "ActionMaps";
 	static const char* VERSION_TAG;    // "Version";
 
-	typedef std::map<string, TFlowInputData, std::less<string>, stl::STLGlobalAllocator<std::pair<const string, TFlowInputData>>> TAttributeMap;
+	//typedef std::map<string, TFlowInputData, std::less<string>, stl::STLGlobalAllocator<std::pair<const string, TFlowInputData>>> TAttributeMap;
 
 	CPlayerProfile(CPlayerProfileManager* pManager, const char* name, const char* userId, bool bIsPreview = false);
 	virtual ~CPlayerProfile();
@@ -50,7 +50,7 @@ public:
 	virtual void DeleteAttribute(const char* name);
 
 	// get the value of an attribute. if not specified optionally lookup in default profile
-	virtual bool GetAttribute(const char* name, TFlowInputData& val, bool bUseDefaultFallback = true) const;
+	//virtual bool GetAttribute(const char* name, TFlowInputData& val, bool bUseDefaultFallback = true) const;
 
 	// get all attributes available
 	// all in this profile and inherited from default profile
@@ -69,12 +69,12 @@ public:
 	void                 SetName(const char* name);
 	void                 SetUserId(const char* userId);
 
-	const TAttributeMap& GetAttributeMap() const
+	/*const TAttributeMap& GetAttributeMap() const
 	{
 		return m_attributeMap;
 	}
 
-	const TAttributeMap& GetDefaultAttributeMap() const;
+	const TAttributeMap& GetDefaultAttributeMap() const;*/
 
 	void                 GetMemoryStatistics(ICrySizer* s);
 
@@ -87,7 +87,7 @@ protected:
 	CPlayerProfileManager* m_pManager;
 	string                 m_name;
 	string                 m_userId;
-	TAttributeMap          m_attributeMap;
+	//TAttributeMap          m_attributeMap;
 	int                    m_attributesVersion;
 	bool                   m_bIsPreview;
 };

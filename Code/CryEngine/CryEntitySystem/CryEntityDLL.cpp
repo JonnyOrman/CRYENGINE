@@ -7,7 +7,6 @@
 #include "EntityUnitTests.h"
 #include "EntityClassRegistry.h"
 #include "EntityCVars.h"
-#include "FlowGraphComponent.h"
 
 #include "Schematyc/EntitySchematycActions.h"
 #include "Schematyc/EntitySchematycUtilFunctions.h"
@@ -78,9 +77,6 @@ public:
 						const Schematyc::IEnvComponent* pEnvComponent = static_cast<const Schematyc::IEnvComponent*>(pEnvElement);
 
 						stack_string  nodeName = stack_string("EntityComponents:") + pEnvComponent->GetName() + ":" + "Signals:" + signal.GetName();
-
-						_smart_ptr<CEntityComponentFlowNodeFactorySignal> pSignalFactory = new CEntityComponentFlowNodeFactorySignal(*pEnvComponent, signal);
-						gEnv->pFlowSystem->RegisterType(nodeName.c_str(), pSignalFactory);
 					}
 
 					return Schematyc::EVisitStatus::Continue;
@@ -93,13 +89,9 @@ public:
 
 					// Create getter flow node
 					nodeName = typeName + ':' + "Get:" + "GetParameter";
-					_smart_ptr<CEntityComponentFlowNodeFactoryGetter> pGetterFactory = new CEntityComponentFlowNodeFactoryGetter(component, component.GetDesc().GetMembers());
-					gEnv->pFlowSystem->RegisterType(nodeName.c_str(), pGetterFactory);
 
 					// Create setter flow node
 					nodeName = typeName + ':' + "Set:" + "SetParameter";
-					_smart_ptr<CEntityComponentFlowNodeFactorySetter> pSetterFactory = new CEntityComponentFlowNodeFactorySetter(component, component.GetDesc().GetMembers());
-					gEnv->pFlowSystem->RegisterType(nodeName.c_str(), pSetterFactory);
 
 					// Create function flow node
 					component.VisitChildren([typeName, &component](const Schematyc::IEnvElement& element) -> Schematyc::EVisitStatus
@@ -111,9 +103,6 @@ public:
 							const Schematyc::CEnvFunction& function = static_cast<const Schematyc::CEnvFunction&>(element);
 
 							stack_string nodeName = typeName + ':' + "Functions:" + function.GetName();
-
-							_smart_ptr<CEntityComponentFlowNodeFactory> pFactory = new CEntityComponentFlowNodeFactory(component, function);
-							gEnv->pFlowSystem->RegisterType(nodeName.c_str(), pFactory);
 						}
 						break;
 						}

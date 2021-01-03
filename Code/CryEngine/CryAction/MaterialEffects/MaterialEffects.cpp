@@ -8,7 +8,6 @@
 #include "MFXParticleEffect.h"
 #include "MFXDecalEffect.h"
 #include "MFXRandomEffect.h"
-#include "MaterialFGManager.h"
 #include "MaterialEffectsDebug.h"
 #include <CryMemory/PoolAllocator.h>
 #include <CryRenderer/IRenderAuxGeom.h>
@@ -71,7 +70,7 @@ CMaterialEffects::CMaterialEffects()
 	m_bUpdateMode = false;
 	m_defaultSurfaceId = MaterialEffectsUtils::FindSurfaceIdByName(MATERIAL_EFFECTS_SURFACE_TYPE_DEFAULT);
 	m_canopySurfaceId = m_defaultSurfaceId;
-	m_pMaterialFGManager = new CMaterialFGManager();
+	//m_pMaterialFGManager = new CMaterialFGManager();
 
 #ifdef MATERIAL_EFFECTS_DEBUG
 	m_pVisualDebug = new MaterialEffectsUtils::CVisualDebug();
@@ -85,7 +84,7 @@ CMaterialEffects::~CMaterialEffects()
 	m_mfxLibraries.clear();
 	m_delayedEffects.clear();
 	m_effectContainers.clear();
-	SAFE_DELETE(m_pMaterialFGManager);
+	//SAFE_DELETE(m_pMaterialFGManager);
 
 #ifdef MATERIAL_EFFECTS_DEBUG
 	SAFE_DELETE(m_pVisualDebug);
@@ -214,7 +213,7 @@ void CMaterialEffects::StopEffect(TMFXEffectId effectId)
 		SMFXFlowGraphListNode* pNext = resources->m_flowGraphList;
 		while (pNext)
 		{
-			GetFGManager()->EndFGEffect(pNext->m_flowGraphParams.name);
+			//GetFGManager()->EndFGEffect(pNext->m_flowGraphParams.name);
 			pNext = pNext->pNext;
 		}
 	}
@@ -516,14 +515,14 @@ void CMaterialEffects::PreLoadAssets()
 		if (m_effectContainers[id])
 			m_effectContainers[id]->PreLoadAssets();
 
-	if (m_pMaterialFGManager)
-		return m_pMaterialFGManager->PreLoad();
+	/*if (m_pMaterialFGManager)
+		return m_pMaterialFGManager->PreLoad();*/
 }
 
 bool CMaterialEffects::LoadFlowGraphLibs()
 {
-	if (m_pMaterialFGManager)
-		return m_pMaterialFGManager->LoadLibs();
+	/*if (m_pMaterialFGManager)
+		return m_pMaterialFGManager->LoadLibs();*/
 	return false;
 }
 
@@ -660,7 +659,7 @@ void CMaterialEffects::SetUpdateMode(bool bUpdate)
 	if (!bUpdate)
 	{
 		m_delayedEffects.clear();
-		m_pMaterialFGManager->Reset(false);
+		//m_pMaterialFGManager->Reset(false);
 	}
 
 	m_bUpdateMode = bUpdate;
@@ -701,11 +700,11 @@ void CMaterialEffects::Update(float frameTime)
 #endif
 }
 
-void CMaterialEffects::NotifyFGHudEffectEnd(IFlowGraphPtr pFG)
-{
-	if (m_pMaterialFGManager)
-		m_pMaterialFGManager->EndFGEffect(pFG);
-}
+//void CMaterialEffects::NotifyFGHudEffectEnd(IFlowGraphPtr pFG)
+//{
+//	if (m_pMaterialFGManager)
+//		m_pMaterialFGManager->EndFGEffect(pFG);
+//}
 
 void CMaterialEffects::Reset(bool bCleanup)
 {
@@ -719,8 +718,8 @@ void CMaterialEffects::Reset(bool bCleanup)
 		}
 	}
 
-	if (m_pMaterialFGManager)
-		m_pMaterialFGManager->Reset(bCleanup);
+	/*if (m_pMaterialFGManager)
+		m_pMaterialFGManager->Reset(bCleanup);*/
 
 	if (bCleanup)
 	{
@@ -749,15 +748,14 @@ void CMaterialEffects::ClearDelayedEffects()
 
 void CMaterialEffects::Serialize(TSerialize ser)
 {
-	if (m_pMaterialFGManager && CMaterialEffectsCVars::Get().mfx_SerializeFGEffects != 0)
-		m_pMaterialFGManager->Serialize(ser);
+	/*if (m_pMaterialFGManager && CMaterialEffectsCVars::Get().mfx_SerializeFGEffects != 0)
+		m_pMaterialFGManager->Serialize(ser);*/
 }
 
 void CMaterialEffects::GetMemoryUsage(ICrySizer* s) const
 {
 	SIZER_SUBCOMPONENT_NAME(s, "MaterialEffects");
 	s->AddObject(this, sizeof(*this));
-	s->AddObject(m_pMaterialFGManager);
 
 	{
 		SIZER_SUBCOMPONENT_NAME(s, "libs");
@@ -916,24 +914,12 @@ int CMaterialEffects::GetDefaultCanopyIndex()
 
 void CMaterialEffects::ReloadMatFXFlowGraphs()
 {
-	m_pMaterialFGManager->ReloadFlowGraphs();
+	//m_pMaterialFGManager->ReloadFlowGraphs();
 }
 
 size_t CMaterialEffects::GetMatFXFlowGraphCount() const
 {
-	return m_pMaterialFGManager->GetFlowGraphCount();
-}
-
-IFlowGraphPtr CMaterialEffects::GetMatFXFlowGraph(int index, string* pFileName /*= NULL*/) const
-{
-	return m_pMaterialFGManager->GetFlowGraph(index, pFileName);
-}
-
-IFlowGraphPtr CMaterialEffects::LoadNewMatFXFlowGraph(const string& filename)
-{
-	IFlowGraphPtr res;
-	m_pMaterialFGManager->LoadFG(filename, &res);
-	return res;
+	return 0;// m_pMaterialFGManager->GetFlowGraphCount();
 }
 
 void CMaterialEffects::EnumerateEffectNames(EnumerateMaterialEffectsDataCallback& callback, const char* szLibraryName) const

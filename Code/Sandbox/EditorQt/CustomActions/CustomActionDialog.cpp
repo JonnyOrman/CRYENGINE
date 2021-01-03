@@ -5,9 +5,6 @@
 #include "CustomActionDialog.h"
 #include "IEditorImpl.h"
 
-#include "HyperGraph/FlowGraphManager.h"
-#include "HyperGraph/FlowGraph.h"
-
 #include "CustomActions/CustomActionsEditorManager.h"
 #include <CryAction/ICustomActions.h>
 #include <CryGame/IGameFramework.h>

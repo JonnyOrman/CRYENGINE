@@ -66,7 +66,6 @@ inline void GameWarning(const char*, ...) PRINTF_PARAMS(1, 2);
 #include <IItemSystem.h>
 #include <IViewSystem.h>
 #include <IVehicleSystem.h>
-#include <CryFlowGraph/IFlowSystem.h>
 #include <IGameplayRecorder.h>
 #include <CryGame/GameUtils.h>
 
