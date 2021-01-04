@@ -13,12 +13,8 @@
 	#endif
 	#include "D3DPostProcess.h"
 
-using namespace CryVR::Osvr;
-
-
-CD3DOsvrRenderer::CD3DOsvrRenderer(IOsvrDevice* pDevice, CD3D9Renderer* pRenderer, CD3DStereoRenderer* pStereoRenderer)
-	: m_pOsvrDevice(pDevice)
-	, m_pRenderer(pRenderer)
+CD3DOsvrRenderer::CD3DOsvrRenderer(CD3D9Renderer* pRenderer, CD3DStereoRenderer* pStereoRenderer)
+	: m_pRenderer(pRenderer)
 	, m_pStereoRenderer(pStereoRenderer)
 	, m_eyeWidth(0)
 	, m_eyeHeight(0)
@@ -34,17 +30,8 @@ CD3DOsvrRenderer::~CD3DOsvrRenderer()
 
 bool CD3DOsvrRenderer::Initialize(int initialWidth, int initialHeight)
 {
-	D3DDevice* d3d11Device = m_pRenderer->GetDevice();
-	D3DDeviceContext* d3d11DeviceContext = m_pRenderer->GetDeviceContext();
-
 	m_eyeWidth  = initialWidth;
 	m_eyeHeight = initialHeight;
-
-	if (!m_pOsvrDevice->InitializeRenderer(d3d11Device, d3d11DeviceContext))
-	{
-		m_pOsvrDevice->ShutdownRenderer();
-		return false;
-	}
 
 	CreateTextureSwapSets(m_eyeWidth, m_eyeHeight, 2);
 
@@ -73,37 +60,6 @@ void CD3DOsvrRenderer::CreateTextureSwapSets(uint32 width, uint32 height, uint32
 		}
 
 	}
-
-	//register created textures to osvr device
-	TextureSwapSet swapSets;
-	TArray<TextureSet> texSets;
-	TArray<Texture> textures;
-
-	TextureSet* texSetsptr = texSets.Grow(swapSetCount);
-	textures.Grow(swapSetCount * EyeCount);
-
-	swapSets.numTextureSets = swapSetCount;
-	swapSets.pTextureSets = texSetsptr;
-
-	for (uint32 i = 0; i < swapSetCount; ++i)
-	{
-		for (uint32 eye = 0; eye < EyeCount; ++eye)
-		{
-			uint32 index = i * EyeCount + eye;
-			Texture& tex = textures[index];
-			CTexture* ctex = m_scene3DRenderData[eye].textures[i];
-			tex.pRtView = ctex->GetSurface(0, 0);
-			tex.pTexture = ctex->GetDevTexture()->Get2DTexture();
-
-		}
-
-		TextureSet& set = texSets[i];
-		set.numTextures = EyeCount;
-		set.pTextures = &textures[i * EyeCount];
-	}
-
-	m_pOsvrDevice->RegisterTextureSwapSet(&swapSets);
-
 }
 void CD3DOsvrRenderer::ReleaseTextureSwapSets()
 {
@@ -122,7 +78,6 @@ void CD3DOsvrRenderer::ReleaseTextureSwapSets()
 void CD3DOsvrRenderer::Shutdown()
 {
 	ReleaseTextureSwapSets();
-	m_pOsvrDevice->ShutdownRenderer();
 }
 
 void CD3DOsvrRenderer::OnResolutionChanged(int newWidth, int newHeight)
@@ -142,12 +97,6 @@ void CD3DOsvrRenderer::SubmitFrame()
 	#ifdef ENABLE_BENCHMARK_SENSOR
 	gcpRendD3D->m_benchmarkRendererSensor->PreStereoFrameSubmit(m_scene3DRenderData[0].textures[m_currentFrame], m_scene3DRenderData[1].textures[m_currentFrame]);
 	#endif
-
-	// Scene3D layer
-	if (!m_pOsvrDevice->PresentTextureSet(gcpRendD3D->GetRenderFrameID(), m_currentFrame))
-	{
-		CryLogAlways("[CD3DEOsvrRenderer] failed to present textureset %d!", m_currentFrame);
-	}
 
 	#ifdef ENABLE_BENCHMARK_SENSOR
 	gcpRendD3D->m_benchmarkRendererSensor->AfterStereoFrameSubmit();

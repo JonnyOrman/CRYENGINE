@@ -5,7 +5,6 @@
 #if defined(INCLUDE_VR_RENDERING)
 
 	#include <CrySystem/VR/IHMDDevice.h>
-	#include <../CryPlugins/VR/CryOpenVR/Interface/IHmdOpenVRDevice.h>
 	#include <CryRenderer/IStereoRenderer.h>
 
 class CD3D9Renderer;
@@ -13,7 +12,7 @@ class CD3D9Renderer;
 class CD3DOpenVRRenderer : public IHmdRenderer
 {
 public:
-	CD3DOpenVRRenderer(CryVR::OpenVR::IOpenVRDevice* openVRDevice, CD3D9Renderer* renderer, CD3DStereoRenderer* stereoRenderer);
+	CD3DOpenVRRenderer(CD3D9Renderer* renderer, CD3DStereoRenderer* stereoRenderer);
 	virtual ~CD3DOpenVRRenderer() = default;
 
 	// IHDMRenderer
@@ -43,9 +42,9 @@ protected:
 		_smart_ptr<CTexture> texture;
 	};
 
-	bool             InitializeEyeTarget(D3DDevice* d3dDevice, EEyeType eye, CryVR::OpenVR::TextureDesc desc, const char* name);
-	bool             InitializeQuadLayer(D3DDevice* d3dDevice, RenderLayer::EQuadLayers quadLayer, CryVR::OpenVR::TextureDesc desc, const char* name);
-	bool             InitializeMirrorTexture(D3DDevice* d3dDevice, EEyeType eye, CryVR::OpenVR::TextureDesc desc, const char* name);
+	bool             InitializeEyeTarget(D3DDevice* d3dDevice, EEyeType eye, const char* name);
+	bool             InitializeQuadLayer(D3DDevice* d3dDevice, RenderLayer::EQuadLayers quadLayer, const char* name);
+	bool             InitializeMirrorTexture(D3DDevice* d3dDevice, EEyeType eye, const char* name);
 
 protected:
 	_smart_ptr<CTexture>          m_mirrorTextures[EEyeType::eEyeType_NumEyes];
@@ -59,7 +58,6 @@ protected:
 	uint32                        m_eyeWidth;
 	uint32                        m_eyeHeight;
 
-	CryVR::OpenVR::IOpenVRDevice* m_pOpenVRDevice;
 	CD3D9Renderer*                m_pRenderer;
 	CD3DStereoRenderer*           m_pStereoRenderer;
 };

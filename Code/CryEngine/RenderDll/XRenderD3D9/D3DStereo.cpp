@@ -1132,11 +1132,11 @@ IHmdRenderer* CD3DStereoRenderer::CreateHmdRenderer(IHmdDevice& device)
 	switch (device.GetClass())
 	{
 	case eHmdClass_Oculus:
-			return new CD3DOculusRenderer(static_cast<CryVR::Oculus::IOculusDevice*>(&device), gcpRendD3D, this);
+			return new CD3DOculusRenderer(gcpRendD3D, this);
 	case eHmdClass_OpenVR:
-			return new CD3DOpenVRRenderer(static_cast<CryVR::OpenVR::IOpenVRDevice*>(&device), gcpRendD3D, this);
+			return new CD3DOpenVRRenderer(gcpRendD3D, this);
 	case eHmdClass_Osvr:
-			return new CD3DOsvrRenderer(static_cast<CryVR::Osvr::IOsvrDevice*>(&device), gcpRendD3D, this);
+			return new CD3DOsvrRenderer(gcpRendD3D, this);
 		case eHmdClass_Emulator:
 			return new CD3DHmdEmulatorRenderer(&device, gcpRendD3D, this);
 	default:

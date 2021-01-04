@@ -15,12 +15,6 @@ void CD3DOculusRenderer::CopyMultiGPUFrameData()
 	NCryDX12::CResource& lRVResource = lRV->GetDX12Resource(); lRVResource.VerifyBackBuffer(false);
 	NCryDX12::CResource& rRVResource = rRV->GetDX12Resource(); rRVResource.VerifyBackBuffer(false);
 
-	const int idx0 = m_pOculusDevice->GetCurrentSwapChainIndex(m_scene3DRenderData[0].vrTextureSet.pDeviceTextureSwapChain);
-	const int idx1 = m_pOculusDevice->GetCurrentSwapChainIndex(m_scene3DRenderData[1].vrTextureSet.pDeviceTextureSwapChain);
-
-	IUnknown* lRVN = m_scene3DRenderData[0].texturesNative[idx0];
-	IUnknown* rRVN = m_scene3DRenderData[1].texturesNative[idx1];
-
 	D3D12_RESOURCE_BARRIER barrierDesc0[8] = {};
 	D3D12_RESOURCE_BARRIER barrierDesc2[8] = {};
 	int n = 0;
@@ -47,7 +41,6 @@ void CD3DOculusRenderer::CopyMultiGPUFrameData()
 	if (barrierDesc0[n].Transition.StateBefore != barrierDesc0[n].Transition.StateAfter)
 		n++;
 
-	barrierDesc0[n].Transition.pResource = (ID3D12Resource*)lRVN;
 	barrierDesc0[n].Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 	barrierDesc0[n].Transition.StateBefore = D3D12_RESOURCE_STATE_COMMON;
 	barrierDesc0[n].Transition.StateAfter = D3D12_RESOURCE_STATE_COPY_DEST;
@@ -55,7 +48,6 @@ void CD3DOculusRenderer::CopyMultiGPUFrameData()
 	if (barrierDesc0[n].Transition.StateBefore != barrierDesc0[n].Transition.StateAfter)
 		n++;
 
-	barrierDesc0[n].Transition.pResource = (ID3D12Resource*)rRVN;
 	barrierDesc0[n].Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 	barrierDesc0[n].Transition.StateBefore = D3D12_RESOURCE_STATE_COMMON;
 	barrierDesc0[n].Transition.StateAfter = D3D12_RESOURCE_STATE_COPY_DEST;
@@ -70,10 +62,6 @@ void CD3DOculusRenderer::CopyMultiGPUFrameData()
 
 		NCryDX12::CResource& qRVResource = qRV->GetDX12Resource(); qRVResource.VerifyBackBuffer(false);
 
-		const int idx = m_pOculusDevice->GetCurrentSwapChainIndex(m_quadLayerRenderData[i].vrTextureSet.pDeviceTextureSwapChain);
-
-		IUnknown* qRVN = m_quadLayerRenderData[i].texturesNative[idx];
-
 		barrierDesc0[n].Transition.pResource = *(*((BroadcastableD3D12Resource<2>*)qRVResource.GetD3D12Resource()))[0];
 		barrierDesc0[n].Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 		barrierDesc0[n].Transition.StateBefore = qRVResource.GetState();
@@ -82,7 +70,6 @@ void CD3DOculusRenderer::CopyMultiGPUFrameData()
 		if (barrierDesc0[n].Transition.StateBefore != barrierDesc0[n].Transition.StateAfter)
 			n++;
 
-		barrierDesc0[n].Transition.pResource = (ID3D12Resource*)qRVN;
 		barrierDesc0[n].Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 		barrierDesc0[n].Transition.StateBefore = D3D12_RESOURCE_STATE_COMMON;
 		barrierDesc0[n].Transition.StateAfter = D3D12_RESOURCE_STATE_COPY_DEST;
@@ -100,20 +87,11 @@ void CD3DOculusRenderer::CopyMultiGPUFrameData()
 
 	pCL0->ResourceBarrier(n, barrierDesc0);
 
-	pCL0->CopyResource((ID3D12Resource*)lRVN, *(*((BroadcastableD3D12Resource<2>*)lRVResource.GetD3D12Resource()))[0]);
-	pCL0->CopyResource((ID3D12Resource*)rRVN, *(*((BroadcastableD3D12Resource<2>*)rRVResource.GetD3D12Resource()))[0]);
-
 	for (uint32 i = 0; i < RenderLayer::eQuadLayers_Total; ++i)
 	{
 		CCryDX12Texture2D* qRV = (CCryDX12Texture2D*)m_pStereoRenderer->GetVrQuadLayerDisplayContext(static_cast<RenderLayer::EQuadLayers>(i)).first->GetCurrentBackBuffer()->GetDevTexture()->GetBaseTexture();
 
 		NCryDX12::CResource& qRVResource = qRV->GetDX12Resource(); qRVResource.VerifyBackBuffer(false);
-
-		const int idx = m_pOculusDevice->GetCurrentSwapChainIndex(m_quadLayerRenderData[i].vrTextureSet.pDeviceTextureSwapChain);
-
-		IUnknown* qRVN = m_quadLayerRenderData[i].texturesNative[idx];
-
-		pCL0->CopyResource((ID3D12Resource*)qRVN, *(*((BroadcastableD3D12Resource<2>*)qRVResource.GetD3D12Resource()))[0]);
 	}
 
 	pCL0->ResourceBarrier(n, barrierDesc2);

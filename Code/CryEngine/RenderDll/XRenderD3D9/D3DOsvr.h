@@ -4,7 +4,6 @@
 #ifdef INCLUDE_VR_RENDERING
 
 	#include <CrySystem/VR/IHMDDevice.h>
-	#include <../CryPlugins/VR/CryOSVR/Interface/IHmdOSVRDevice.h>
 	#include <CryRenderer/IStereoRenderer.h>
 
 class CD3D9Renderer;
@@ -14,7 +13,7 @@ class CD3DOsvrRenderer : public IHmdRenderer
 {
 public:
 
-	CD3DOsvrRenderer(CryVR::Osvr::IOsvrDevice* pDevice, CD3D9Renderer* pRenderer, CD3DStereoRenderer* pStereoRenderer);
+	CD3DOsvrRenderer(CD3D9Renderer* pRenderer, CD3DStereoRenderer* pStereoRenderer);
 	virtual ~CD3DOsvrRenderer();
 
 	// IHDMRenderer implementation
@@ -37,7 +36,6 @@ private:
 		TArray<CTexture*> textures;
 	};
 
-	CryVR::Osvr::IOsvrDevice* m_pOsvrDevice;
 	CD3D9Renderer*            m_pRenderer;
 	CD3DStereoRenderer*       m_pStereoRenderer;
 

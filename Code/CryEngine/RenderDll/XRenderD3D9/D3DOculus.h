@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include <../CryPlugins/VR/CryOculusVR/Interface/IHmdOculusRiftDevice.h>
 #include <CryRenderer/IStereoRenderer.h>
 
 #include <string>
@@ -16,7 +15,7 @@ class CD3D9Renderer;
 class CD3DOculusRenderer : public IHmdRenderer
 {
 public:
-	CD3DOculusRenderer(CryVR::Oculus::IOculusDevice* oculusDevice, CD3D9Renderer* renderer, CD3DStereoRenderer* stereoRenderer);
+	CD3DOculusRenderer(CD3D9Renderer* renderer, CD3DStereoRenderer* stereoRenderer);
 	virtual ~CD3DOculusRenderer() = default;
 
 	// IHDMRenderer
@@ -36,7 +35,6 @@ private:
 	// Structure used for rendering the scene to the buffer of textures sent to the Hmd
 	struct STextureSwapChainRenderData
 	{
-		CryVR::Oculus::STextureSwapChain  vrTextureSet;
 		Vec2i                             viewportPosition;
 		Vec2i                             viewportSize;
 		std::vector<_smart_ptr<CTexture>> textures;
@@ -47,15 +45,14 @@ private:
 	struct SMirrorTextureRenderData
 	{
 		SMirrorTextureRenderData() : pMirrorTexture(nullptr) {}
-		CryVR::Oculus::STexture vrMirrorTexture; // device texture
 		_smart_ptr<CTexture>    pMirrorTexture;  // CryEngine's texture used as render target for Oculus to write their mirror texture
 		IUnknown*               pMirrorTextureNative;
 	};
 
-	bool InitializeTextureSwapSet(ID3D11Device* d3dDevice, EEyeType eye, STextureSwapChainRenderData& eyeRenderData, CryVR::Oculus::TextureDesc desc, const std::string& name);
-	bool InitializeTextureSwapSet(ID3D11Device* d3dDevice, EEyeType eye, CryVR::Oculus::TextureDesc desc, const std::string& name);
-	bool InitializeQuadTextureSwapSet(ID3D11Device* d3dDevice, RenderLayer::EQuadLayers id, CryVR::Oculus::TextureDesc desc, const std::string& name);
-	bool InitializeMirrorTexture(ID3D11Device* d3dDevice, CryVR::Oculus::TextureDesc desc, const std::string& name);
+	bool InitializeTextureSwapSet(ID3D11Device* d3dDevice, EEyeType eye, STextureSwapChainRenderData& eyeRenderData, const std::string& name);
+	bool InitializeTextureSwapSet(ID3D11Device* d3dDevice, EEyeType eye, const std::string& name);
+	bool InitializeQuadTextureSwapSet(ID3D11Device* d3dDevice, RenderLayer::EQuadLayers id, const std::string& name);
+	bool InitializeMirrorTexture(ID3D11Device* d3dDevice, const std::string& name);
 
 	void SetupRenderTargets();
 
@@ -72,13 +69,9 @@ private:
 		SLayersManager();
 
 		void                               UpdateSwapChainData(CD3DStereoRenderer* pStereoRenderer, const STextureSwapChainRenderData* scene3DRenderData, const STextureSwapChainRenderData* quadRenderData);
-		CryVR::Oculus::SHmdSubmitFrameData ConstructFrameData();
 
 		RenderLayer::CProperties         m_scene3DLayerProperties[RenderLayer::eSceneLayers_Total];
 		RenderLayer::CProperties         m_quadLayerProperties[RenderLayer::eQuadLayers_Total];
-		CryVR::Oculus::SHmdSwapChainInfo m_swapChainInfoEyeLeft;
-		CryVR::Oculus::SHmdSwapChainInfo m_swapChainInfoEyeRight;
-		CryVR::Oculus::SHmdSwapChainInfo m_swapChainInfoQuadLayers[2 + RenderLayer::eQuadLayers_Total];
 	};
 
 private:
@@ -91,7 +84,6 @@ private:
 	uint32                        m_eyeWidth;
 	uint32                        m_eyeHeight;
 
-	CryVR::Oculus::IOculusDevice* m_pOculusDevice;
 	CD3D9Renderer*                m_pRenderer;
 	CD3DStereoRenderer*           m_pStereoRenderer;
 
