@@ -14,7 +14,6 @@
 #include "StdAfx.h"
 #include "UIDraw.h"
 #include <CryRenderer/IRenderAuxGeom.h>
-#include <CryFont/IFont.h>
 
 //-----------------------------------------------------------------------------------------------------
 
@@ -481,12 +480,6 @@ void CUIDraw::InternalDrawText(IFFont* pFont,
 	string wrappedStr;
 	if (bWrapText)
 	{
-		STextDrawContext ctx;
-		ctx.SetSizeIn800x600(false);
-		ctx.SetSize(Vec2(fSizeX, fSizeY));
-		ctx.SetColor(ColorF(fRed, fGreen, fBlue, fAlpha));
-
-		pFont->WrapText(wrappedStr, fMaxWidth, strText, ctx);
 		strText = wrappedStr.c_str();
 	}
 
@@ -530,43 +523,6 @@ void CUIDraw::InternalGetTextDim(IFFont* pFont,
                                  float fSizeY,
                                  const char* strText)
 {
-	if (NULL == pFont)
-	{
-		return;
-	}
-
-	const bool bWrapText = fMaxWidth > 0.0f;
-	if (bWrapText)
-		fMaxWidth = m_pRenderer->ScaleCoordX(fMaxWidth);
-
-	//	fSizeX = m_pRenderer->ScaleCoordX(fSizeX);
-	//	fSizeY = m_pRenderer->ScaleCoordY(fSizeY);
-
-	// Note: First ScaleCoordY is not a mistake
-	if (fSizeX <= 0.0f) fSizeX = 15.0f;
-	if (fSizeY <= 0.0f) fSizeY = 15.0f;
-
-	fSizeX = m_pRenderer->ScaleCoordY(fSizeX);
-	fSizeY = m_pRenderer->ScaleCoordY(fSizeY);
-
-	STextDrawContext ctx;
-	ctx.SetSizeIn800x600(false);
-	ctx.SetSize(Vec2(fSizeX, fSizeY));
-
-	string wrappedStr;
-	if (bWrapText)
-	{
-		pFont->WrapText(wrappedStr, fMaxWidth, strText, ctx);
-		strText = wrappedStr.c_str();
-	}
-
-	Vec2 dim = pFont->GetTextSize(strText, true, ctx);
-
-	float fScaleBack = 1.0f / m_pRenderer->ScaleCoordY(1.0f);
-	if (fWidth)
-		*fWidth = dim.x * fScaleBack;
-	if (fHeight)
-		*fHeight = dim.y * fScaleBack;
 }
 
 //-----------------------------------------------------------------------------------------------------

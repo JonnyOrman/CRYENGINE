@@ -5,7 +5,6 @@
 #include "CryAction.h"
 #include <CryRenderer/IRenderAuxGeom.h>
 #include <IUIDraw.h>
-#include <CryFont/IFont.h>
 #include <CrySystem/ILocalizationManager.h>
 #include <CrySystem/ConsoleRegistration.h>
 
@@ -24,7 +23,6 @@ CPersistantDebug::CPersistantDebug()
 	, m_pETColorOverrideG(nullptr)
 	, m_pETColorOverrideB(nullptr)
 {
-	m_pDefaultFont = gEnv->pCryFont->GetFont("default");
 	CRY_ASSERT(m_pDefaultFont);
 }
 

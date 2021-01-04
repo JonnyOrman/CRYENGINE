@@ -5,7 +5,6 @@
 #include "CryAction.h"
 #include <CryRenderer/IRenderAuxGeom.h>
 #include <IUIDraw.h>
-#include <CryFont/IFont.h>
 
 const char* CPersistantDebug::entityTagsContext = "PersistantDebugEntities";
 const float CPersistantDebug::kUnlimitedTime = -1.0f;
@@ -131,12 +130,6 @@ void CPersistantDebug::UpdateTags(float frameTime, SObj& obj, bool doFirstPass)
 			obj.columns[i].height = 0.f;
 	}
 
-	IFFont* pFont = gEnv->pCryFont->GetFont("default");
-	CRY_ASSERT(pFont);
-	STextDrawContext ctx;
-	ctx.SetSizeIn800x600(false);
-	ctx.SetProportional(true);
-
 	for (TListTag::iterator iterList = obj.tags.begin(); iterList != obj.tags.end(); ++iterList)
 	{
 		if (iterList->vScreenPos.IsZero())
@@ -144,23 +137,11 @@ void CPersistantDebug::UpdateTags(float frameTime, SObj& obj, bool doFirstPass)
 
 		float fontSize = iterList->params.size * m_pETFontSizeMultiplier->GetFVal();
 
-		// Calculate size of text on screen (so we can place it properly)
-		ctx.SetSize(Vec2(12 * fontSize, 12 * fontSize));
-		Vec2 textBoxSize = pFont->GetTextSize(iterList->params.text.c_str(), true, ctx);
-
-		if (doFirstPass)
-		{
-			int pos(iterList->params.column - 1);
-			obj.columns[pos].width = max(obj.columns[pos].width, textBoxSize.x + 15.f);
-		}
-		else
 		{
 			// Determine position
-			SColumn& column = obj.columns[iterList->params.column - 1];
 			Vec3 screenPos(iterList->vScreenPos);
 			screenPos.x = screenPos.x * 0.01f * gEnv->pRenderer->GetOverlayWidth();
-			screenPos.y = screenPos.y * 0.01f * gEnv->pRenderer->GetOverlayHeight() - textBoxSize.y - column.height;
-			column.height += textBoxSize.y;
+			screenPos.y = screenPos.y * 0.01f * gEnv->pRenderer->GetOverlayHeight();
 
 			// Adjust X value for multi-columns
 			if (obj.columns.size() > 1)
@@ -172,13 +153,6 @@ void CPersistantDebug::UpdateTags(float frameTime, SObj& obj, bool doFirstPass)
 				else
 					for (int i = centerLine; i < iterList->params.column - 1; ++i)
 						screenPos.x += obj.columns[i].width;
-
-				if (obj.columns.size() % 2 != 0)
-					screenPos.x -= textBoxSize.x * 0.5f;
-			}
-			else
-			{
-				screenPos.x -= textBoxSize.x * 0.5f;
 			}
 
 			// Determine color

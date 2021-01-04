@@ -16,7 +16,6 @@
 #include "ActionMap.h"
 #include "ActionFilter.h"
 #include <CryCore/CryCrc32.h>
-#include <CryFont/IFont.h>
 #include "GameObjects/GameObject.h"
 #include <CryCore/Platform/IPlatformOS.h>
 #include <CryRenderer/IRenderAuxGeom.h>
@@ -145,37 +144,8 @@ void CActionMapManager::Update()
 		const bool renderAll = (i_listActionMaps != 2);
 		const float xMargin = 40.f;
 
-		IFFont* defaultFont = gEnv->pCryFont->GetFont("default");
 		float yPos = gEnv->pRenderer->GetOverlayHeight() - 100.f;
 		float secondColumnOffset = 0.f;
-
-		STextDrawContext ctx;
-		ctx.SetSizeIn800x600(false);
-		ctx.SetSize(Vec2(UIDRAW_TEXTSIZEFACTOR * textSize, UIDRAW_TEXTSIZEFACTOR * textSize));
-
-		if (defaultFont)
-		{
-			TActionFilterMap::iterator it = m_actionFilters.begin();
-			TActionFilterMap::iterator itEnd = m_actionFilters.end();
-			while (it != itEnd)
-			{
-				const bool isEnabled = it->second->Enabled();
-
-				if (renderAll || isEnabled)
-				{
-					string message;
-					message.Format("%sFilter '%s' %s", isEnabled ? "$7" : "$5", it->second->GetName(), isEnabled ? "blocking inputs" : "allowing inputs");
-
-					const float width = defaultFont->GetTextSize(message, true, ctx).x + 5.f;
-					secondColumnOffset = max(width, secondColumnOffset);
-
-					IRenderAuxText::Draw2dLabel(xMargin, yPos, 1.5f, color, false, "%s", message.c_str());
-					yPos -= 15.f;
-				}
-
-				++it;
-			}
-		}
 
 		yPos = gEnv->pRenderer->GetOverlayHeight() - 100.f;
 

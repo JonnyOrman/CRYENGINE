@@ -4,8 +4,6 @@
 
 //=========================================================================================
 
-#include "../CryFont/FBitmap.h"
-
 bool CD3D9Renderer::FontUpdateTexture(int nTexId, int nX, int nY, int USize, int VSize, const byte* pSrcData)
 {
 	CTexture* tp = CTexture::GetByID(nTexId);
@@ -25,17 +23,12 @@ bool CD3D9Renderer::FontUploadTexture(class CFBitmap* pBmp, ETEX_Format eSrcForm
 		return false;
 
 	CRY_ASSERT(eSrcFormat == eTF_R8G8B8A8);
-	unsigned int* pDstData = nullptr;
-	pBmp->Get32Bpp(&pDstData);
 
 	char szName[128];
 	cry_sprintf(szName, "$AutoFont_%d", m_TexGenID++);
 
 	// Indicate non-blocking
 	const int iFlags = FT_TEX_FONT | FT_TAKEOVER_DATA_POINTER | FT_DONT_STREAM | FT_DONT_RELEASE;
-	CTexture* tp = CTexture::GetOrCreate2DTexture(szName, pBmp->GetWidth(), pBmp->GetHeight(), 1, iFlags, (const byte*)pDstData, eSrcFormat);
-
-	pBmp->SetRenderData((void*)tp);
 
 	return true;
 }
@@ -64,12 +57,4 @@ int CD3D9Renderer::FontCreateTexture(int Width, int Height, const byte* pSrcData
 
 void CD3D9Renderer::FontReleaseTexture(class CFBitmap* pBmp)
 {
-	if (!pBmp)
-	{
-		return;
-	}
-
-	CTexture* tp = (CTexture*)pBmp->GetRenderData();
-
-	SAFE_RELEASE(tp);
 }

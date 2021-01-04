@@ -1,7 +1,6 @@
 // Copyright 2001-2019 Crytek GmbH / Crytek Group. All rights reserved.
 
 #include "StdAfx.h"
-#include <CryFont/IFont.h>
 #include "RenderAuxGeom.h"
 #include "CommonRender.h"
 #include "Common/RenderDisplayContext.h"
@@ -2154,9 +2153,6 @@ void CAuxGeomCB::RenderTextQueued(Vec3 pos, const SDrawTextInfo& ti, const char*
 
 		if (!pFont)
 		{
-			if (gEnv->pSystem && gEnv->pSystem->GetICryFont())
-				pFont = gEnv->pSystem->GetICryFont()->GetFont("default");
-
 			if (!pFont)
 				return;
 		}
@@ -2364,15 +2360,6 @@ void CAuxGeomCB::DrawTextMessages(CTextMessages& messages, bool reset)
 			bDraw = vPos.x >= 0 && vPos.x <= fMaxPosX;
 			bDraw &= vPos.y >= 0 && vPos.y <= fMaxPosY;
 			bDraw &= vPos.z >= 0 && vPos.z <= 1;
-			//
-			//      if( nDrawFlags & eDrawText_DepthTest )
-			//      {
-			//        sz = 1.0f - 2.0f * sz;
-			//      }
-			//      else
-			//      {
-			//        sz = 1.0f;
-			//      }
 
 			vPos.x *= (b800x600 ? 8.f : 1.f);
 			vPos.y *= (b800x600 ? 6.f : 1.f);
@@ -2381,9 +2368,6 @@ void CAuxGeomCB::DrawTextMessages(CTextMessages& messages, bool reset)
 		if (szText && bDraw)
 		{
 			IFFont* pFont = nullptr;
-
-			if (gEnv->pSystem->GetICryFont())
-				pFont = gEnv->pSystem->GetICryFont()->GetFont("default");
 
 			if (!pFont)
 			{
@@ -2394,68 +2378,6 @@ void CAuxGeomCB::DrawTextMessages(CTextMessages& messages, bool reset)
 			const float g = CLAMP(vColor[1], 0.0f, 1.0f);
 			const float b = CLAMP(vColor[2], 0.0f, 1.0f);
 			const float a = CLAMP(vColor[3], 0.0f, 1.0f);
-
-			STextDrawContext ctx;
-			ctx.SetColor(ColorF(r, g, b, a));
-			ctx.SetCharWidthScale(1.0f);
-			ctx.EnableFrame((nDrawFlags & eDrawText_Framed) != 0);
-
-			if (nDrawFlags & eDrawText_Monospace)
-			{
-				if (nDrawFlags & eDrawText_FixedSize)
-					ctx.SetSizeIn800x600(false);
-				ctx.SetSize(Vec2(UIDRAW_TEXTSIZEFACTOR * fSize.x, UIDRAW_TEXTSIZEFACTOR * fSize.y));
-				ctx.SetCharWidthScale(0.5f);
-				ctx.SetProportional(false);
-
-				if (nDrawFlags & eDrawText_800x600)
-				{
-					vPos = Vec3(vPos.x * scale800x600.x, vPos.y * scale800x600.y, vPos.z);
-				}
-			}
-			else if (nDrawFlags & eDrawText_FixedSize)
-			{
-				ctx.SetSizeIn800x600(false);
-				ctx.SetSize(Vec2(UIDRAW_TEXTSIZEFACTOR * fSize.x, UIDRAW_TEXTSIZEFACTOR * fSize.y));
-				ctx.SetProportional(true);
-
-				if (nDrawFlags & eDrawText_800x600)
-				{
-					vPos = Vec3(vPos.x * scale800x600.x, vPos.y * scale800x600.y, vPos.z);
-				}
-			}
-			else
-			{
-				ctx.SetSizeIn800x600(true);
-				ctx.SetProportional(false);
-				ctx.SetCharWidthScale(0.5f);
-				ctx.SetSize(Vec2(UIDRAW_TEXTSIZEFACTOR * fSize.x, UIDRAW_TEXTSIZEFACTOR * fSize.y));
-			}
-
-			// align left/right/center
-			if (nDrawFlags & (eDrawText_Center | eDrawText_CenterV | eDrawText_Right))
-			{
-				Vec2 textSize = pFont->GetTextSize(szText, true, ctx);
-
-				// If we're using virtual 800x600 coordinates, convert the text size from
-				// pixels to that before using it as an offset.
-				if (ctx.m_sizeIn800x600)
-				{
-					textSize.x /= scale800x600.x;
-					textSize.y /= scale800x600.y;
-				}
-
-				if (nDrawFlags & eDrawText_Center) vPos.x -= textSize.x * 0.5f;
-				else if (nDrawFlags & eDrawText_Right) vPos.x -= textSize.x;
-
-				if (nDrawFlags & eDrawText_CenterV)
-					vPos.y -= textSize.y * 0.5f;
-			}
-
-			// Pass flags so that overscan borders can be applied if necessary
-			ctx.SetFlags(nDrawFlags);
-
-			pFont->RenderCallback(vPos.x, vPos.y, vPos.z, szText, true, ctx, pAux);
 		}
 	}
 

@@ -10,7 +10,6 @@
 #include <Cry3DEngine/IIndexedMesh.h>
 #include <CryCore/BitFiddling.h>                              // IntegerLog2()
 #include <Cry3DEngine/ImageExtensionHelper.h>                 // CImageExtensionHelper
-#include <CryFont/IFont.h>
 #include "Textures/Image/CImage.h"
 #include "Textures/TextureManager.h"
 #include "Textures/TextureStreamPool.h"
@@ -294,16 +293,6 @@ void CRenderer::PostInit()
 	// Initialize the shader system
 	//////////////////////////////////////////////////////////////////////////
 	m_cEF.mfPostInit();
-
-	//////////////////////////////////////////////////////////////////////////
-	// Load internal renderer font.
-	//////////////////////////////////////////////////////////////////////////
-	if (gEnv->pCryFont)
-	{
-		m_pDefaultFont = gEnv->pCryFont->GetFont("default");
-		if (!m_pDefaultFont)
-			CryWarning(VALIDATOR_MODULE_SYSTEM, VALIDATOR_ERROR, "Error getting default font");
-	}
 
 	// load all default textures
 	if (!m_bShaderCacheGen && m_pTextureManager)

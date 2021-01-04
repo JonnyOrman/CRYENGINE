@@ -5,7 +5,6 @@
 #include "System.h"
 #include "ConsoleBatchFile.h"
 #include "ConsoleHelpGen.h"
-#include <CryFont/IFont.h>
 #include <CryInput/IHardwareMouse.h>
 #include <CryNetwork/INetwork.h>     // EvenBalance - M.Quinn
 #include <CryNetwork/IRemoteCommand.h>
@@ -669,8 +668,6 @@ void CXConsole::PreProjectSystemInit()
 
 void CXConsole::PostRendererInit()
 {
-	if (m_system.GetICryFont())
-		m_pFont = m_system.GetICryFont()->GetFont("default");
 	m_pRenderer = m_system.GetIRenderer();
 	m_pNetwork = gEnv->pNetwork;  // EvenBalance - M. Quinn
 	m_pInput = m_system.GetIInput();
@@ -1676,15 +1673,6 @@ void CXConsole::Draw()
 	if (!m_pRenderer)
 		return;
 
-	if (!m_pFont)
-	{
-		// For Editor.
-		ICryFont* pICryFont = m_system.GetICryFont();
-
-		if (pICryFont)
-			m_pFont = m_system.GetICryFont()->GetFont("default");
-	}
-
 	ScrollConsole();
 
 	if (!m_bConsoleActive && con_display_last_messages == 0)
@@ -1757,9 +1745,6 @@ void CXConsole::DrawBuffer(int nScrollPos, const char* szEffect)
 			if (m_bDrawCursor)
 			{
 				string szCursorLeft(m_sInputBuffer.c_str(), m_sInputBuffer.c_str() + m_nCursorPos);
-				int n = m_pFont->GetTextLength(szCursorLeft.c_str(), false);
-
-				IRenderAuxText::DrawText(Vec3(xPos + (fCharWidth * n), yPos, 1), fontSize * 1.16f / 14, nullptr, flags, "_");
 			}
 		}
 

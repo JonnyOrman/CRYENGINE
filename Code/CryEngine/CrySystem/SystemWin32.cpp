@@ -18,7 +18,6 @@
 #include <CryGame/IGameFramework.h>
 #include <CryCore/Platform/IPlatformOS.h>
 #include <CryString/StringUtils.h>
-#include <CryFont/IFont.h>
 
 #if CRY_PLATFORM_LINUX || CRY_PLATFORM_ANDROID || CRY_PLATFORM_APPLE
 	#include <unistd.h>
@@ -388,9 +387,6 @@ void CSystem::CollectMemStats(ICrySizer* pSizer, MemStatsPurposeEnum nPurpose, s
 				if (info)
 					pSizer->AddObject(info, static_cast<size_t>(info->memInfo.allocated - info->memInfo.requested));
 			}
-
-			m_env.pCryFont->GetMemoryUsage(pSizer);
-			m_pIFont->GetMemoryUsage(pSizer);
 		}
 
 	}

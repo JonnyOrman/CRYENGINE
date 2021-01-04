@@ -20,7 +20,6 @@
 #include <CryMono/IMonoRuntime.h>
 #include <CryMono/IMonoRuntime.h>
 #include <CryGame/IGameStartup.h>
-#include <CryFont/IFont.h>
 #include <CrySystem/ConsoleRegistration.h>
 
 #if (CRY_PLATFORM_APPLE || CRY_PLATFORM_LINUX || CRY_PLATFORM_ANDROID) && !defined(DEDICATED_SERVER)
@@ -2055,37 +2054,37 @@ bool CSystem::InitStreamEngine()
 /////////////////////////////////////////////////////////////////////////////////
 bool CSystem::InitFont(const SSystemInitParams& startupParams)
 {
-	CRY_PROFILE_FUNCTION(PROFILE_LOADING_ONLY);
-	MEMSTAT_CONTEXT(EMemStatContextType::Other, "Init Font");
+	//CRY_PROFILE_FUNCTION(PROFILE_LOADING_ONLY);
+	//MEMSTAT_CONTEXT(EMemStatContextType::Other, "Init Font");
 
-	if (!InitializeEngineModule(startupParams, DLL_FONT, cryiidof<IFontEngineModule>(), true))
-		return false;
+	//if (!InitializeEngineModule(startupParams, DLL_FONT, cryiidof<IFontEngineModule>(), true))
+	//	return false;
 
-	if (!m_env.pCryFont)
-	{
-		CryFatalError("Error creating Font System!");
-		return false;
-	}
+	//if (!m_env.pCryFont)
+	//{
+	//	CryFatalError("Error creating Font System!");
+	//	return false;
+	//}
 
-	if (gEnv->IsDedicated())
-		return true;
+	//if (gEnv->IsDedicated())
+	//	return true;
 
-	// Load the default font
-	m_pIFont = m_env.pCryFont->NewFont("default");
-	if (!m_pIFont)
-	{
-		CryWarning(VALIDATOR_MODULE_SYSTEM, VALIDATOR_ERROR, "Error creating the default fonts");
-		return false;
-	}
+	//// Load the default font
+	//m_pIFont = m_env.pCryFont->NewFont("default");
+	//if (!m_pIFont)
+	//{
+	//	CryWarning(VALIDATOR_MODULE_SYSTEM, VALIDATOR_ERROR, "Error creating the default fonts");
+	//	return false;
+	//}
 
-	//////////////////////////////////////////////////////////////////////////
-	const char* szFontPath = "%engine%/Fonts/default.xml";
+	////////////////////////////////////////////////////////////////////////////
+	//const char* szFontPath = "%engine%/Fonts/default.xml";
 
-	if (!m_pIFont->Load(szFontPath))
-	{
-		CryWarning(VALIDATOR_MODULE_SYSTEM, VALIDATOR_ERROR, "Error loading the default font from '%s'. You're probably running the executable from the wrong working folder.", szFontPath);
-		return false;
-	}
+	//if (!m_pIFont->Load(szFontPath))
+	//{
+	//	CryWarning(VALIDATOR_MODULE_SYSTEM, VALIDATOR_ERROR, "Error loading the default font from '%s'. You're probably running the executable from the wrong working folder.", szFontPath);
+	//	return false;
+	//}
 
 	return true;
 }
@@ -3144,9 +3143,6 @@ bool CSystem::Initialize(SSystemInitParams& startupParams)
 			CryLogAlways("Font initialization");
 			if (!InitFont(startupParams))
 				return false;
-
-			if (m_env.pCryFont)
-				m_env.pCryFont->SetRendererProperties(m_env.pRenderer);
 		}
 
 		InlineInitializationProcessing("CSystem::Init InitFonts");

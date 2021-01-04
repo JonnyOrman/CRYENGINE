@@ -17,7 +17,6 @@
 #include "ScriptBind_System.h"
 #include <Cry3DEngine/ISurfaceType.h>
 #include <CryAnimation/ICryAnimation.h>
-#include <CryFont/IFont.h>
 #include <CrySystem/ILog.h>
 #include <CryRenderer/IRenderer.h>
 #include <Cry3DEngine/I3DEngine.h>
@@ -333,28 +332,8 @@ int CScriptBind_System::LoadFont(IFunctionHandler* pH)
 	if (pICryFont)
 	{
 		string szFontPath = "fonts/";
-		/*
-		   m_pSS->GetGlobalValue("g_language", szLanguage);
-
-		   if (!szLanguage || !strlen(szLanguage))
-		   {
-		   szFontPath += "english";
-		   }
-		   else
-		   {
-		   szFontPath += szLanguage;
-		   }
-		 */
-
 		szFontPath += pszName;
 		szFontPath += ".xml";
-
-		IFFont* pIFont = pICryFont->NewFont(pszName);
-
-		if (!pIFont->Load(szFontPath.c_str()))
-		{
-			m_pLog->Log("Error loading digital font from: %s", szFontPath.c_str());
-		}
 	}
 	return pH->EndFunction();
 }
@@ -1240,20 +1219,6 @@ int CScriptBind_System::DrawText(IFunctionHandler* pH)
 	pH->GetParam(7, g);
 	pH->GetParam(8, b);
 	pH->GetParam(9, a);
-
-	IFFont* pFont = pCryFont->GetFont(fontName);
-
-	if (!pFont)
-	{
-		return pH->EndFunction();
-	}
-
-	STextDrawContext ctx;
-	ctx.SetColor(ColorF(r, g, b, a));
-	ctx.SetSize(Vec2(size, size));
-	ctx.SetProportional(true);
-	ctx.SetSizeIn800x600(true);
-	pFont->DrawString(x, y, text, true, ctx);
 
 	return pH->EndFunction();
 }

@@ -6,7 +6,6 @@
 #include <CrySystem/IProjectManager.h>
 #include <CrySystem/ConsoleRegistration.h>
 #include <CrySystem/SystemInitParams.h>
-#include <CryFont/IFont.h>
 
 #include "D3DStereo.h"
 #include "D3DPostProcess.h"
