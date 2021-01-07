@@ -2753,7 +2753,7 @@ void STDMETHODCALLTYPE CCryDX12DeviceContext::UpdateSubresource1(
 
 		DX12_ASSERT((desc.Dimension != D3D12_RESOURCE_DIMENSION_BUFFER) || (!pDstBox), "Box used for buffer update, that's not supported!");
 		DX12_ASSERT((desc.Dimension == D3D12_RESOURCE_DIMENSION_BUFFER) || (SrcDepthPitch != 0), "Slice-pitch is missing for UpdateSubresourceRegion(), this is a required parameter!");
-		ID3D12Resource* uploadBuffer;
+		ID3D12Resource* uploadBuffer = nullptr;
 
 		D3D12_SUBRESOURCE_DATA subData;
 		ZeroMemory(&subData, sizeof(D3D12_SUBRESOURCE_DATA));
@@ -2762,7 +2762,7 @@ void STDMETHODCALLTYPE CCryDX12DeviceContext::UpdateSubresource1(
 		subData.SlicePitch = SrcDepthPitch;
 		assert(subData.pData != nullptr);
 
-		const NCryDX12::NODE64& uploadMasks = resource.GetNodeMasks();
+		/*const NCryDX12::NODE64& uploadMasks = resource.GetNodeMasks();
 		if (S_OK != GetDevice()->GetDX12Device()->CreateOrReuseCommittedResource(
 		      &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD, blsi(uploadMasks.creationMask), uploadMasks.creationMask),
 		      D3D12_HEAP_FLAG_NONE,
@@ -2773,7 +2773,7 @@ void STDMETHODCALLTYPE CCryDX12DeviceContext::UpdateSubresource1(
 		{
 			DX12_ERROR("Could not create intermediate upload buffer!");
 			return;
-		}
+		}*/
 
 		m_Scheduler.GetCommandList(copyQueue)->PendingResourceBarriers();
 		::UpdateSubresources<1>(GetD3D12Device(), m_Scheduler.GetCommandList(copyQueue)->GetD3D12CommandList(), res12, uploadBuffer, 0, DstSubresource, 1, &subData, reinterpret_cast<const D3D12_BOX*>(pDstBox));

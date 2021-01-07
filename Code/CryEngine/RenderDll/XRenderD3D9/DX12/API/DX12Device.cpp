@@ -296,7 +296,7 @@ CDevice::CDevice(ID3D12Device* d3d12Device, D3D_FEATURE_LEVEL featureLevel, UINT
 		m_OcclusionHeap.Init(this, desc);
 	}
 
-	if (S_OK != CreateOrReuseCommittedResource(
+	/*if (S_OK != CreateOrReuseCommittedResource(
 				&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_READBACK, blsi(m_nodeMask), m_nodeMask),
 				D3D12_HEAP_FLAG_NONE,
 				&CD3DX12_RESOURCE_DESC::Buffer(sizeof(UINT64) * m_TimestampHeap.GetCapacity()),
@@ -305,9 +305,9 @@ CDevice::CDevice(ID3D12Device* d3d12Device, D3D_FEATURE_LEVEL featureLevel, UINT
 				IID_GFX_ARGS(&m_TimestampDownloadBuffer)))
 	{
 		DX12_ERROR("Could not create intermediate timestamp download buffer!");
-	}
+	}*/
 
-	if (S_OK != CreateOrReuseCommittedResource(
+	/*if (S_OK != CreateOrReuseCommittedResource(
 				&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_READBACK, blsi(m_nodeMask), m_nodeMask),
 				D3D12_HEAP_FLAG_NONE,
 				&CD3DX12_RESOURCE_DESC::Buffer(sizeof(UINT64) * m_OcclusionHeap.GetCapacity()),
@@ -316,7 +316,7 @@ CDevice::CDevice(ID3D12Device* d3d12Device, D3D_FEATURE_LEVEL featureLevel, UINT
 				IID_GFX_ARGS(&m_OcclusionDownloadBuffer)))
 	{
 		DX12_ERROR("Could not create intermediate occlusion download buffer!");
-	}
+	}*/
 
 	m_TimestampMemory = nullptr;
 	m_OcclusionMemory = nullptr;
@@ -833,15 +833,15 @@ HRESULT STDMETHODCALLTYPE CDevice::CreateOrReuseStagingResource(
 	UINT numSubResources = 1;// resourceDesc.MipLevels * (resourceDesc.Dimension == D3D12_RESOURCE_DIMENSION_TEXTURE3D ? 1 : resourceDesc.DepthOrArraySize);
 	GetD3D12Device()->GetCopyableFootprints(&resourceDesc, 0, numSubResources, 0, nullptr, &rowCount, &rowPitch, &requiredSize);
 
-	D3D12_RESOURCE_STATES initialState = Upload ? D3D12_RESOURCE_STATE_GENERIC_READ : D3D12_RESOURCE_STATE_COPY_DEST;
-	D3D12_HEAP_TYPE heapType = Upload ? D3D12_HEAP_TYPE_UPLOAD : D3D12_HEAP_TYPE_READBACK;
+	//D3D12_RESOURCE_STATES initialState = Upload ? D3D12_RESOURCE_STATE_GENERIC_READ : D3D12_RESOURCE_STATE_COPY_DEST;
+	//D3D12_HEAP_TYPE heapType = Upload ? D3D12_HEAP_TYPE_UPLOAD : D3D12_HEAP_TYPE_READBACK;
 
 	pInputResource->GetHeapProperties(&sHeap, nullptr);
 
 	// NOTE: this is a staging resource, no flags permitting views are allowed
 	resourceDesc.Flags = D3D12_RESOURCE_FLAG_DENY_SHADER_RESOURCE;
 
-	ID3D12Resource* stagingResource = NULL;
+	/*ID3D12Resource* stagingResource = NULL;
 	HRESULT result = CreateOrReuseCommittedResource(
 		&CD3DX12_HEAP_PROPERTIES(heapType, blsi(sHeap.CreationNodeMask), sHeap.CreationNodeMask),
 		D3D12_HEAP_FLAG_NONE,
@@ -852,12 +852,12 @@ HRESULT STDMETHODCALLTYPE CDevice::CreateOrReuseStagingResource(
 
 	if (result == S_OK && stagingResource != nullptr)
 	{
-		*ppStagingResource = stagingResource;
+		*ppStagingResource = stagingResource;*/
 
 		return S_OK;
-	}
+	/*}
 
-	return result;
+	return result;*/
 }
 
 //---------------------------------------------------------------------------------------------------------------------

@@ -1096,7 +1096,7 @@ void CCommandList::UpdateSubresourceRegion(CResource& rResource, UINT subResourc
 
 	DX12_ASSERT((desc.Dimension != D3D12_RESOURCE_DIMENSION_BUFFER) || (box == nullptr), "Box used for buffer update, that's not supported!");
 	DX12_ASSERT((desc.Dimension == D3D12_RESOURCE_DIMENSION_BUFFER) || (slicePitch != 0), "Slice-pitch is missing for UpdateSubresourceRegion(), this is a required parameter!");
-	ID3D12Resource* uploadBuffer;
+	ID3D12Resource* uploadBuffer = nullptr;
 
 	D3D12_SUBRESOURCE_DATA subData;
 	ZeroMemory(&subData, sizeof(D3D12_SUBRESOURCE_DATA));
@@ -1106,7 +1106,7 @@ void CCommandList::UpdateSubresourceRegion(CResource& rResource, UINT subResourc
 	assert(subData.pData != nullptr);
 
 	// NOTE: this is a staging resource, a single instance for all GPUs is valid
-	const NODE64& uploadMasks = rResource.GetNodeMasks();
+	/*const NODE64& uploadMasks = rResource.GetNodeMasks();
 	if (S_OK != GetDevice()->CreateOrReuseCommittedResource(
 	      &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD, blsi(uploadMasks.creationMask), uploadMasks.creationMask),
 	      D3D12_HEAP_FLAG_NONE,
@@ -1117,7 +1117,7 @@ void CCommandList::UpdateSubresourceRegion(CResource& rResource, UINT subResourc
 	{
 		DX12_ERROR("Could not create intermediate upload buffer!");
 		return;
-	}
+	}*/
 
 	PendingResourceBarriers();
 
@@ -1145,7 +1145,7 @@ void CCommandList::UpdateSubresources(CResource& rResource, D3D12_RESOURCE_STATE
 	ID3D12Resource* uploadBuffer = NULL;
 
 	// NOTE: this is a staging resource, a single instance for all GPUs is valid
-	const NODE64& uploadMasks = rResource.GetNodeMasks();
+	/*const NODE64& uploadMasks = rResource.GetNodeMasks();
 	if (S_OK != GetDevice()->CreateOrReuseCommittedResource(
 	      &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD, blsi(uploadMasks.creationMask), uploadMasks.creationMask),
 	      D3D12_HEAP_FLAG_NONE,
@@ -1155,7 +1155,7 @@ void CCommandList::UpdateSubresources(CResource& rResource, D3D12_RESOURCE_STATE
 	      IID_GFX_ARGS(&uploadBuffer)))
 	{
 		DX12_ERROR("Could not create intermediate upload buffer!");
-	}
+	}*/
 
 	// TODO: if we know early that the resource(s) will be DEST and SOURCE we can begin the barrier early and end it here
 	SetResourceState(rResource, D3D12_RESOURCE_STATE_COPY_DEST);        // compatible with D3D12_HEAP_TYPE_READBACK's D3D12_RESOURCE_STATE_COPY_DEST requirement
