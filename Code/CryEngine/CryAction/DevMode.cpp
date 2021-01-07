@@ -193,24 +193,9 @@ bool CDevMode::OnInputEvent(const SInputEvent& evt)
 		{
 			if (handled = (evt.keyId == eKI_NP_1) && !gEnv->bMultiplayer) // give all items
 			{
-				CCryAction::GetCryAction()->GetIItemSystem()->GetIEquipmentManager()->GiveEquipmentPack(pActor, "Player_Default", true, true);
 			}
 			else if (handled = (evt.keyId == eKI_F2)) // go to next spawnpoint
 			{
-				Vec3 oldPos = pEntity->GetWorldPos();
-				if (gEnv->pScriptSystem->BeginCall("BasicActor", "OnNextSpawnPoint"))
-				{
-					gEnv->pScriptSystem->PushFuncParam(pEntity->GetScriptTable());
-					gEnv->pScriptSystem->EndCall();
-
-					if (gEnv->pStatoscope)
-					{
-						char buffer[100];
-						Vec3 pos = pEntity->GetWorldPos();
-						cry_sprintf(buffer, "Teleported from (%.2f, %.2f, %.2f) to (%.2f, %.2f, %.2f)", oldPos.x, oldPos.y, oldPos.z, pos.x, pos.y, pos.z);
-						gEnv->pStatoscope->AddUserMarker("Player", buffer);
-					}
-				}
 			}
 		}
 	}

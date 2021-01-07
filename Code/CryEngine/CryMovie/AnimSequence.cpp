@@ -5,7 +5,6 @@
 
 #include "EntityNode.h"
 #include "CVarNode.h"
-#include "ScriptVarNode.h"
 #include "AnimCameraNode.h"
 #include "SceneNode.h"
 #include <CryCore/StlUtils.h>
@@ -22,7 +21,6 @@
 #include "AudioNode.h"
 
 #include <Cry3DEngine/I3DEngine.h>
-#include <CryScriptSystem/IScriptSystem.h>
 
 CAnimSequence::CAnimSequence(IMovieSystem* pMovieSystem, uint32 id)
 {
@@ -173,10 +171,6 @@ IAnimNode* CAnimSequence::CreateNodeInternal(EAnimNodeType nodeType, uint32 nNod
 
 	case eAnimNodeType_CVar:
 		pAnimNode = new CAnimCVarNode(nNodeId);
-		break;
-
-	case eAnimNodeType_ScriptVar:
-		pAnimNode = new CAnimScriptVarNode(nNodeId);
 		break;
 
 	case eAnimNodeType_Director:

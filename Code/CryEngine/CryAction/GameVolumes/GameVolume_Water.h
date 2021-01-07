@@ -4,6 +4,7 @@
 #define _GAME_VOLUME_WATER_H
 
 #pragma once
+#include "Cry3DEngine/IRenderNode.h"
 
 class CGameVolume_Water : public CGameObjectExtensionHelper<CGameVolume_Water, IGameObjectExtension>
 {
@@ -14,32 +15,6 @@ class CGameVolume_Water : public CGameObjectExtensionHelper<CGameVolume_Water, I
 			CRY_ASSERT(pEntity != NULL);
 
 			memset(this, 0, sizeof(WaterProperties));
-
-			SmartScriptTable properties;
-			IScriptTable* pScriptTable = pEntity->GetScriptTable();
-
-			if ((pScriptTable != NULL) && pScriptTable->GetValue("Properties", properties))
-			{
-				properties->GetValue("StreamSpeed", streamSpeed);
-				properties->GetValue("FogDensity", fogDensity);
-				properties->GetValue("UScale", uScale);
-				properties->GetValue("VScale", vScale);
-				properties->GetValue("Depth", depth);
-				properties->GetValue("ViewDistanceRatio", viewDistanceRatio);
-				properties->GetValue("MinSpec", minSpec);
-				properties->GetValue("MaterialLayerMask", materialLayerMask);
-				properties->GetValue("FogColorMultiplier", fogColorMultiplier);
-				properties->GetValue("color_FogColor", fogColor);
-				properties->GetValue("bFogColorAffectedBySun", fogColorAffectedBySun);
-				properties->GetValue("FogShadowing", fogShadowing);
-				properties->GetValue("bCapFogAtVolumeDepth", capFogAtVolumeDepth);
-				properties->GetValue("bAwakeAreaWhenMoving", awakeAreaWhenMoving);
-				properties->GetValue("bIsRiver", isRiver);
-				properties->GetValue("bCaustics", caustics);
-				properties->GetValue("CausticIntensity", causticIntensity);
-				properties->GetValue("CausticTiling", causticTiling);
-				properties->GetValue("CausticHeight", causticHeight);
-			}
 		}
 
 		float streamSpeed;

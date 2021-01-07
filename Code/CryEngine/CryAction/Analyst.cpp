@@ -42,7 +42,6 @@ void CGameplayAnalyst::ProcessPlayerEvent(EntityId id, const GameplayEvent& even
 			PlayerAnalysis& player = GetPlayer(id);
 			player.deaths++;
 
-			GetCurrentWeapon(id).deaths++;
 			player.suit.deaths[player.suit.mode]++;
 
 			CTimeValue now = gEnv->pTimer->GetFrameStartTime();
@@ -233,19 +232,6 @@ CGameplayAnalyst::WeaponAnalysis& CGameplayAnalyst::GetWeapon(EntityId playerId,
 	}
 	else
 		return it->second;
-}
-
-//------------------------------------------------------------------------
-CGameplayAnalyst::WeaponAnalysis& CGameplayAnalyst::GetCurrentWeapon(EntityId playerId)
-{
-	if (IActor* pActor = CCryAction::GetCryAction()->GetIActorSystem()->GetActor(playerId))
-	{
-		if (IInventory* pInventory = pActor->GetInventory())
-			return GetWeapon(playerId, pInventory->GetCurrentItem());
-	}
-
-	static WeaponAnalysis def;
-	return def;
 }
 
 //------------------------------------------------------------------------

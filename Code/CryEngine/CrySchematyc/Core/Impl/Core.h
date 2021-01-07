@@ -4,6 +4,7 @@
 
 #include "CrySchematyc/ICore.h"
 #include "CrySchematyc/Utils/Assert.h"
+#include "CrySystem/IEngineModule.h"
 #include "CrySystem/ISystem.h"
 
 namespace Schematyc

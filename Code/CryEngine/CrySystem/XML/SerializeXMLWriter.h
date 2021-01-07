@@ -32,7 +32,6 @@ public:
 	}
 
 	bool Value(const char* name, CTimeValue value);
-	bool Value(const char* name, ScriptAnyValue& value);
 	bool Value(const char* name, XmlNodeRef& value);
 
 	void BeginGroup(const char* szName);
@@ -48,8 +47,6 @@ private:
 	CTimeValue                 m_curTime;
 
 	std::vector<XmlNodeRef>    m_nodeStack;
-	//bool m_bCheckEntityOnScript;
-	std::vector<IScriptTable*> m_savedTables;
 	std::vector<const char*>   m_luaSaveStack;
 	//////////////////////////////////////////////////////////////////////////
 
@@ -109,15 +106,9 @@ private:
 		}
 	}
 
-	void        WriteTable(XmlNodeRef addTo, SmartScriptTable tbl, bool bCheckEntityOnScript);
-	void        ScriptValue(XmlNodeRef addTo, const char* tag, const char* name, const ScriptAnyValue& value, bool bCheckEntityOnScript);
 	// Used for printing currebnt stack info for warnings.
 	const char* GetStackInfo() const;
 	const char* GetLuaStackInfo() const;
-
-	static bool ShouldSkipValue(const char* name, const ScriptAnyValue& value);
-	static bool IsVector(SmartScriptTable tbl);
-	bool        IsEntity(SmartScriptTable tbl, EntityId& entityId);
 
 	//////////////////////////////////////////////////////////////////////////
 	// Check For Defaults.
@@ -136,7 +127,6 @@ private:
 	bool IsDefaultValue(const Vec3& v) const               { return v.x == 0 && v.y == 0 && v.z == 0; };
 	bool IsDefaultValue(const Ang3& v) const               { return v.x == 0 && v.y == 0 && v.z == 0; };
 	bool IsDefaultValue(const Quat& v) const               { return v.w == 1.0f && v.v.x == 0 && v.v.y == 0 && v.v.z == 0; };
-	bool IsDefaultValue(const ScriptAnyValue& v) const     { return false; };
 	bool IsDefaultValue(const CTimeValue& v) const         { return v.GetValue() == 0; };
 	bool IsDefaultValue(const char* str) const             { return !str || !*str; };
 	bool IsDefaultValue(const string& str) const           { return str.empty(); };

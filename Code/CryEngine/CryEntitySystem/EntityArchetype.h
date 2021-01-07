@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include <CryScriptSystem/IScriptSystem.h>
 #include <CryEntitySystem/IEntitySystem.h>
 #include <CryCore/smartptr.h>
 
@@ -19,7 +18,6 @@ public:
 	//////////////////////////////////////////////////////////////////////////
 	virtual IEntityClass* GetClass() const override { return m_pClass; }
 	virtual const char*   GetName() const override  { return m_name.c_str(); }
-	virtual IScriptTable* GetProperties() override  { return m_pProperties; }
 	virtual XmlNodeRef    GetObjectVars() override  { return m_ObjectVars; }
 	virtual void          LoadFromXML(XmlNodeRef& propertiesNode, XmlNodeRef& objectVarsNode) override;
 	//////////////////////////////////////////////////////////////////////////
@@ -28,7 +26,6 @@ public:
 
 private:
 	string           m_name;
-	SmartScriptTable m_pProperties;
 	XmlNodeRef       m_ObjectVars;
 	IEntityClass*    m_pClass;
 };

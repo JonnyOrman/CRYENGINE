@@ -22,9 +22,6 @@
 #include <CryMath/Cry_Camera.h>
 #include <CrySchematyc/MathTypes.h>
 
-#include <CryAISystem/IAgent.h>
-#include <CryAISystem/IAIObject.h>
-#include <CryAISystem/IAIActor.h>
 #include <CryGame/IGameFramework.h>
 #include <CrySystem/ConsoleRegistration.h>
 
@@ -33,6 +30,8 @@
 #include <../CryAction/ICryMannequinDefs.h>
 #include <../CryAction/ICryMannequin.h>
 #include <../CryAction/IAnimatedCharacter.h>
+
+#include "CryPhysics/physinterface.h"
 
 #define g_nodeParamsInitialized g_nodeParamsInitializedEnt
 #define g_nodeParams            g_nodeParamsEnt
@@ -77,12 +76,6 @@ void AddSupportedParam(std::vector<CAnimNode::SParamInfo>& nodeParams, const cha
 
 void NotifyEntityScript(const IEntity* pEntity, const char* funcName)
 {
-	IScriptTable* pEntityScript = pEntity->GetScriptTable();
-
-	if (pEntityScript && pEntityScript->HaveValue(funcName))
-	{
-		Script::CallMethod(pEntityScript, funcName);
-	}
 }
 
 // Quat::IsEquivalent has numerical problems with very similar values
@@ -96,12 +89,6 @@ bool CompareRotation(const Quat& q1, const Quat& q2, float epsilon)
 
 void NotifyEntityScript(const IEntity* pEntity, const char* funcName, const char* strParam)
 {
-	IScriptTable* pEntityScript = pEntity->GetScriptTable();
-
-	if (pEntityScript && pEntityScript->HaveValue(funcName))
-	{
-		Script::CallMethod(pEntityScript, funcName, strParam);
-	}
 }
 
 CAnimEntityNode::CAnimEntityNode(const int id) : CAnimNode(id)
@@ -447,23 +434,6 @@ void CAnimEntityNode::UpdateDynamicParams_Editor()
 {
 	if (IEntity* pEntity = GetEntity())
 	{
-		if (IScriptTable* pScriptTable = pEntity->GetScriptTable())
-		{
-			SmartScriptTable propertiesTable;
-
-			if (pScriptTable->GetValue("Properties", propertiesTable))
-			{
-				FindDynamicPropertiesRec(propertiesTable, "Properties/", 0);
-			}
-
-			SmartScriptTable propertiesInstanceTable;
-
-			if (pScriptTable->GetValue("PropertiesInstance", propertiesInstanceTable))
-			{
-				FindDynamicPropertiesRec(propertiesInstanceTable, "PropertiesInstance/", 0);
-			}
-		}
-
 		DynArray<IEntityComponent*> components;
 		pEntity->GetComponents(components);
 		for (IEntityComponent* pComponent : components)
@@ -498,8 +468,6 @@ void CAnimEntityNode::UpdateDynamicParams_PureGame()
 		return;
 	}
 
-	IScriptTable* pEntityScriptTable = pEntity->GetScriptTable();
-
 	for (uint32 i = 0; i < m_tracks.size(); ++i)
 	{
 		_smart_ptr<IAnimTrack> pTrack = m_tracks[i];
@@ -513,30 +481,7 @@ void CAnimEntityNode::UpdateDynamicParams_PureGame()
 		string paramName = paramType.GetName();
 		if (g_entityScriptPropertyPrefix == paramName.Left(g_entityScriptPropertyPrefix.size()))
 		{
-			if (!pEntityScriptTable)
-			{
-				continue;
-			}
-
-			string path = paramName.Right(paramName.size() - g_entityScriptPropertyPrefix.size());
-
-			string propertyName;
-			SmartScriptTable propertyScriptTable;
-			FindScriptTableForParameterRec(pEntityScriptTable, path, propertyName, propertyScriptTable);
-
-			if (propertyScriptTable && !propertyName.empty())
-			{
-				SScriptPropertyParamInfo paramInfo;
-				ObtainPropertyTypeInfo(propertyName.c_str(), propertyScriptTable, paramInfo);
-
-				if (paramInfo.animNodeParamInfo.valueType == eAnimValue_Unknown)
-				{
-					return;
-				}
-
-				string strippedPath = path.Left(path.size() - propertyName.size());
-				AddPropertyToParamInfoMap(propertyName.c_str(), strippedPath, paramInfo);
-			}
+			continue;
 		}
 		InitializeTrackDefaultValue(pTrack, paramType);
 	}
@@ -564,113 +509,6 @@ void CAnimEntityNode::UpdateDynamicParams_PureGame()
 			componentMember.GetTypeDesc().GetOperators().serialize(archive, reinterpret_cast<uint8*>(pComponent) + componentMember.GetOffset(), componentMember.GetName(), componentMember.GetLabel());
 		}
 	}
-}
-
-void CAnimEntityNode::FindScriptTableForParameterRec(IScriptTable* pScriptTable, const string& path, string& propertyName, SmartScriptTable& propertyScriptTable)
-{
-	size_t pos = path.find_first_of('/');
-
-	if (pos == string::npos)
-	{
-		propertyName = path;
-		propertyScriptTable = pScriptTable;
-		return;
-	}
-
-	string tableName = path.Left(pos);
-	pos++;
-	string pathLeft = path.Right(path.size() - pos);
-
-	ScriptAnyValue value;
-	pScriptTable->GetValueAny(tableName.c_str(), value);
-	assert(value.GetType() == EScriptAnyType::Table);
-
-	if (value.GetType() == EScriptAnyType::Table)
-	{
-		FindScriptTableForParameterRec(value.GetScriptTable(), pathLeft, propertyName, propertyScriptTable);
-	}
-}
-
-void CAnimEntityNode::FindDynamicPropertiesRec(IScriptTable* pScriptTable, const string& currentPath, unsigned int depth)
-{
-	// There might be infinite recursion in the tables, so we need to limit the max recursion depth
-	const unsigned int kMaxRecursionDepth = 5;
-
-	IScriptTable::Iterator iter = pScriptTable->BeginIteration();
-
-	while (pScriptTable->MoveNext(iter))
-	{
-		if (!iter.sKey || iter.sKey[0] == '_')  // Skip properties that start with an underscore
-		{
-			continue;
-		}
-
-		SScriptPropertyParamInfo paramInfo;
-		bool isUnknownTable = ObtainPropertyTypeInfo(iter.sKey, pScriptTable, paramInfo);
-
-		if (isUnknownTable && depth < kMaxRecursionDepth)
-		{
-			FindDynamicPropertiesRec(paramInfo.scriptTable, currentPath + iter.sKey + "/", depth + 1);
-			continue;
-		}
-
-		if (paramInfo.animNodeParamInfo.valueType != eAnimValue_Unknown)
-		{
-			AddPropertyToParamInfoMap(iter.sKey, currentPath, paramInfo);
-		}
-	}
-
-	pScriptTable->EndIteration(iter);
-}
-
-// fills some fields in paramInfo with the appropriate value related to the property defined by pScriptTable and pKey.
-// returns true if the property is a table that should be parsed, instead of an atomic type  (simple vectors are treated like atomic types)
-bool CAnimEntityNode::ObtainPropertyTypeInfo(const char* pKey, IScriptTable* pScriptTable, SScriptPropertyParamInfo& paramInfo)
-{
-	ScriptAnyValue value;
-	pScriptTable->GetValueAny(pKey, value);
-	paramInfo.scriptTable = pScriptTable;
-	paramInfo.isVectorTable = false;
-	paramInfo.animNodeParamInfo.valueType = eAnimValue_Unknown;
-	bool isUnknownTable = false;
-
-	switch (value.GetType())
-	{
-	case EScriptAnyType::Number:
-		{
-			const bool hasBoolPrefix = (strlen(pKey) > 1) && (pKey[0] == 'b')
-			                           && (pKey[1] != tolower(pKey[1]));
-			paramInfo.animNodeParamInfo.valueType = hasBoolPrefix ? eAnimValue_Bool : eAnimValue_Float;
-		}
-		break;
-
-	case EScriptAnyType::Vector:
-		paramInfo.animNodeParamInfo.valueType = eAnimValue_Vector;
-		break;
-
-	case EScriptAnyType::Boolean:
-		paramInfo.animNodeParamInfo.valueType = eAnimValue_Bool;
-		break;
-
-	case EScriptAnyType::Table:
-		// Threat table as vector if it contains x, y & z
-		paramInfo.scriptTable = value.GetScriptTable();
-
-		if (value.GetScriptTable()->HaveValue("x") && value.GetScriptTable()->HaveValue("y") && value.GetScriptTable()->HaveValue("z"))
-		{
-			paramInfo.animNodeParamInfo.valueType = eAnimValue_Vector;
-			paramInfo.scriptTable = value.GetScriptTable();
-			paramInfo.isVectorTable = true;
-		}
-		else
-		{
-			isUnknownTable = true;
-		}
-
-		break;
-	}
-
-	return isUnknownTable;
 }
 
 void CAnimEntityNode::AddPropertyToParamInfoMap(const char* pKey, const string& currentPath, SScriptPropertyParamInfo& paramInfo)
@@ -754,9 +592,6 @@ void CAnimEntityNode::InitializeTrackDefaultValue(IAnimTrack* pTrack, const CAni
 					{
 						float value = 0.f;
 
-						const SScriptPropertyParamInfo& scriptParam = static_cast<const SScriptPropertyParamInfo&>(param);
-						scriptParam.scriptTable->GetValue(scriptParam.variableName, value);
-
 						pTrack->SetDefaultValue(TMovieSystemValue(value));
 					}
 				}
@@ -769,17 +604,6 @@ void CAnimEntityNode::InitializeTrackDefaultValue(IAnimTrack* pTrack, const CAni
 
 					if (param.GetType() == IPropertyParamInfo::EType::LegacyScriptProperty)
 					{
-						const SScriptPropertyParamInfo& scriptParam = static_cast<const SScriptPropertyParamInfo&>(param);
-						if (scriptParam.isVectorTable)
-						{
-							scriptParam.scriptTable->GetValue("x", value.x);
-							scriptParam.scriptTable->GetValue("y", value.y);
-							scriptParam.scriptTable->GetValue("z", value.z);
-						}
-						else
-						{
-							scriptParam.scriptTable->GetValue(scriptParam.variableName, value);
-						}
 					}
 					break;
 				}
@@ -790,8 +614,6 @@ void CAnimEntityNode::InitializeTrackDefaultValue(IAnimTrack* pTrack, const CAni
 
 					if (param.GetType() == IPropertyParamInfo::EType::LegacyScriptProperty)
 					{
-						const SScriptPropertyParamInfo& scriptParam = static_cast<const SScriptPropertyParamInfo&>(param);
-						scriptParam.scriptTable->GetValue(scriptParam.variableName, value);
 					}
 
 					pTrack->SetDefaultValue(TMovieSystemValue(value));
@@ -1571,15 +1393,6 @@ void CAnimEntityNode::Animate(SAnimContext& animContext)
 		}
 	}
 
-	if (bEntityPropertyModified && pEntity != nullptr && pEntity->GetScriptTable() != nullptr)
-	{
-		if (pEntity->GetScriptTable()->HaveValue("OnPropertyChange"))
-			Script::CallMethod(pEntity->GetScriptTable(), "OnPropertyChange");
-#ifdef CHECK_FOR_TOO_MANY_ONPROPERTY_SCRIPT_CALLS
-		m_OnPropertyCalls++;
-#endif
-	}
-
 	// Update physics status if needed.
 	IAnimTrack* pPhysicalizeTrack = GetTrackForParameter(eAnimParamType_Physicalize);
 
@@ -2016,68 +1829,6 @@ void CAnimEntityNode::ApplyEventKey(CEventTrack* track, int keyIndex, SEventKey&
 
 	if (key.m_event.size() > 0) // if there's an event
 	{
-		// Fire event on Entity.
-		IEntityScriptComponent* pScriptProxy = (IEntityScriptComponent*)pEntity->GetProxy(ENTITY_PROXY_SCRIPT);
-
-		if (pScriptProxy)
-		{
-			// Find event
-			int type = -1;
-
-			if (IEntityClass* pClass = pEntity->GetClass())
-			{
-				const int count = pClass->GetEventCount();
-				IEntityClass::SEventInfo info;
-
-				for (int i = 0; i < count; ++i)
-				{
-					info = pClass->GetEventInfo(i);
-
-					if (strcmp(key.m_event, info.name) == 0)
-					{
-						type = info.type;
-						break;
-					}
-				}
-			}
-
-			// Convert value to type
-			switch (type)
-			{
-			case IEntityClass::EVT_INT:
-			case IEntityClass::EVT_FLOAT:
-			case IEntityClass::EVT_ENTITY:
-				pScriptProxy->CallEvent(key.m_event, (float)atof(key.m_eventValue));
-				break;
-
-			case IEntityClass::EVT_BOOL:
-				pScriptProxy->CallEvent(key.m_event, atoi(key.m_eventValue) != 0 ? true : false);
-				break;
-
-			case IEntityClass::EVT_STRING:
-				pScriptProxy->CallEvent(key.m_event, key.m_eventValue);
-				break;
-
-			case IEntityClass::EVT_VECTOR:
-				{
-					Vec3 vTemp(0, 0, 0);
-					float x = 0, y = 0, z = 0;
-#if defined(USE_CRY_ASSERT)
-					int res = sscanf(key.m_eventValue, "%f,%f,%f", &x, &y, &z);
-					assert(res == 3);
-#else
-					sscanf(key.m_eventValue, "%f,%f,%f", &x, &y, &z);
-#endif
-					vTemp(x, y, z);
-					pScriptProxy->CallEvent(key.m_event, vTemp);
-				}
-				break;
-
-			case -1:
-			default:
-				pScriptProxy->CallEvent(key.m_event);
-			}
-		}
 	}
 }
 
@@ -2714,112 +2465,8 @@ bool CAnimEntityNode::AnimateLegacyScriptProperty(const SScriptPropertyParamInfo
 	bool bChangedProperty = false;
 	const TMovieSystemValue value = pTrack->GetValue(animContext.time);
 
-	float fValue;
 	Vec3 vecValue;
-	bool boolValue;
-	float currfValue = 0.f;
 	Vec3 currVecValue(0, 0, 0);
-	bool currBoolValue = false;
-	int currBoolIntValue = 0;
-
-	switch (pTrack->GetValueType())
-	{
-	case eAnimValue_Float:
-		fValue = stl::get<float>(value);
-		param.scriptTable->GetValue(param.variableName, currfValue);
-
-		// this check actually fails much more often than it should. There is some kind of lack of precision in the trackview interpolation calculations, and often a value that should
-		// be constant does small oscillations around the correct value. (0.49999, 5.00001, 0.49999, etc).
-		// not a big issue as long as those changes dont trigger constant calls to OnPropertyChange, but maybe it could be worth it to see if is ok to use some range check like fcmp().
-		if (currfValue != fValue)
-		{
-			param.scriptTable->SetValue(param.variableName, fValue);
-			bChangedProperty = true;
-		}
-
-		break;
-
-	case eAnimValue_Vector:
-		// fall through
-	case eAnimValue_RGB:
-		vecValue = stl::get<Vec3>(value);
-
-		if (pTrack->GetValueType() == eAnimValue_RGB)
-		{
-			vecValue /= 255.0f;
-
-			vecValue.x = clamp_tpl(vecValue.x, 0.0f, 1.0f);
-			vecValue.y = clamp_tpl(vecValue.y, 0.0f, 1.0f);
-			vecValue.z = clamp_tpl(vecValue.z, 0.0f, 1.0f);
-		}
-
-		if (param.isVectorTable)
-		{
-			param.scriptTable->GetValue("x", currVecValue.x) && param.scriptTable->GetValue("y", currVecValue.y) && param.scriptTable->GetValue("z", currVecValue.z);
-
-			if (currVecValue != vecValue)
-			{
-				param.scriptTable->SetValue("x", vecValue.x);
-				param.scriptTable->SetValue("y", vecValue.y);
-				param.scriptTable->SetValue("z", vecValue.z);
-				bChangedProperty = true;
-			}
-		}
-		else
-		{
-			param.scriptTable->GetValue(param.variableName, currVecValue);
-
-			if (currVecValue != vecValue)
-			{
-				param.scriptTable->SetValue(param.variableName, vecValue);
-				bChangedProperty = true;
-			}
-		}
-
-		break;
-
-	case eAnimValue_Bool:
-		boolValue = stl::get<bool>(value);
-
-		if (param.scriptTable->GetValueType(param.variableName) == svtNumber)
-		{
-			int boolIntValue = boolValue ? 1 : 0;
-			param.scriptTable->GetValue(param.variableName, currBoolIntValue);
-
-			if (currBoolIntValue != boolIntValue)
-			{
-				param.scriptTable->SetValue(param.variableName, boolIntValue);
-				bChangedProperty = true;
-			}
-		}
-		else
-		{
-			param.scriptTable->GetValue(param.variableName, currBoolValue);
-
-			if (currBoolValue != boolValue)
-			{
-				param.scriptTable->SetValue(param.variableName, boolValue);
-				bChangedProperty = true;
-			}
-		}
-
-		break;
-	}
-
-	// we give the lua code the chance to internally manage the change without needing a call to OnPropertyChange which is totally general and usually includes a recreation of all internal objects
-	if (bChangedProperty)
-	{
-		HSCRIPTFUNCTION func = 0;
-		pEntity->GetScriptTable()->GetValue("OnPropertyAnimated", func);
-
-		if (func)
-		{
-			bool changeTakenCareOf = false;
-			Script::CallReturn(gEnv->pScriptSystem, func, pEntity->GetScriptTable(), param.variableName.c_str(), changeTakenCareOf);
-			bChangedProperty = !changeTakenCareOf;
-			gEnv->pScriptSystem->ReleaseFunc(func);
-		}
-	}
 
 	return bChangedProperty;
 }

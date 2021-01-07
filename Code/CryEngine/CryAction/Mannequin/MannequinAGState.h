@@ -23,6 +23,7 @@
 #include "ICryMannequin.h"
 #include "Mannequin/MannequinAGDefs.h"
 #include "Mannequin/AnimActionTriState.h"
+#include "CryCore/Containers/CryFixedArray.h"
 
 namespace MannequinAG
 {

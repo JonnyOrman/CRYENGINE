@@ -24,7 +24,6 @@ struct INetEntity;
 struct IParticleEffect;
 struct IParticleEmitter;
 struct IPhysicalEntity;
-struct IScriptTable;
 struct IStatObj;
 struct SEntityUpdateContext;
 struct SFogVolumeProperties;
@@ -156,8 +155,6 @@ struct SEntitySpawnParams
 	//! This value will be set by the entity system, providing more information about the spawn result.
 	EEntitySpawnResult spawnResult = EEntitySpawnResult::Error;
 
-	/*CRY_DEPRECATED_ENTTIY_LUA*/ IScriptTable*           pPropertiesTable = nullptr;
-	/*CRY_DEPRECATED_ENTTIY_LUA*/ IScriptTable*           pPropertiesInstanceTable = nullptr;
 	/*CRY_DEPRECATED_ENTTIY_ARCHETYPE*/ IEntityArchetype* pArchetype = nullptr;
 };
 
@@ -1232,9 +1229,6 @@ public:
 	
 	//! Invalidates the entity's and all its children's transformation matrices!
 	virtual void InvalidateTM(EntityTransformationFlagsMask transformReasons = EntityTransformationFlagsMask(), bool bRecalcPhyBounds = false) = 0;
-
-	//! Easy Script table access.
-	CRY_DEPRECATED_ENTTIY_LUA virtual IScriptTable* GetScriptTable() const = 0;
 
 	//! Retrieve 3D Engine render node, used to render this entity for a given slot.
 	//! If nSlot is -1 return first existing render node in slots.

@@ -10,7 +10,6 @@
 #include "LiveCreateHost.h"
 
 #include "LiveCreate_System.h"
-#include <CryAISystem/IAISystem.h>
 
 #ifndef NO_LIVECREATE
 

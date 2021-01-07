@@ -16,13 +16,11 @@
 
 #define STATS_MODE_CVAR 1
 
-#include <CryScriptSystem/IScriptSystem.h>
 #include <CryGame/IGameStatistics.h>
 
 //////////////////////////////////////////////////////////////////////////
 
 class CGameStatistics;
-class CScriptBind_GameStatistics;
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -70,7 +68,7 @@ public:
 class CStatsTracker : public IStatsTracker
 {
 public:
-	CStatsTracker(const SNodeLocator& locator, CGameStatistics* pGameStats, IScriptTable* pTable = 0);
+	CStatsTracker(const SNodeLocator& locator, CGameStatistics* pGameStats);
 	~CStatsTracker();
 	virtual void             StateValue(size_t stateID, const SStatAnyValue& value);
 	virtual void             Event(size_t eventID, const SStatAnyValue& value);
@@ -78,7 +76,6 @@ public:
 	virtual void             GetMemoryStatistics(ICrySizer* pSizer);
 
 	SNodeLocator             GetLocator() const;
-	IScriptTable*            GetScriptTable() const;
 
 	void                     GetMemoryUsage(ICrySizer* pSizer) const {}
 private:
@@ -88,7 +85,6 @@ private:
 private:
 	IStatsContainerPtr m_container;
 	SNodeLocator       m_locator;
-	SmartScriptTable   m_scriptTable;
 	CGameStatistics*   m_pGameStats;
 };
 

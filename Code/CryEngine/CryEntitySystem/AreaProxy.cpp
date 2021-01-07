@@ -130,22 +130,6 @@ void CEntityComponentArea::OnEnable(bool bIsEnable, bool bIsCallScript)
 			m_areaDefinition.pGravityParams = &m_gravityParams;
 		}
 		m_pEntity->Physicalize(physparams);
-
-		if (bIsCallScript)
-		{
-			//call the OnEnable function in the script, to set game flags for this entity and such.
-			IScriptTable* pScriptTable = m_pEntity->GetScriptTable();
-			if (pScriptTable)
-			{
-				HSCRIPTFUNCTION scriptFunc(NULL);
-				pScriptTable->GetValue("OnEnable", scriptFunc);
-
-				if (scriptFunc)
-					Script::Call(gEnv->pScriptSystem, scriptFunc, pScriptTable, bIsEnable);
-
-				gEnv->pScriptSystem->ReleaseFunc(scriptFunc);
-			}
-		}
 	}
 }
 
@@ -156,15 +140,6 @@ void CEntityComponentArea::ProcessEvent(const SEntityEvent& event)
 	{
 	case ENTITY_EVENT_XFORM:
 		OnMove();
-		break;
-	case ENTITY_EVENT_SCRIPT_EVENT:
-		{
-			const char* pName = (const char*)event.nParam[0];
-			if (!stricmp(pName, "Enable"))
-				OnEnable(true);
-			else if (!stricmp(pName, "Disable"))
-				OnEnable(false);
-		}
 		break;
 	case ENTITY_EVENT_RENDER_VISIBILITY_CHANGE:
 		{
@@ -191,7 +166,7 @@ void CEntityComponentArea::ProcessEvent(const SEntityEvent& event)
 //////////////////////////////////////////////////////////////////////////
 Cry::Entity::EventFlags CEntityComponentArea::GetEventMask() const
 {
-	return ENTITY_EVENT_XFORM | ENTITY_EVENT_SCRIPT_EVENT | ENTITY_EVENT_RENDER_VISIBILITY_CHANGE;
+	return ENTITY_EVENT_XFORM | ENTITY_EVENT_RENDER_VISIBILITY_CHANGE;
 }
 
 //////////////////////////////////////////////////////////////////////////

@@ -6,6 +6,7 @@
 #include <CryCore/Containers/CryArray.h>
 #include <CryParticleSystem/Options.h>
 #include "TypeInfo_decl.h"
+#include "CryCore/Platform/platform.h"
 
 class ICrySizer;
 

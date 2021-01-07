@@ -16,7 +16,6 @@
 #if CRY_PLATFORM_WINDOWS
 	#include <CryCore/Platform/CryWindows.h>
 	#include <wininet.h> // requires <windows.h>
-	#include <CryScriptSystem/IScriptSystem.h>
 	#include <dbghelp.h>
 
 	#define HTTP_BUFFER_SIZE (16384)
@@ -47,14 +46,6 @@ public:
 	const string& GetDstFileName() const { return m_szDstFile; };
 	void          Release();
 
-	int           Download(IFunctionHandler* pH);
-	int           Cancel(IFunctionHandler* pH);
-	int           Release(IFunctionHandler* pH);
-
-	int           GetURL(IFunctionHandler* pH);
-	int           GetFileSize(IFunctionHandler* pH);
-	int           GetFileName(IFunctionHandler* pH);
-
 	void          OnError();
 	void          OnComplete();
 	void          OnCancel();
@@ -65,7 +56,6 @@ private:
 	void          CreateDownloadThread();
 	DWORD         DoDownload();
 	void          PrepareBuffer();
-	IScriptTable* GetScriptObject() { return 0; };
 
 	string            m_szURL;
 	string            m_szDstFile;
@@ -81,8 +71,6 @@ private:
 
 	ISystem*          m_pSystem;
 	CDownloadManager* m_pParent;
-
-	IScriptSystem*    m_pScriptSystem;
 };
 
 #endif

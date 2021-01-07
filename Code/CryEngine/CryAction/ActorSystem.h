@@ -20,11 +20,9 @@
 
 #include "IActorSystem.h"
 #include <CryGame/IGameFramework.h>
-#include "ItemParams.h"
 
 typedef std::map<EntityId, IActor*> TActorMap;
 
-struct IScriptTable;
 class CPlayerEntityProxy;
 
 class CActorSystem :
@@ -158,14 +156,10 @@ private:
 
 	typedef struct SActorParamsDesc
 	{
-		SActorParamsDesc() : params(0) {};
+		SActorParamsDesc() {};
 		~SActorParamsDesc()
 		{
-			if (params)
-				params->Release();
 		};
-
-		CItemParamsNode* params;
 
 	} SItemParamsDesc;
 

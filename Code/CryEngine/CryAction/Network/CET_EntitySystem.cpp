@@ -87,10 +87,6 @@ public:
 		gEnv->p3DEngine->ResetParticlesAndDecals();
 		gEnv->pGameFramework->ResetBrokenGameObjects();
 		gEnv->pPhysicalWorld->ResetDynamicEntities();
-		if (gEnv->pGameFramework->GetIItemSystem())
-		{
-			gEnv->pGameFramework->GetIItemSystem()->Reset();
-		}
 		if (gEnv->pGameFramework->GetIMaterialEffects())
 		{
 			gEnv->pGameFramework->GetIMaterialEffects()->Reset(false);
@@ -220,11 +216,6 @@ public:
 
 		if (rootNode)
 		{
-			const char* script = rootNode->getAttr("Script");
-
-			if (script && script[0])
-				gEnv->pScriptSystem->ExecuteFile(script, true, true);
-
 			XmlNodeRef objectsNode = rootNode->findChild("Objects");
 
 			if (objectsNode)

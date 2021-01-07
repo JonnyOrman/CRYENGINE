@@ -2,7 +2,6 @@
 
 #include "stdafx.h"
 #include "EntityClass.h"
-#include "EntityScript.h"
 
 #include <CrySchematyc/ICore.h>
 
@@ -14,42 +13,19 @@ CEntityClass::CEntityClass()
 	m_pEventHandler = NULL;
 	m_pScriptFileHandler = NULL;
 
-	m_pEntityScript = NULL;
 	m_bScriptLoaded = false;
 }
 
 //////////////////////////////////////////////////////////////////////////
 CEntityClass::~CEntityClass()
 {
-	SAFE_RELEASE(m_pEntityScript);
-}
-
-//////////////////////////////////////////////////////////////////////////
-IScriptTable* CEntityClass::GetScriptTable() const
-{
-	IScriptTable* pScriptTable = NULL;
-
-	if (m_pEntityScript)
-	{
-		CEntityScript* pScript = static_cast<CEntityScript*>(m_pEntityScript);
-		pScriptTable = (pScript ? pScript->GetScriptTable() : NULL);
-	}
-
-	return pScriptTable;
 }
 
 //////////////////////////////////////////////////////////////////////////
 bool CEntityClass::LoadScript(bool bForceReload)
 {
 	bool bRes = true;
-	if (m_pEntityScript)
-	{
-		CEntityScript* pScript = static_cast<CEntityScript*>(m_pEntityScript);
-		bRes = pScript->LoadScript(bForceReload);
-
-		m_bScriptLoaded = true;
-	}
-
+	
 	if (m_pScriptFileHandler && bForceReload)
 		m_pScriptFileHandler->ReloadScriptFile();
 
@@ -68,10 +44,7 @@ int CEntityClass::GetEventCount()
 	if (!m_bScriptLoaded)
 		LoadScript(false);
 
-	if (!m_pEntityScript)
-		return 0;
-
-	return static_cast<CEntityScript*>(m_pEntityScript)->GetEventCount();
+	return 0;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -127,18 +100,8 @@ CEntityClass::SEventInfo CEntityClass::GetEventInfo(int nIndex)
 
 	CRY_ASSERT(nIndex >= 0 && nIndex < GetEventCount());
 
-	if (m_pEntityScript)
-	{
-		const SEntityScriptEvent& scriptEvent = static_cast<CEntityScript*>(m_pEntityScript)->GetEvent(nIndex);
-		info.name = scriptEvent.name.c_str();
-		info.bOutput = scriptEvent.bOutput;
-		info.type = scriptEvent.valueType;
-	}
-	else
-	{
-		info.name = "";
-		info.bOutput = false;
-	}
+	info.name = "";
+	info.bOutput = false;
 
 	return info;
 }
@@ -149,18 +112,7 @@ bool CEntityClass::FindEventInfo(const char* sEvent, SEventInfo& event)
 	if (!m_bScriptLoaded)
 		LoadScript(false);
 
-	if (!m_pEntityScript)
-		return false;
-
-	const SEntityScriptEvent* pScriptEvent = static_cast<CEntityScript*>(m_pEntityScript)->FindEvent(sEvent);
-	if (!pScriptEvent)
-		return false;
-
-	event.name = pScriptEvent->name.c_str();
-	event.bOutput = pScriptEvent->bOutput;
-	event.type = pScriptEvent->valueType;
-
-	return true;
+	return false;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -192,11 +144,6 @@ void CEntityClass::SetGUID(const CryGUID& guid)
 void CEntityClass::SetScriptFile(const char* sScriptFile)
 {
 	m_sScriptFile = sScriptFile;
-}
-
-void CEntityClass::SetEntityScript(IEntityScript* pScript)
-{
-	m_pEntityScript = pScript;
 }
 
 void CEntityClass::SetUserProxyCreateFunc(UserProxyCreateFunc pFunc, void* pUserData /*=NULL */)

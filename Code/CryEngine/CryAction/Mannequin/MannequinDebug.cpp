@@ -4,7 +4,6 @@
 #include "MannequinDebug.h"
 #include "ActionController.h"
 
-#include <CryAISystem/IAIObject.h>
 #include <CryRenderer/IRenderAuxGeom.h>
 #include <CrySystem/ConsoleRegistration.h>
 

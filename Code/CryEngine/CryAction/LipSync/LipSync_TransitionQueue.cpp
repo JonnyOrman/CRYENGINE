@@ -58,28 +58,6 @@ CLipSyncProvider_TransitionQueue::CLipSyncProvider_TransitionQueue(EntityId enti
 	, m_nCurrentAnimationToken(0)
 	, m_soundId(CryAudio::InvalidControlId)
 {
-	// read settings from script
-	if (IEntity* pEntity = GetEntity())
-	{
-		if (SmartScriptTable pScriptTable = pEntity->GetScriptTable())
-		{
-			SmartScriptTable pPropertiesTable;
-			if (pScriptTable->GetValue("Properties", pPropertiesTable))
-			{
-				SmartScriptTable pLipSyncTable;
-				if (pPropertiesTable->GetValue("LipSync", pLipSyncTable))
-				{
-					SmartScriptTable pSettingsTable;
-					if (pLipSyncTable->GetValue("TransitionQueueSettings", pSettingsTable))
-					{
-						pSettingsTable->GetValue("nCharacterSlot", m_nCharacterSlot);
-						pSettingsTable->GetValue("nAnimLayer", m_nAnimLayer);
-						pSettingsTable->GetValue("sDefaultAnimName", m_sDefaultAnimName);
-					}
-				}
-			}
-		}
-	}
 }
 
 IEntity* CLipSyncProvider_TransitionQueue::GetEntity()

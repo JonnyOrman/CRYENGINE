@@ -67,19 +67,6 @@ public:
 		return true;
 	}
 
-	bool ReadValue(CCommInputStream& in, ScriptAnyValue& value, CArithModel* pModel, uint32 age) const
-	{
-		NET_ASSERT(!"script values not supported");
-		NetWarning("Network serialization of script types is not supported");
-		return false;
-	}
-	bool WriteValue(CCommOutputStream& out, const ScriptAnyValue& value, CArithModel* pModel, uint32 age) const
-	{
-		NET_ASSERT(!"script values not supported");
-		NetWarning("Network serialization of script types is not supported");
-		return false;
-	}
-
 	bool ReadValue(CCommInputStream& in, XmlNodeRef& value, CArithModel* pModel, uint32 age) const
 	{
 		NET_ASSERT(!"XmlNodeRef not supported");
@@ -202,11 +189,6 @@ public:
 	int GetBitCount(CTimeValue value)
 	{
 		return BITCOUNT_TIME;
-	}
-
-	int GetBitCount(ScriptAnyValue value)
-	{
-		return 0;
 	}
 
 	int GetBitCount(SSerializeString& value)

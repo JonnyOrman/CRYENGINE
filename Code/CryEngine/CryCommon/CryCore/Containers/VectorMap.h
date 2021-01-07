@@ -216,7 +216,7 @@ void VectorMap<K, V, T, A >::clear()
 template<typename K, typename V, typename T, typename A>
 void VectorMap<K, V, T, A >::clearAndFreeMemory()
 {
-	stl::free_container(m_entries);
+	throw "TODO";// stl::free_container(m_entries);
 }
 
 template<typename K, typename V, typename T, typename A>

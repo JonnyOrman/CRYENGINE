@@ -2205,8 +2205,6 @@ void CXConsole::ExecuteStringInternal(const char* command, const bool bFromConso
 
 			if (m_system.IsDevMode())
 			{
-				if (m_system.GetIScriptSystem())
-					m_system.GetIScriptSystem()->ExecuteBuffer(command + 1, strlen(command) - 1);
 				m_bDrawCursor = false;
 			}
 			return;
@@ -2495,8 +2493,6 @@ void CXConsole::ExecuteCommand(CConsoleCommand& cmd, string& str, bool bIgnoreDe
 		}
 	}
 
-	if (m_system.GetIScriptSystem())
-		m_system.GetIScriptSystem()->ExecuteBuffer(buf.c_str(), buf.length());
 	m_bDrawCursor = 0;
 }
 

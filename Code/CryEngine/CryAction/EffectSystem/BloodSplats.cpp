@@ -3,6 +3,8 @@
 #include "StdAfx.h"
 #include "BloodSplats.h"
 
+#include "Cry3DEngine/I3DEngine.h"
+
 void CBloodSplats::Init(int type, float maxTime)
 {
 	m_type = type;

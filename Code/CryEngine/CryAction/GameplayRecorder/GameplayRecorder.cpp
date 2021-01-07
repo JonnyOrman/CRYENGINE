@@ -139,33 +139,6 @@ void CGameplayRecorder::CExampleMetadataListener::RecordGameData()
 				pActorMetadata->AddField(eDT_armor, eBT_i08, &armor, 1);
 				uint8 isgod = pActor->IsGod() ? 0xff : 0x00;
 				pActorMetadata->AddField(eDT_isgod, eBT_i08, &isgod, 1);
-				//uint8 third = pOldActor->IsThirdPerson() ? 0xff : 0x00;
-				//pActorMetadata->AddField(eDT_3rdperson, eBT_i08, &third, 1);
-				if (IItem* pItem = pActor->GetCurrentItem())
-				{
-					IMetadataPtr pItemMetadata;
-					pItemMetadata->SetTag(eDT_item);
-					string name = pItem->GetEntity()->GetName();
-					pItemMetadata->AddField(eDT_name, eBT_str, (uint8*)name.data(), static_cast<uint8>(name.size()));
-					if (IWeapon* pWeapon = pItem->GetIWeapon())
-					{
-						IMetadataPtr pWeaponMetadata;
-						pWeaponMetadata->SetTag(eDT_weapon);
-						IFireMode* pFireMode = pWeapon->GetFireMode(pWeapon->GetCurrentFireMode());
-						string fire = pFireMode->GetName();
-						pWeaponMetadata->AddField(eDT_firemode, eBT_str, (uint8*)fire.data(), static_cast<uint8>(fire.size()));
-						if (pFireMode->GetAmmoType())
-						{
-							string ammt = pFireMode->GetAmmoType()->GetName();
-							pWeaponMetadata->AddField(eDT_ammotype, eBT_str, (uint8*)ammt.data(), static_cast<uint8>(ammt.size()));
-						}
-						uint32 ammo = pFireMode->GetAmmoCount();
-						pWeaponMetadata->AddField(eDT_ammocount, eBT_u32, (uint8*)&ammo, sizeof(ammo));
-
-						pItemMetadata->AddField(pWeaponMetadata.get());
-					}
-					pActorMetadata->AddField(pItemMetadata.get());
-				}
 			}
 
 			//m_pMetadataRecorder->RecordIt(pActorMetadata.get());

@@ -28,8 +28,6 @@ public:
 	virtual CryGUID                   GetGUID() const final             { return m_guid; }
 	virtual const char*               GetScriptFile() const override    { return m_sScriptFile.c_str(); }
 
-	virtual IEntityScript*            GetIEntityScript() const override { return m_pEntityScript; }
-	virtual IScriptTable*             GetScriptTable() const override;
 	virtual bool                      LoadScript(bool bForceReload) override;
 	virtual UserProxyCreateFunc       GetUserProxyCreateFunc() const override { return m_pfnUserProxyCreate; }
 	virtual void*                     GetUserProxyData() const override       { return m_pUserProxyUserData; }
@@ -53,7 +51,6 @@ public:
 	void                             SetName(const char* sName);
 	void                             SetGUID(const CryGUID& guid);
 	void                             SetScriptFile(const char* sScriptFile);
-	void                             SetEntityScript(IEntityScript* pScript);
 
 	void                             SetUserProxyCreateFunc(UserProxyCreateFunc pFunc, void* pUserData = NULL);
 	void                             SetEventHandler(IEntityEventHandler* pEventHandler);
@@ -67,7 +64,6 @@ public:
 	{
 		pSizer->AddObject(m_sName);
 		pSizer->AddObject(m_sScriptFile);
-		pSizer->AddObject(m_pEntityScript);
 		pSizer->AddObject(m_pEventHandler);
 		pSizer->AddObject(m_pScriptFileHandler);
 	}
@@ -76,7 +72,6 @@ private:
 	string                                   m_sName;
 	CryGUID                                  m_guid;
 	string                                   m_sScriptFile;
-	IEntityScript*                           m_pEntityScript;
 
 	UserProxyCreateFunc                      m_pfnUserProxyCreate;
 	void*                                    m_pUserProxyUserData;

@@ -18,8 +18,6 @@
 #include "Network/GameServerChannel.h"
 #include "Network/GameClientNub.h"
 #include "Network/GameServerNub.h"
-#include "Serialization/SerializeScriptTableWriter.h"
-#include "Serialization/SerializeScriptTableReader.h"
 #include "GameObjectSystem.h"
 #include <CrySystem/ITextModeConsole.h>
 #include <CryRenderer/IRenderAuxGeom.h>
@@ -27,7 +25,6 @@
 
 // ugly: for GetMovementController()
 #include "IActorSystem.h"
-#include "IVehicleSystem.h"
 
 #include <CryNetwork/INetwork.h>
 #include <CrySystem/ConsoleRegistration.h>
@@ -1113,28 +1110,6 @@ void CGameObject::EnableDelegatableAspect(NetworkAspectType aspects, bool enable
 	m_pNetEntity->EnableDelegatableAspect(aspects, enable);
 }
 
-//------------------------------------------------------------------------
-template<class T>
-ILINE bool CGameObject::DoGetSetExtensionParams(const char* extension, SmartScriptTable params)
-{
-	IGameObjectSystem* pGameObjectSystem = m_pGOS;
-	SExtension ext;
-	ext.id = pGameObjectSystem->GetID(extension);
-	if (ext.id != IGameObjectSystem::InvalidExtensionID)
-	{
-		TExtensions::iterator iter = std::lower_bound(m_extensions.begin(), m_extensions.end(), ext);
-
-		if (iter != m_extensions.end() && ext.id == iter->id)
-		{
-			T impl(params);
-			CSimpleSerialize<T> ser(impl);
-			iter->pExtension->FullSerialize(TSerialize(&ser));
-			return ser.Ok();
-		}
-	}
-	return false;
-}
-
 IGameObjectExtension* CGameObject::QueryExtension(const char* extension) const
 {
 	CRY_PROFILE_FUNCTION(PROFILE_ACTION);
@@ -1156,16 +1131,6 @@ IGameObjectExtension* CGameObject::QueryExtension(IGameObjectSystem::ExtensionID
 	}
 
 	return 0;
-}
-
-bool CGameObject::GetExtensionParams(const char* extension, SmartScriptTable params)
-{
-	return DoGetSetExtensionParams<CSerializeScriptTableWriterImpl>(extension, params);
-}
-
-bool CGameObject::SetExtensionParams(const char* extension, SmartScriptTable params)
-{
-	return DoGetSetExtensionParams<CSerializeScriptTableReaderImpl>(extension, params);
 }
 
 //------------------------------------------------------------------------
@@ -1415,15 +1380,6 @@ void CGameObject::SendEvent(const SGameObjectEvent& event)
 		CGameObject::HandleEvent(event);
 	if (event.flags & eGOEF_ToScriptSystem)
 	{
-		SmartScriptTable scriptTable = GetEntity()->GetScriptTable();
-		if (event.event != IGameObjectSystem::InvalidEventID)
-		{
-			const char* eventName = m_pGOS->GetEventName(event.event);
-			if (!!scriptTable && eventName && scriptTable->HaveValue(eventName))
-			{
-				Script::CallMethod(scriptTable, eventName);
-			}
-		}
 	}
 	if (event.flags & eGOEF_ToExtensions)
 	{
@@ -1694,25 +1650,6 @@ void CGameObject::SetPhysicsDisable(bool disablePhysics)
 	}
 }
 
-/*
-   void CGameObject::SetVisibility( bool isVisible )
-   {
-   if (isVisible != m_isVisible)
-   {
-   //		CryLogAlways("%s is now %svisible", m_pEntity->GetName(), isVisible? "" : "in");
-
-    uint32 flags = m_pEntity->GetFlags();
-    if (isVisible)
-      flags &= ~ENTITY_FLAG_SEND_RENDER_EVENT;
-    else
-      flags |= ENTITY_FLAG_SEND_RENDER_EVENT;
-    m_pEntity->SetFlags(flags);
-
-    m_isVisible = isVisible;
-   }
-   }
- */
-
 IWorldQuery* CGameObject::GetWorldQuery()
 {
 	if (IWorldQuery* query = (IWorldQuery*)QueryExtension("WorldQuery"))
@@ -1726,8 +1663,6 @@ IMovementController* CGameObject::GetMovementController()
 	IActor* pActor = gEnv->pGameFramework->GetIActorSystem()->GetActor(m_pEntity->GetId());
 	if (pActor != NULL)
 		return pActor->GetMovementController();
-	else if (IVehicle* pVehicle = gEnv->pGameFramework->GetIVehicleSystem()->GetVehicle(m_pEntity->GetId()))
-		return pVehicle->GetMovementController();
 	else
 		return m_pMovementController;
 }

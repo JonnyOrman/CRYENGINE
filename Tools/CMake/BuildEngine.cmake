@@ -423,7 +423,7 @@ if (OPTION_ENGINE)
 		endif()
 		add_subdirectory ("Code/CryEngine/CrySchematyc2")
 	endif()
-	add_subdirectory ("Code/CryEngine/CryScriptSystem")
+
 	add_subdirectory ("Code/CryEngine/CryUDR")
 
 	if (WINDOWS)

@@ -23,7 +23,6 @@
 #if CRY_PLATFORM_WINDOWS
 
 	#include <CrySystem/ConsoleRegistration.h>
-	#include <CryScriptSystem/IScriptSystem.h>
 	#include "JiraClient.h"
 	#include "System.h"
 	#include <CryCore/CryCustomTypes.h>

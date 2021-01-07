@@ -29,8 +29,6 @@
 #include "GraphicsPipeline/GpuParticles.h"
 
 #include <CryMovie/AnimKey.h>
-#include <CryAISystem/IAISystem.h>
-#include <CryAISystem/INavigationSystem.h>
 #include <CrySystem/VR/IHMDManager.h>
 
 #ifdef ENABLE_BENCHMARK_SENSOR

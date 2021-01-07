@@ -1378,9 +1378,6 @@ public:
 				return SetFailed("EntitySystem failed to handle loading the level");
 			}
 
-			// reset all the script timers
-			gEnv->pScriptSystem->ResetTimers();
-
 			// Reset TimeOfDayScheduler
 			CCryAction::GetCryAction()->GetTimeOfDayScheduler()->Reset();
 			CCryAction::GetCryAction()->OnActionEvent(SActionEvent(eAE_loadLevel));
@@ -1423,7 +1420,6 @@ public:
 				{
 					CryLog("Executing script '%s'", script);
 					INDENT_LOG_DURING_SCOPE();
-					gEnv->pScriptSystem->ExecuteFile(script, true, true);
 				}
 
 				XmlNodeRef objectsNode = m_missionXml->findChild("Objects");
@@ -1499,11 +1495,6 @@ public:
 			//////////////////////////////////////////////////////////////////////////
 			gEnv->p3DEngine->PostLoadLevel();
 
-			if (gEnv->pScriptSystem)
-			{
-				// After level was loaded force GC cycle in Lua
-				gEnv->pScriptSystem->ForceGarbageCollection();
-			}
 			//////////////////////////////////////////////////////////////////////////
 
 			//////////////////////////////////////////////////////////////////////////
@@ -1751,11 +1742,6 @@ void CLevelSystem::PrepareNextLevel(const char* levelName)
 		ICVar* gfx_loadtimethread = gEnv->pConsole->GetCVar("gfx_loadtimethread");
 		if (gfx_loadtimethread)
 			gfx_loadtimethread->Set(0);
-	}
-
-	// force a Lua deep garbage collection
-	{
-		gEnv->pScriptSystem->ForceGarbageCollection();
 	}
 
 #if CAPTURE_REPLAY_LOG
@@ -2238,21 +2224,9 @@ void CLevelSystem::UnLoadLevel()
 		pPlatformOS->AllowOpticalDriveUsage(false);
 	}
 
-	if (gEnv->pScriptSystem)
-	{
-		gEnv->pScriptSystem->ResetTimers();
-	}
-
 	CCryAction* pCryAction = CCryAction::GetCryAction();
 	if (pCryAction)
 	{
-		if (IItemSystem* pItemSystem = pCryAction->GetIItemSystem())
-		{
-			pItemSystem->ClearGeometryCache();
-			pItemSystem->ClearSoundCache();
-			pItemSystem->Reset();
-		}
-
 		if (ICooperativeAnimationManager* pCoopAnimManager = pCryAction->GetICooperativeAnimationManager())
 		{
 			pCoopAnimManager->Reset();

@@ -49,10 +49,6 @@ void CEntityLayer::AddObject(EntityId id)
 	if (pEntity)
 	{
 		bool bEnableScriptUpdate = false;
-		if (auto* pComponent = static_cast<CEntityComponentLuaScript*>(pEntity->GetComponent<IEntityScriptComponent>()))
-		{
-			bEnableScriptUpdate = pComponent->IsUpdateEnabled();
-		}
 
 		EntityProp& property = m_entities.emplace(id, EntityProp(id, false, pEntity->IsHidden(), bEnableScriptUpdate)).first->second;
 
@@ -250,14 +246,7 @@ void CEntityLayer::EnableEntity(CEntity& entity, EntityProp& property, bool isEn
 	{
 		property.m_bIsHidden = entity.IsHidden();
 
-		if (CEntityComponentLuaScript* pScriptComponent = static_cast<CEntityComponentLuaScript*>(entity.GetComponent<IEntityScriptComponent>()))
-		{
-			property.m_bEnableScriptUpdate = pScriptComponent->IsUpdateEnabled();
-		}
-		else
-		{
-			property.m_bEnableScriptUpdate = false;
-		}
+		property.m_bEnableScriptUpdate = false;
 	}
 
 	if (property.m_bIsHidden)
@@ -266,11 +255,6 @@ void CEntityLayer::EnableEntity(CEntity& entity, EntityProp& property, bool isEn
 	if (isEnable)
 	{
 		entity.Hide(!isEnable);
-
-		if (CEntityComponentLuaScript* pScriptComponent = static_cast<CEntityComponentLuaScript*>(entity.GetComponent<IEntityScriptComponent>()))
-		{
-			pScriptComponent->EnableScriptUpdate(property.m_bEnableScriptUpdate);
-		}
 
 		if (property.m_bIsNoAwake && entity.GetPhysicalProxy() && entity.GetPhysicalProxy()->GetPhysicalEntity())
 		{
@@ -304,10 +288,6 @@ void CEntityLayer::EnableEntity(CEntity& entity, EntityProp& property, bool isEn
 				property.m_bIsNoAwake = true;
 		}
 		entity.Hide(!isEnable);
-		if (CEntityComponentLuaScript* pScriptComponent = static_cast<CEntityComponentLuaScript*>(entity.GetComponent<IEntityScriptComponent>()))
-		{
-			pScriptComponent->EnableScriptUpdate(isEnable);
-		}
 		if (property.m_bIsNoAwake && entity.GetPhysicalProxy() && entity.GetPhysicalProxy()->GetPhysicalEntity())
 		{
 			pe_action_awake noAwake;

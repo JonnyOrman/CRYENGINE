@@ -39,82 +39,82 @@ public:
 				static_cast<CEntityClassRegistry*>(g_pIEntitySystem->GetClassRegistry())->OnGameFrameworkInitialized();
 			}
 			break;
-		case ESYSTEM_EVENT_REGISTER_SCHEMATYC_ENV:
-		{
-
-			auto entitySchematycRegistration = [](Schematyc::IEnvRegistrar& registrar)
-			{
-				Schematyc::CEntityTimerAction::Register(registrar);
-				Schematyc::CEntityDebugTextAction::Register(registrar);
-				Schematyc::Entity::RegisterUtilFunctions(registrar);
-				Schematyc::CEntityUtilsComponent::Register(registrar);
-				
-#ifdef CRY_TESTING
-				RegisterUnitTestComponents(registrar);
-#endif
-			};
-
-			gEnv->pSchematyc->GetEnvRegistry().RegisterPackage(
-				stl::make_unique<Schematyc::CEnvPackage>(
-					SchematyEntityComponentsPackageGUID,
-					"EntityComponents",
-					"Crytek GmbH",
-					"CRYENGINE Default Entity Components",
-					entitySchematycRegistration
-					)
-			);
-
-			// Check if flowgraph components are enabled
-			if (CVar::pFlowgraphComponents->GetIVal() != 0)
-			{
-				// Create signal flow nodes
-				gEnv->pSchematyc->GetEnvRegistry().VisitSignals([](const Schematyc::IEnvSignal& signal) -> Schematyc::EVisitStatus
-				{
-					const Schematyc::IEnvElement* pEnvElement = signal.GetParent();
-
-					if (Schematyc::EEnvElementType::Component == pEnvElement->GetType())
-					{
-						const Schematyc::IEnvComponent* pEnvComponent = static_cast<const Schematyc::IEnvComponent*>(pEnvElement);
-
-						stack_string  nodeName = stack_string("EntityComponents:") + pEnvComponent->GetName() + ":" + "Signals:" + signal.GetName();
-					}
-
-					return Schematyc::EVisitStatus::Continue;
-				});
-
-				gEnv->pSchematyc->GetEnvRegistry().VisitComponents([](const Schematyc::IEnvComponent& component) -> Schematyc::EVisitStatus
-				{
-					stack_string  typeName = stack_string("EntityComponents:") + component.GetName();
-					stack_string  nodeName;
-
-					// Create getter flow node
-					nodeName = typeName + ':' + "Get:" + "GetParameter";
-
-					// Create setter flow node
-					nodeName = typeName + ':' + "Set:" + "SetParameter";
-
-					// Create function flow node
-					component.VisitChildren([typeName, &component](const Schematyc::IEnvElement& element) -> Schematyc::EVisitStatus
-					{
-						switch (element.GetType())
-						{
-						case Schematyc::EEnvElementType::Function:
-						{
-							const Schematyc::CEnvFunction& function = static_cast<const Schematyc::CEnvFunction&>(element);
-
-							stack_string nodeName = typeName + ':' + "Functions:" + function.GetName();
-						}
-						break;
-						}
-
-						return Schematyc::EVisitStatus::Continue;
-					});
-
-					return Schematyc::EVisitStatus::Continue;
-				});
-			}
-		}
-		break;
+//		case ESYSTEM_EVENT_REGISTER_SCHEMATYC_ENV:
+//				{
+//
+//			auto entitySchematycRegistration = [](Schematyc::IEnvRegistrar& registrar)
+//			{
+//				Schematyc::CEntityTimerAction::Register(registrar);
+//				Schematyc::CEntityDebugTextAction::Register(registrar);
+//				Schematyc::Entity::RegisterUtilFunctions(registrar);
+//				Schematyc::CEntityUtilsComponent::Register(registrar);
+//				
+//#ifdef CRY_TESTING
+//				RegisterUnitTestComponents(registrar);
+//#endif
+//			};
+//
+//			gEnv->pSchematyc->GetEnvRegistry().RegisterPackage(
+//				stl::make_unique<Schematyc::CEnvPackage>(
+//					SchematyEntityComponentsPackageGUID,
+//					"EntityComponents",
+//					"Crytek GmbH",
+//					"CRYENGINE Default Entity Components",
+//					entitySchematycRegistration
+//					)
+//			);
+//
+//			// Check if flowgraph components are enabled
+//			if (CVar::pFlowgraphComponents->GetIVal() != 0)
+//			{
+//				// Create signal flow nodes
+//				gEnv->pSchematyc->GetEnvRegistry().VisitSignals([](const Schematyc::IEnvSignal& signal) -> Schematyc::EVisitStatus
+//				{
+//					const Schematyc::IEnvElement* pEnvElement = signal.GetParent();
+//
+//					if (Schematyc::EEnvElementType::Component == pEnvElement->GetType())
+//					{
+//						const Schematyc::IEnvComponent* pEnvComponent = static_cast<const Schematyc::IEnvComponent*>(pEnvElement);
+//
+//						stack_string  nodeName = stack_string("EntityComponents:") + pEnvComponent->GetName() + ":" + "Signals:" + signal.GetName();
+//					}
+//
+//					return Schematyc::EVisitStatus::Continue;
+//				});
+//
+//				gEnv->pSchematyc->GetEnvRegistry().VisitComponents([](const Schematyc::IEnvComponent& component) -> Schematyc::EVisitStatus
+//				{
+//					stack_string  typeName = stack_string("EntityComponents:") + component.GetName();
+//					stack_string  nodeName;
+//
+//					// Create getter flow node
+//					nodeName = typeName + ':' + "Get:" + "GetParameter";
+//
+//					// Create setter flow node
+//					nodeName = typeName + ':' + "Set:" + "SetParameter";
+//
+//					// Create function flow node
+//					component.VisitChildren([typeName, &component](const Schematyc::IEnvElement& element) -> Schematyc::EVisitStatus
+//					{
+//						switch (element.GetType())
+//						{
+//						case Schematyc::EEnvElementType::Function:
+//						{
+//							const Schematyc::CEnvFunction& function = static_cast<const Schematyc::CEnvFunction&>(element);
+//
+//							stack_string nodeName = typeName + ':' + "Functions:" + function.GetName();
+//						}
+//						break;
+//						}
+//
+//						return Schematyc::EVisitStatus::Continue;
+//					});
+//
+//					return Schematyc::EVisitStatus::Continue;
+//				});
+//			}
+//		}
+//		break;
 		case ESYSTEM_EVENT_FULL_SHUTDOWN:
 		case ESYSTEM_EVENT_FAST_SHUTDOWN:
 			{

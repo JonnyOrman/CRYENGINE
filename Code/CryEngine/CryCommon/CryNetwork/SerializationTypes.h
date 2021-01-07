@@ -14,7 +14,6 @@ SERIALIZATION_TYPE(uint8)
 SERIALIZATION_TYPE(uint16)
 SERIALIZATION_TYPE(uint32)
 SERIALIZATION_TYPE(uint64)
-SERIALIZATION_TYPE(ScriptAnyValue) // not for network - only for save games
 SERIALIZATION_TYPE(CTimeValue)
 SERIALIZATION_TYPE(SNetObjectID)
 SERIALIZATION_TYPE(XmlNodeRef) // not for network - only for save games

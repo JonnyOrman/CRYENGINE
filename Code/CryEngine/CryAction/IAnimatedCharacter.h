@@ -406,7 +406,7 @@ struct IAnimatedCharacter : public IGameObjectExtension
 
 namespace animatedcharacter
 {
-void Preload(struct IScriptTable* pEntityScript);
+void Preload();
 }
 
 struct IAnimationPoseModifierTorsoAim : public IAnimationPoseModifier

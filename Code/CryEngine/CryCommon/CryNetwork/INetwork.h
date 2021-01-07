@@ -17,6 +17,9 @@
 #include <CrySystem/TimeValue.h>
 #include <CryLobby/CommonICryMatchMaking.h>
 #include <CryNetwork/INetworkService.h>
+#include "CrySystem/IEngineModule.h"
+
+//#include "IDefaultComponentsPlugin.h"
 
 #define SERVER_DEFAULT_PORT        64087
 #define SERVER_DEFAULT_PORT_STRING "64087"
@@ -1360,9 +1363,6 @@ struct IGameContext
 
 	//! An entity has been unbound (we may wish to destroy it).
 	virtual void UnboundObject(EntityId id) = 0;
-
-	//! Handles a remote method invocation.
-	virtual INetAtSyncItem* HandleRMI(bool bClient, EntityId objID, uint8 funcID, TSerialize ser, INetChannel* pChannel) = 0;
 
 	//! Passes current demo playback mapped entity ID of the original demo recording server (local) player.
 	virtual void PassDemoPlaybackMappedOriginalServerPlayer(EntityId id) = 0;

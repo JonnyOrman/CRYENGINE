@@ -48,7 +48,6 @@ inline void GameWarning(const char*, ...) PRINTF_PARAMS(1, 2);
 #include <CrySystem/ISystem.h>
 #include <CryNetwork/INetwork.h>
 #include <CryInput/IInput.h>
-#include <CryScriptSystem/IScriptSystem.h>
 #include <CryEntitySystem/IEntitySystem.h>
 #include <CryNetwork/NetHelpers.h>
 #include <CrySystem/File/ICryPak.h>
@@ -62,10 +61,7 @@ inline void GameWarning(const char*, ...) PRINTF_PARAMS(1, 2);
 #include <IActorSystem.h>
 #include <IAnimatedCharacter.h>
 #include <CryGame/IGame.h>
-#include <IItem.h>
-#include <IItemSystem.h>
 #include <IViewSystem.h>
-#include <IVehicleSystem.h>
 #include <IGameplayRecorder.h>
 #include <CryGame/GameUtils.h>
 

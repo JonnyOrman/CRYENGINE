@@ -7,7 +7,6 @@
 #include "AreaManager.h"
 #include <CryAnimation/ICryAnimation.h>
 #include <CryEntitySystem/IEntityComponent.h>
-#include <CryAISystem/IAISystem.h>
 #include <CryAnimation/IAttachment.h>
 #include <CrySystem/ConsoleRegistration.h>
 
@@ -59,15 +58,6 @@ static void OnSysSpecLightChange(ICVar* pVar)
 {
 	IEntityItPtr it = GetIEntitySystem()->GetEntityIterator();
 	it->MoveFirst();
-
-	while (CEntity* pEntity = static_cast<CEntity*>(it->Next()))
-	{
-		IScriptTable* pScriptTable = pEntity->GetScriptTable();
-		if (pScriptTable && pScriptTable->HaveValue("OnSysSpecLightChanged"))
-		{
-			Script::CallMethod(pScriptTable, "OnSysSpecLightChanged");
-		}
-	}
 }
 
 //////////////////////////////////////////////////////////////////////////

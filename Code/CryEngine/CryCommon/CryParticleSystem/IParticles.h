@@ -20,7 +20,6 @@
 #include <CryCore/CryVariant.h>
 #include <CryCore/smartptr.h>
 #include <memory>
-class SmartScriptTable;
 struct GeomRef;
 
 //! Real-time params to control particle emitters.

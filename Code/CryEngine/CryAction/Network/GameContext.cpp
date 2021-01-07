@@ -18,9 +18,7 @@
 #include "IGameSessionHandler.h"
 #include "CryAction.h"
 #include "GameRulesSystem.h"
-#include <CryScriptSystem/IScriptSystem.h>
 #include "GameObjects/GameObject.h"
-#include "ScriptRMI.h"
 #include <CryPhysics/IPhysics.h>
 #include "PhysicsSync.h"
 #include "GameClientNub.h"
@@ -95,14 +93,13 @@ static ILINE bool FromHexStr(string& x)
 	return true;
 }
 
-CGameContext::CGameContext(CCryAction* pFramework, CScriptRMI* pScriptRMI, CActionGame* pGame) :
+CGameContext::CGameContext(CCryAction* pFramework, CActionGame* pGame) :
 	m_pFramework(pFramework),
 	m_pPhysicsSync(0),
 	m_pNetContext(0),
 	m_pEntitySystem(0),
 	m_pGame(pGame),
 	m_isInLevelLoad(false),
-	m_pScriptRMI(pScriptRMI),
 	m_bStarted(false),
 	m_bIsLoadingSaveGame(false),
 	m_bHasSpawnPoint(true),
@@ -119,7 +116,6 @@ CGameContext::CGameContext(CCryAction* pFramework, CScriptRMI* pScriptRMI, CActi
 	s_pGameContext = this;
 	gEnv->pConsole->AddConsoleVarSink(this);
 
-	m_pScriptRMI->SetContext(this);
 #ifndef OLD_VOICE_SYSTEM_DEPRECATED
 	m_pVoiceController = NULL;
 #endif
@@ -157,18 +153,11 @@ CGameContext::~CGameContext()
 
 	gEnv->pConsole->RemoveConsoleVarSink(this);
 
-	IScriptSystem* pSS = gEnv->pScriptSystem;
-	for (DelegateCallbacks::iterator iter = m_delegateCallbacks.begin(); iter != m_delegateCallbacks.end(); ++iter)
-	{
-		pSS->ReleaseFunc(iter->second);
-	}
-
 	if (m_pEntitySystem)
 		m_pEntitySystem->RemoveSink(this);
 
 	m_pGame->RemoveGlobalPhysicsCallback(eEPE_OnCollisionLogged, OnCollision, 0);
 
-	m_pScriptRMI->SetContext(NULL);
 #ifndef OLD_VOICE_SYSTEM_DEPRECATED
 	delete m_pVoiceController;
 #endif
@@ -697,65 +686,6 @@ void CGameContext::ResetMap(bool isServer)
 		m_pNetContext->ChangeContext();
 }
 
-/*
-   void CGameContext::EndContext()
-   {
-   // TODO: temporary
-   IActionMap* pActionMap = 0;
-   IPlayerProfileManager* pPPMgr = m_pFramework->GetIPlayerProfileManager();
-   if (pPPMgr)
-   {
-    int userCount = pPPMgr->GetUserCount();
-    if (userCount > 0)
-    {
-      IPlayerProfileManager::SUserInfo info;
-      pPPMgr->GetUserInfo(0, info);
-      IPlayerProfile* pProfile = pPPMgr->GetCurrentProfile(info.userId);
-      if (pProfile)
-      {
-        pActionMap = pProfile->GetActionMap("default");
-        if (pActionMap == 0)
-          GameWarning("[PlayerProfiles] CGameContext::EndContext: User '%s' has no actionmap 'default'!", info.userId);
-      }
-      else
-        GameWarning("[PlayerProfiles] CGameContext::EndContext: User '%s' has no active profile!", info.userId);
-    }
-    else
-    {
-      ;
-      // GameWarning("[PlayerProfiles] CGameContext::EndContext: No users logged in");
-    }
-   }
-
-   if (pActionMap == 0)
-   {
-    // use action map without any profile stuff
-    IActionMapManager * pActionMapMan = m_pFramework->GetIActionMapManager();
-    if (pActionMapMan)
-    {
-      pActionMap = pActionMapMan->GetActionMap("default");
-    }
-   }
-
-   if (pActionMap)
-    pActionMap->SetActionListener(0);
-   // ~TODO: temporary
-
-   if (!HasContextFlag(eGSF_NoGameRules))
-   {
-    m_pEntitySystem->Reset();
-    for (int i=0; i<64; i++)
-      m_pEntitySystem->ReserveEntityId(LOCAL_PLAYER_ENTITY_ID+i);
-    if (CGameClientNub * pClientNub = m_pFramework->GetGameClientNub())
-      if (CGameClientChannel * pClientChannel = pClientNub->GetGameClientChannel())
-        pClientChannel->ClearPlayer();
-   }
-
-   m_classRegistry.Reset();
-   m_controlledObjects.Reset( m_pFramework->IsServer() );
-   }
- */
-
 bool CGameContext::HasSpawnPoint()
 {
 	IEntityItPtr pIt = gEnv->pEntitySystem->GetEntityIterator();
@@ -772,35 +702,6 @@ bool CGameContext::HasSpawnPoint()
 
 void CGameContext::CallOnSpawnComplete(IEntity* pEntity)
 {
-	IScriptTable* pScriptTable(pEntity->GetScriptTable());
-	if (!pScriptTable)
-		return;
-
-	if (gEnv->bServer)
-	{
-		SmartScriptTable server;
-		if (pScriptTable->GetValue("Server", server))
-		{
-			if ((server->GetValueType("OnSpawnComplete") == svtFunction) && pScriptTable->GetScriptSystem()->BeginCall(server, "OnSpawnComplete"))
-			{
-				pScriptTable->GetScriptSystem()->PushFuncParam(pScriptTable);
-				pScriptTable->GetScriptSystem()->EndCall();
-			}
-		}
-	}
-
-	if (gEnv->IsClient())
-	{
-		SmartScriptTable client;
-		if (pScriptTable->GetValue("Client", client))
-		{
-			if ((client->GetValueType("OnSpawnComplete") == svtFunction) && pScriptTable->GetScriptSystem()->BeginCall(client, "OnSpawnComplete"))
-			{
-				pScriptTable->GetScriptSystem()->PushFuncParam(pScriptTable);
-				pScriptTable->GetScriptSystem()->EndCall();
-			}
-		}
-	}
 }
 
 ESynchObjectResult CGameContext::SynchObject(EntityId entityId, NetworkAspectType nAspect, uint8 profile, TSerialize serialize, bool verboseLogging)
@@ -822,21 +723,14 @@ ESynchObjectResult CGameContext::SynchObject(EntityId entityId, NetworkAspectTyp
 
 	if (nAspect == eEA_Script)
 	{
-		IEntityScriptComponent* pScriptProxy = static_cast<IEntityScriptComponent*>(pEntity->GetProxy(ENTITY_PROXY_SCRIPT));
-		if (pScriptProxy)
-		{
-			NET_PROFILE_SCOPE("ScriptProxy", serialize.IsReading());
-			pScriptProxy->GameSerialize(serialize);
-		}
-
 		NET_PROFILE_SCOPE("ScriptRMI", serialize.IsReading());
-		if (!m_pScriptRMI->SerializeScript(serialize, pEntity))
+		/*if (!m_pScriptRMI->SerializeScript(serialize, pEntity))
 		{
 			if (verboseLogging)
 				GameWarning("CGameContext::SynchObject: failed to serialize script aspect");
 			NET_PROFILE_COUNT_READ_BITS(false);
 			return eSOR_Failed;
-		}
+		}*/
 		return eSOR_Ok;
 	}
 
@@ -983,7 +877,6 @@ void CGameContext::ObjectInitClient(EntityId entityId, INetChannel* pChannel)
 	{
 		pGameObject->InitClient(channelId);
 	}
-	m_pScriptRMI->OnInitClient(channelId, pEntity);
 }
 
 bool CGameContext::SendPostSpawnObject(EntityId id, INetChannel* pINetChannel)
@@ -1004,27 +897,12 @@ bool CGameContext::SendPostSpawnObject(EntityId id, INetChannel* pINetChannel)
 	CGameObject* pGameObject = reinterpret_cast<CGameObject*>(pProxy);
 	if (pGameObject)
 		pGameObject->PostInitClient(channelId);
-	m_pScriptRMI->OnPostInitClient(channelId, pEntity);
 
 	return true;
 }
 
 void CGameContext::ControlObject(EntityId id, bool bHaveControl)
 {
-	SDelegateCallbackIndex idx = { id, bHaveControl };
-	DelegateCallbacks::iterator iter = m_delegateCallbacks.lower_bound(idx);
-	IScriptSystem* pSS = gEnv->pScriptSystem;
-	while (iter != m_delegateCallbacks.end() && iter->first == idx)
-	{
-		DelegateCallbacks::iterator next = iter;
-		++next;
-
-		Script::Call(pSS, iter->second);
-		pSS->ReleaseFunc(iter->second);
-		m_delegateCallbacks.erase(iter);
-
-		iter = next;
-	}
 }
 
 void CGameContext::PassDemoPlaybackMappedOriginalServerPlayer(EntityId id)
@@ -1032,20 +910,9 @@ void CGameContext::PassDemoPlaybackMappedOriginalServerPlayer(EntityId id)
 	CCryAction::GetCryAction()->GetIActorSystem()->SetDemoPlaybackMappedOriginalServerPlayer(id);
 }
 
-void CGameContext::AddControlObjectCallback(EntityId id, bool willHaveControl, HSCRIPTFUNCTION func)
-{
-	SDelegateCallbackIndex idx = { id, willHaveControl };
-	m_delegateCallbacks.insert(std::make_pair(idx, func));
-}
-
 void CGameContext::UnboundObject(EntityId entityId)
 {
 	m_pEntitySystem->RemoveEntity(entityId, false);
-}
-
-INetAtSyncItem* CGameContext::HandleRMI(bool bClient, EntityId objID, uint8 funcID, TSerialize ser, INetChannel* pChannel)
-{
-	return m_pScriptRMI->HandleRMI(bClient, objID, funcID, ser, pChannel);
 }
 
 //
@@ -1122,19 +989,9 @@ void CGameContext::OnSpawn(IEntity* pEntity, SEntitySpawnParams& params)
 
 	if (pEntity->GetProxy(ENTITY_PROXY_SCRIPT))
 	{
-		m_pScriptRMI->SetupEntity(params.id, pEntity, true, true);
 	}
 
 	bool calledBindToNetwork = false;
-	if (m_isInLevelLoad && gEnv->bMultiplayer)
-	{
-		if (pEntity->GetScriptTable() && !pEntity->GetProxy(ENTITY_PROXY_USER))
-		{
-			//CryLog("Forcibly binding %s to network", params.sName);
-			calledBindToNetwork = true;
-			pEntity->GetNetEntity()->BindToNetwork();
-		}
-	}
 
 	if (!calledBindToNetwork)
 	{
@@ -1199,8 +1056,6 @@ bool CGameContext::OnRemove(IEntity* pEntity)
 
 	if (ok)
 	{
-		m_pScriptRMI->RemoveEntity(id);
-
 		if (CGameClientNub* pClientNub = m_pFramework->GetGameClientNub())
 			if (CGameClientChannel* pClientChannel = pClientNub->GetGameClientChannel())
 				if (pClientChannel->GetPlayerId() == id)
@@ -1224,11 +1079,8 @@ void CGameContext::OnReused(IEntity* pEntity, SEntitySpawnParams& params)
 	if (m_pBreakReplicator.get())
 		m_pBreakReplicator->OnReuse(pEntity, params);
 
-	m_pScriptRMI->RemoveEntity(params.prevId);
-
 	if (pEntity->GetProxy(ENTITY_PROXY_SCRIPT))
 	{
-		m_pScriptRMI->SetupEntity(params.id, pEntity, true, true);
 	}
 
 	if (CGameClientNub* pClientNub = m_pFramework->GetGameClientNub())

@@ -18,13 +18,11 @@
 
 //engine interfaces
 #include <Cry3DEngine/I3DEngine.h>
-#include <CryAISystem/IAISystem.h>
 #include <CryGame/IGameTokens.h>
 #include <CryGame/IGameFramework.h>
 #include <CryEntitySystem/IEntitySystem.h>
 #include "IActorSystem.h"
 #include "IPlayerProfiles.h"
-#include "IVehicleSystem.h"
 #include <CryMovie/IMovieSystem.h>
 #include <CryString/CryPath.h>
 
@@ -202,9 +200,6 @@ bool CCheckpointSystem::SaveGame(EntityId checkpointId, const char* fileName)
 	// TODO For now, not saving actor info (AI) - If this happens later, support needs to be added for entity pools
 	//WriteActorData(CHECKPOINT_SAVE_XML_NODE);
 
-	//vehicle data
-	WriteVehicleData(CHECKPOINT_SAVE_XML_NODE);
-
 	//write game tokens
 	WriteGameTokens(CHECKPOINT_SAVE_XML_NODE);
 
@@ -252,17 +247,6 @@ void CCheckpointSystem::WriteActorData(XmlNodeRef parentNode)
 	node->addChild(activatedActors);
 
 	parentNode->addChild(node);
-}
-
-//////////////////////////////////////////////////////////////////////////
-void CCheckpointSystem::WriteVehicleData(XmlNodeRef parentNode)
-{
-	IVehicleSystem* pVehicleSystem = CCryAction::GetCryAction()->GetIVehicleSystem();
-	IVehicleIteratorPtr pVehIt = pVehicleSystem->CreateVehicleIterator();
-	while (IVehicle* pVehicle = pVehIt->Next())
-	{
-		SaveExternalEntity(pVehicle->GetEntityId());
-	}
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -552,17 +536,6 @@ void CCheckpointSystem::ResetEngine()
 	event.nParam[0] = 0;
 	gEnv->pEntitySystem->SendEventToAll(event);
 
-	//Vehicle System
-	IVehicleSystem* pVehicleSystem = CCryAction::GetCryAction()->GetIVehicleSystem();
-	IVehicleIteratorPtr pVehIt = pVehicleSystem->CreateVehicleIterator();
-	while (IVehicle* pVehicle = pVehIt->Next())
-	{
-		pVehicle->Reset(true);
-	}
-
-	//make sure the scripts are clean
-	gEnv->pScriptSystem->ForceGarbageCollection();
-
 	//turn on physics again
 	gEnv->pSystem->SetThreadState(ESubsys_Physics, true);
 
@@ -776,24 +749,6 @@ void CCheckpointSystem::RestartGameplay()
 //////////////////////////////////////////////////////////////////////////
 void CCheckpointSystem::OnCheckpointLoaded(SCheckpointData metaData)
 {
-	IEntity* pCheckpoint = gEnv->pEntitySystem->GetEntity(metaData.m_checkPointId);
-	if (pCheckpoint)
-	{
-		//Trigger OnLoad
-		IScriptTable* pScript = pCheckpoint->GetScriptTable();
-		if (pScript)
-		{
-			HSCRIPTFUNCTION hScriptFunc(NULL);
-			pScript->GetValue("Event_OnLoadCheckpoint", hScriptFunc);
-
-			if (hScriptFunc) //this will trigger the flowgraph output
-			{
-				IScriptSystem* pIScriptSystem = gEnv->pScriptSystem;
-				Script::Call(pIScriptSystem, hScriptFunc, pScript);
-				pIScriptSystem->ReleaseFunc(hScriptFunc);
-			}
-		}
-	}
 }
 
 //SHARED ********************************

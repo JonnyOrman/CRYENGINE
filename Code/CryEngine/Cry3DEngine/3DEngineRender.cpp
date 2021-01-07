@@ -34,7 +34,6 @@
 #ifdef ENABLE_LW_PROFILERS
 	#include <CryAnimation/IAttachment.h>
 #endif
-#include <CryAISystem/IAISystem.h>
 #include <CryCore/Platform/IPlatformOS.h>
 #include <CryGame/IGame.h>
 #include <CrySystem/Profilers/ILegacyProfiler.h>

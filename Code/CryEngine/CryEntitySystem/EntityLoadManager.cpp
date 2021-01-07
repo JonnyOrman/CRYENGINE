@@ -446,15 +446,6 @@ bool CEntityLoadManager::CreateEntity(CEntity* pPreallocatedEntity, SEntityLoadP
 
 		const char* szMtlName(NULL);
 
-		if (spawnParams.pArchetype)
-		{
-			IScriptTable* pArchetypeProperties = spawnParams.pArchetype->GetProperties();
-			if (pArchetypeProperties)
-			{
-				pArchetypeProperties->GetValue("PrototypeMaterial", szMtlName);
-			}
-		}
-
 		if (entityNode)
 		{
 			// Create needed proxies
@@ -507,28 +498,6 @@ bool CEntityLoadManager::CreateEntity(CEntity* pPreallocatedEntity, SEntityLoadP
 			{
 				if (IEntityEventHandler* pEventHandler = pSpawnedEntity->GetClass()->GetEventHandler())
 					pEventHandler->LoadEntityXMLEvents(pSpawnedEntity, entityNode);
-
-				// Serialize script proxy.
-				CEntityComponentLuaScript* pScriptProxy = pSpawnedEntity->GetScriptProxy();
-				if (pScriptProxy)
-				{
-					XmlNodeRef componentNode;
-					if (XmlNodeRef componentsNode = entityNode->findChild("Components"))
-					{
-						for (int i = 0, n = componentsNode->getChildCount(); i < n; ++i)
-						{
-							CryInterfaceID componentTypeId;
-							componentNode = componentsNode->getChild(i);
-							if (!componentNode->getAttr("typeId", componentTypeId))
-								continue;
-
-							if (componentTypeId == pScriptProxy->GetCID())
-								break;
-						}
-					}
-
-					pScriptProxy->LegacySerializeXML(entityNode, componentNode, true);
-				}
 
 			}
 		}

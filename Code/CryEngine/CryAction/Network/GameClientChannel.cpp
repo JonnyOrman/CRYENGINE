@@ -145,10 +145,6 @@ CGameClientChannel::CGameClientChannel(INetChannel* pNetChannel, CGameContext* p
 	CRY_ASSERT(pNetChannel);
 	if (!CCryAction::GetCryAction()->IsGameSessionMigrating())
 	{
-		// if we're migrating these globals are already setup to the correct variables
-		gEnv->pScriptSystem->SetGlobalToNull(LOCAL_ACTORID_VARIABLE);
-		gEnv->pScriptSystem->SetGlobalToNull(LOCAL_ACTOR_VARIABLE);
-		gEnv->pScriptSystem->SetGlobalToNull(LOCAL_CHANNELID_VARIABLE);
 	}
 
 	CCryAction::GetCryAction()->OnActionEvent(SActionEvent(eAE_channelCreated, 0));
@@ -161,10 +157,6 @@ CGameClientChannel::~CGameClientChannel()
 
 	if (!CCryAction::GetCryAction()->IsGameSessionMigrating())
 	{
-		// if we're migrating these globals are already setup to the correct variables
-		gEnv->pScriptSystem->SetGlobalToNull(LOCAL_ACTORID_VARIABLE);
-		gEnv->pScriptSystem->SetGlobalToNull(LOCAL_ACTOR_VARIABLE);
-		gEnv->pScriptSystem->SetGlobalToNull(LOCAL_CHANNELID_VARIABLE);
 	}
 
 	// If we're not migrating the host, restore the cached cvars.  If we *are*
@@ -439,33 +431,9 @@ void CGameClientChannel::SetPlayerId(EntityId id)
 {
 	CGameChannel::SetPlayerId(id);
 
-	IScriptSystem* pSS = gEnv->pScriptSystem;
-
 	if (id)
 	{
-		ScriptHandle hdl;
-		hdl.n = GetPlayerId();
-		pSS->SetGlobalValue(LOCAL_ACTORID_VARIABLE, hdl);
-		IEntity* pEntity = gEnv->pEntitySystem->GetEntity(id);
-		if (pEntity)
-		{
-			IGameObject* pGameObject = CCryAction::GetCryAction()->GetGameObject(id);
-			pSS->SetGlobalValue(LOCAL_ACTOR_VARIABLE, pEntity->GetScriptTable());
-			pSS->SetGlobalValue(LOCAL_CHANNELID_VARIABLE, pGameObject ? pGameObject->GetChannelId() : 0);
-		}
-		else
-		{
-			pSS->SetGlobalToNull(LOCAL_ACTOR_VARIABLE);
-			pSS->SetGlobalToNull(LOCAL_CHANNELID_VARIABLE);
-		}
-
 		CallOnSetPlayerId();
-	}
-	else
-	{
-		gEnv->pScriptSystem->SetGlobalToNull(LOCAL_ACTORID_VARIABLE);
-		gEnv->pScriptSystem->SetGlobalToNull(LOCAL_ACTOR_VARIABLE);
-		gEnv->pScriptSystem->SetGlobalToNull(LOCAL_CHANNELID_VARIABLE);
 	}
 }
 
@@ -475,19 +443,6 @@ void CGameClientChannel::CallOnSetPlayerId()
 	if (!pPlayer)
 		return;
 
-	IScriptTable* pScriptTable = pPlayer->GetScriptTable();
-	if (pScriptTable)
-	{
-		SmartScriptTable client;
-		if (pScriptTable->GetValue("Client", client))
-		{
-			if (pScriptTable->GetScriptSystem()->BeginCall(client, "OnSetPlayerId"))
-			{
-				pScriptTable->GetScriptSystem()->PushFuncParam(pScriptTable);
-				pScriptTable->GetScriptSystem()->EndCall();
-			}
-		}
-	}
 
 	if (IActor* pActor = CCryAction::GetCryAction()->GetIActorSystem()->GetActor(GetPlayerId()))
 		pActor->InitLocalPlayer();

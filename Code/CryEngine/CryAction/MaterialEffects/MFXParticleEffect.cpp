@@ -7,6 +7,9 @@
 	#include <CryParticleSystem/ParticleParams_TypeInfo.h>
 #endif
 #include "MFXParticleEffect.h"
+
+#include "CryAnimation/IAttachment.h"
+#include "CryPhysics/physinterface.h"
 #include "MaterialEffectsCVars.h"
 #include "IActorSystem.h"
 

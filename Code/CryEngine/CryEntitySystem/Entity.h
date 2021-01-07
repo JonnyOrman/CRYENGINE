@@ -30,7 +30,6 @@ const static EEntityProxy ProxySerializationOrder[] = {
 // They are needed for correct up casting from IEntityComponent to real proxy class.
 #include "RenderProxy.h"
 #include "PhysicsProxy.h"
-#include "ScriptProxy.h"
 #include "SubstitutionProxy.h"
 #include "EntityComponentsVector.h"
 //////////////////////////////////////////////////////////////////////////
@@ -326,9 +325,6 @@ public:
 
 	virtual void                       InvalidateTM(EntityTransformationFlagsMask transformReasons = EntityTransformationFlagsMask(), bool bRecalcPhyBounds = false) final;
 
-	// Inline implementation.
-	virtual IScriptTable* GetScriptTable() const final;
-
 	// Load/Save entity parameters in XML node.
 	virtual void         SerializeXML(XmlNodeRef& node, bool bLoading, bool bIncludeScriptProxy = true, bool bExcludeSchematycProperties = false) final;
 
@@ -355,8 +351,6 @@ public:
 	ILINE const CEntityPhysics* GetPhysicalProxy() const { return static_cast<const CEntityPhysics*>(&m_physics); }
 	ILINE CEntityPhysics*       GetPhysicalProxy()       { return static_cast<CEntityPhysics*>(&m_physics); }
 
-	// Get script proxy object.
-	ILINE CEntityComponentLuaScript* GetScriptProxy() const { return static_cast<CEntityComponentLuaScript*>(CEntity::GetProxy(ENTITY_PROXY_SCRIPT)); }
 	//////////////////////////////////////////////////////////////////////////
 
 	// For internal use.

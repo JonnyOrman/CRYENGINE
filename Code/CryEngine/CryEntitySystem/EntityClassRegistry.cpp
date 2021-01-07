@@ -3,7 +3,6 @@
 #include "stdafx.h"
 #include "EntityClassRegistry.h"
 #include "EntityClass.h"
-#include "EntityScript.h"
 #include "EntitySystem.h"
 #include "Entity.h"
 #include <CrySystem/File/CryFile.h>
@@ -133,26 +132,26 @@ IEntityClass* CEntityClassRegistry::RegisterStdClass(const SEntityClassDesc& ent
 
 	pClass->SetClassDesc(entityClassDesc);
 
-	// Check if need to create entity script.
-	if (entityClassDesc.sScriptFile[0] || entityClassDesc.pScriptTable)
-	{
-		// Create a new entity script.
-		CEntityScript* pScript = new CEntityScript;
-		bool ok = false;
-		if (entityClassDesc.sScriptFile[0])
-			ok = pScript->Init(entityClassDesc.sName, entityClassDesc.sScriptFile);
-		else
-			ok = pScript->Init(entityClassDesc.sName, entityClassDesc.pScriptTable);
+	//// Check if need to create entity script.
+	//if (entityClassDesc.sScriptFile[0] || entityClassDesc.pScriptTable)
+	//{
+	//	// Create a new entity script.
+	//	CEntityScript* pScript = new CEntityScript;
+	//	bool ok = false;
+	//	if (entityClassDesc.sScriptFile[0])
+	//		ok = pScript->Init(entityClassDesc.sName, entityClassDesc.sScriptFile);
+	//	else
+	//		ok = pScript->Init(entityClassDesc.sName, entityClassDesc.pScriptTable);
 
-		if (!ok)
-		{
-			EntityWarning("EntityScript %s failed to initialize", entityClassDesc.sScriptFile.c_str());
-			pScript->Release();
-			pClass->Release();
-			return NULL;
-		}
-		pClass->SetEntityScript(pScript);
-	}
+	//	if (!ok)
+	//	{
+	//		EntityWarning("EntityScript %s failed to initialize", entityClassDesc.sScriptFile.c_str());
+	//		pScript->Release();
+	//		pClass->Release();
+	//		return NULL;
+	//	}
+	//	pClass->SetEntityScript(pScript);
+	//}
 
 	if (!RegisterEntityClass(pClass))
 	{

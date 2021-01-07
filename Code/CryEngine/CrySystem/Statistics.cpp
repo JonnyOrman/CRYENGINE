@@ -14,7 +14,6 @@
 #include "CrySizerStats.h"
 #include "System.h"
 #include <CryMemory/CryMemoryManager.h>
-#include <CryScriptSystem/IScriptSystem.h>
 #include <CryCore/ToolsHelpers/ResourceCompilerHelper.h>
 #include "PhysRenderer.h"
 #include <CrySystem/File/IResourceManager.h>
@@ -628,8 +627,6 @@ struct SCryEngineStats
 			pRenderer->EF_Query(EFQ_Mesh_Count, nSummaryMeshCount);
 			pRenderer->EF_Query(EFQ_Alloc_APIMesh, nAPI_MeshSize);
 		}
-
-		nSummaryScriptSize = pSystem->GetIScriptSystem()->GetScriptAllocSize();
 
 		IMemoryManager::SProcessMemInfo procMeminfo;
 		GetISystem()->GetIMemoryManager()->GetProcessMemInfo(procMeminfo);

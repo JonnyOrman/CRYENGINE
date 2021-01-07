@@ -12,6 +12,8 @@
 // For legacy support, define it to swap on big endian platforms.
 /////////////////////////////////////////////////////////////////////////////////////
 
+#include "CryCore/CryTypeInfo.h"
+
 typedef bool EEndian;
 
 #if defined(SYSTEM_IS_LITTLE_ENDIAN)
@@ -70,7 +72,6 @@ inline bool IsSystemLittleEndian()
 /////////////////////////////////////////////////////////////////////////////////////
 
 //! SwapEndian function, using TypeInfo.
-struct CTypeInfo;
 void SwapEndian(const CTypeInfo& Info, size_t nSizeCheck, void* pData, size_t nCount = 1, bool bWriting = false);
 
 //! Default template utilizes TypeInfo.

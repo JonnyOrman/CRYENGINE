@@ -8,8 +8,6 @@
 struct IEntity;
 struct IEntityComponent;
 struct SEntitySpawnParams;
-struct IEntityScript;
-struct IScriptTable;
 struct ITexture;
 
 struct SEditorClassInfo
@@ -165,14 +163,6 @@ struct IEntityClass
 	//! \return Lua Script filename, return empty string if entity does not use script.
 	virtual const char* GetScriptFile() const = 0;
 
-	//! Returns the IEntityScript interface assigned for this entity class.
-	//! \return IEntityScript interface if this entity have script, or nullptr if no script defined for this entity class.
-	virtual IEntityScript* GetIEntityScript() const = 0;
-
-	//! Returns the IScriptTable interface assigned for this entity class.
-	//! \return IScriptTable interface if this entity have script, or nullptr if no script defined for this entity class.
-	virtual IScriptTable*             GetScriptTable() const = 0;
-
 	virtual IEntityEventHandler*      GetEventHandler() const = 0;
 	virtual IEntityScriptFileHandler* GetScriptFileHandler() const = 0;
 
@@ -224,7 +214,6 @@ struct IEntityClassRegistry
 			: flags(0)
 			, sName("")
 			, sScriptFile("")
-			, pScriptTable(nullptr)
 			, editorClassInfo()
 			, pUserProxyCreateFunc(nullptr)
 			, pUserProxyData(nullptr)
@@ -238,7 +227,6 @@ struct IEntityClassRegistry
 		int                               flags;
 		string                            sName;
 		string                            sScriptFile;
-		IScriptTable*                     pScriptTable;
 
 		SEditorClassInfo                  editorClassInfo;
 

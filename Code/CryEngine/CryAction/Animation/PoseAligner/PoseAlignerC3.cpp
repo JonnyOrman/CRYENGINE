@@ -16,9 +16,8 @@
 class CContactRaycastPinger : public PoseAligner::CContactReporter
 {
 public:
-	CContactRaycastPinger(IVehicle& pinger, float length)
-		: m_pinger(pinger)
-		, m_length(length)
+	CContactRaycastPinger(float length)
+		: m_length(length)
 	{}
 
 	// CContactReporter
@@ -26,7 +25,6 @@ public:
 	virtual bool Update(Vec3& position, Vec3& normal);
 
 private:
-	IVehicle& m_pinger;
 	float     m_length;
 };
 
@@ -40,16 +38,9 @@ bool CContactRaycastPinger::Update(Vec3& position, Vec3& normal)
 	Vec3 rayPosition = positionPreviousGlobal;
 	rayPosition.z += m_length;
 
-	IPhysicalEntity* pSkipEntities[10];
-	int nSkip = m_pinger.GetSkipEntities(pSkipEntities, 10);
-
 	static const int totalHits = 6;
 	ray_hit hits[totalHits];
 	IPhysicalWorld::SRWIParams rp;
-
-	rp.Init(rayPosition, Vec3(0.0f, 0.0f, -m_length * 2.0f), ent_static | ent_terrain, rwi_pierceability0,
-	        SCollisionClass(0, collision_class_living | collision_class_articulated),
-	        &hits[0], totalHits, pSkipEntities, nSkip);
 
 	gEnv->pPhysicalWorld->RayWorldIntersection(rp);
 
@@ -259,17 +250,16 @@ ILINE bool InitializePoseAlignerPinger(PoseAligner::CPose& pose, IEntity& entity
 
 	const bool bIsMP = gEnv->bMultiplayer;
 
-	IVehicle* pVehicle = gEnv->pGameFramework->GetIVehicleSystem()->GetVehicle(entity.GetId());
-	if (bIsMP && !pVehicle)
+	if (bIsMP)
 		return false;
 
 #define CREATEPINGERCONTACTREPORTER                                                                          \
   if (bIsMP)                                                                                                 \
   {                                                                                                          \
-    if (_smart_ptr<CContactRaycastPinger> pContactRaycast = new CContactRaycastPinger(*pVehicle, 3.f))       \
+    /*if (_smart_ptr<CContactRaycastPinger> pContactRaycast = new CContactRaycastPinger(*pVehicle, 3.f))       \
     {                                                                                                        \
       chainDesc.pContactReporter = pContactRaycast;                                                          \
-    }                                                                                                        \
+    } */                                                                                                       \
   }                                                                                                          \
   else                                                                                                       \
   {                                                                                                          \

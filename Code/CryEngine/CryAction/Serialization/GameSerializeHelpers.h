@@ -3,6 +3,7 @@
 #ifndef __GAME_SERIALIZE_HELPERS_H__
 #define __GAME_SERIALIZE_HELPERS_H__
 
+#include "Cry3DEngine/I3DEngine.h"
 #include "CryActionCVars.h"
 
 // Some Helpers

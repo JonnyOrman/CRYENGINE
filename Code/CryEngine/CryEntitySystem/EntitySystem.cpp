@@ -6,7 +6,6 @@
 
 #include "Entity.h"
 #include "EntityClassRegistry.h"
-#include "ScriptBind_Entity.h"
 #include "PhysicsEventListener.h"
 #include "AreaManager.h"
 #include "AreaProxy.h"
@@ -132,18 +131,11 @@ bool SEntityLoadParams::CloneXmlNode(const XmlNodeRef sourceNode, XmlNodeRef des
 //////////////////////////////////////////////////////////////////////
 void SEntityLoadParams::AddRef()
 {
-	if (spawnParams.pPropertiesTable)
-		spawnParams.pPropertiesTable->AddRef();
-
-	if (spawnParams.pPropertiesInstanceTable)
-		spawnParams.pPropertiesInstanceTable->AddRef();
 }
 
 //////////////////////////////////////////////////////////////////////
 void SEntityLoadParams::RemoveRef()
 {
-	SAFE_RELEASE(spawnParams.pPropertiesTable);
-	SAFE_RELEASE(spawnParams.pPropertiesInstanceTable);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -161,7 +153,6 @@ CEntitySystem::CEntitySystem(ISystem* pSystem)
 
 	m_pISystem = pSystem;
 	m_pClassRegistry = 0;
-	m_pEntityScriptBinding = NULL;
 
 	CVar::Init();
 
@@ -215,7 +206,6 @@ CEntitySystem::~CEntitySystem()
 #endif
 	SAFE_DELETE(m_pAreaManager);
 	SAFE_DELETE(m_pEntityArchetypeManager);
-	SAFE_DELETE(m_pEntityScriptBinding);
 	SAFE_DELETE(m_pEntityLoadManager);
 
 	SAFE_DELETE(m_pPhysicsEventListener);
@@ -243,7 +233,7 @@ bool CEntitySystem::Init(ISystem* pSystem)
 
 	//////////////////////////////////////////////////////////////////////////
 	// Initialize entity script bindings.
-	m_pEntityScriptBinding = new CScriptBind_Entity(pSystem->GetIScriptSystem(), pSystem);
+	//m_pEntityScriptBinding = new CScriptBind_Entity(pSystem->GetIScriptSystem(), pSystem);
 
 	// Initialize physics events handler.
 	if (pSystem->GetIPhysicalWorld())
@@ -2870,11 +2860,6 @@ void CEntitySystem::Serialize(TSerialize ser)
 
 		ser.EndGroup();
 
-		if (gEnv->pScriptSystem)
-		{
-			gEnv->pScriptSystem->SerializeTimers(GetImpl(ser));
-		}
-
 		ser.BeginGroup("Layers");
 		TLayerActivationOpVec deferredLayerActivations;
 
@@ -3685,14 +3670,6 @@ bool CEntitySystem::ShouldSerializedEntity(IEntity* pEntity)
 	//lua flag
 	if (CVar::es_SaveLoadUseLUANoSaveFlag != 0)
 	{
-		IScriptTable* pEntityScript = pEntity->GetScriptTable();
-		SmartScriptTable props;
-		if (pEntityScript && pEntityScript->GetValue("Properties", props))
-		{
-			bool bSerialize = true;
-			if (props->GetValue("bSerialize", bSerialize) && (bSerialize == false))
-				return false;
-		}
 	}
 
 	// layer settings

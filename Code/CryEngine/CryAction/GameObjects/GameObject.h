@@ -160,8 +160,6 @@ public:
 	virtual IGameObjectExtension* QueryExtension(const char* extension) const override;
 	virtual IGameObjectExtension* QueryExtension(IGameObjectSystem::ExtensionID id) const override;
 
-	virtual bool                  SetExtensionParams(const char* extension, SmartScriptTable params) override;
-	virtual bool                  GetExtensionParams(const char* extension, SmartScriptTable params) override;
 	virtual IGameObjectExtension* ChangeExtension(const char* extension, EChangeExtension change) override;
 	virtual void                  SendEvent(const SGameObjectEvent&) override;
 	virtual void                  SetChannelId(uint16 id) override;
@@ -283,8 +281,6 @@ private:
 
 	// Need a mutex to defend shutdown against event handling.
 	CryMutex m_mutex;
-
-	template<class T> bool DoGetSetExtensionParams(const char* extension, SmartScriptTable params);
 
 	// any extensions (extra GameObject functionality) goes here
 	struct SExtension

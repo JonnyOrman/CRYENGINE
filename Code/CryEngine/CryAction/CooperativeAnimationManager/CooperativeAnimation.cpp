@@ -20,6 +20,10 @@
 #include <CryGame/IGameFramework.h>
 #include <CryRenderer/IRenderAuxGeom.h>
 
+
+#include "../../CrySystem/PhysRenderer.h"
+#include "Cry3DEngine/I3DEngine.h"
+
 const static char* COOP_ANIM_NAME = "CoopAnimation";
 const static int MY_ANIM = 54545;
 

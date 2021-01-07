@@ -163,12 +163,6 @@ enum class EEvent : uint64
 	//! nParam[0] == 1 physics entity awakes), 0 physics entity get to a sleep state.
 	PhysicsStateChanged = BIT64(16),
 
-	//! Sent when script is broadcasting its events.
-	//! nParam[0] = Pointer to the ASCIIZ string with the name of the script event.
-	//! nParam[1] = Type of the event value from IEntityClass::EventValueType.
-	//! nParam[2] = Pointer to the event value depending on the type.
-	LuaScriptEvent = BIT64(17),
-
 	//! Sent when another entity enters an area linked to this entity
 	//! nParam[0] = EntityId of the entity in our area
 	//! nParam[1] = Area identifier
@@ -243,12 +237,6 @@ enum class EEvent : uint64
 	//! Called when the game is started (games may start multiple times).
 	GameplayStarted = BIT64(31),
 
-	//! Called when the entity enters a script state.
-	EnterLuaScriptState = BIT64(32),
-
-	//! Called when the entity leaves a script state.
-	LeaveLuaScriptState = BIT64(33),
-
 	//! Called before we serialized the game from file.
 	DeserializeSaveGameStart = BIT64(34),
 
@@ -273,10 +261,6 @@ enum class EEvent : uint64
 	//! nParam[1] = ICharacterInstance* that this event occurred on
 	AnimationEvent = BIT64(39),
 
-	//! Called from ScriptBind_Entity when script requests to set collidermode.
-	//! nParam[0] = ColliderMode
-	LuaScriptSetColliderMode = BIT64(40),
-
 	//! Called to activate some output in a flow node connected to the entity
 	//! nParam[0] = Output port index
 	//! nParam[1] = TFlowInputData* to send to output
@@ -286,9 +270,6 @@ enum class EEvent : uint64
 	//! nParam[0] = IEntityComponent pointer or nullptr
 	//! nParam[1] = Member id of the changed property), (@see IEntityComponent::GetClassDesc() FindMemberById(nParam[1]))
 	EditorPropertyChanged = BIT64(42),
-
-	//! Called when a script reloading is requested and done in the editor.
-	ReloadLuaScript = BIT64(43),
 
 	//! Called when the entity is added to the list of entities that are updated.
 	//! Note that this event is deprecated), and should not be used
@@ -373,7 +354,6 @@ constexpr EEntityEvent ENTITY_EVENT_LAYER_HIDE = EEntityEvent::LayerHidden;
 constexpr EEntityEvent ENTITY_EVENT_LAYER_UNHIDE = EEntityEvent::LayerUnhidden;
 constexpr EEntityEvent ENTITY_EVENT_ENABLE_PHYSICS = EEntityEvent::PhysicsToggled;
 constexpr EEntityEvent ENTITY_EVENT_PHYSICS_CHANGE_STATE = EEntityEvent::PhysicsStateChanged;
-constexpr EEntityEvent ENTITY_EVENT_SCRIPT_EVENT = EEntityEvent::LuaScriptEvent;
 constexpr EEntityEvent ENTITY_EVENT_ENTERAREA = EEntityEvent::EntityEnteredThisArea;
 constexpr EEntityEvent ENTITY_EVENT_LEAVEAREA = EEntityEvent::EntityLeftThisArea;
 constexpr EEntityEvent ENTITY_EVENT_ENTERNEARAREA = EEntityEvent::EntityEnteredNearThisArea;
@@ -388,19 +368,15 @@ constexpr EEntityEvent ENTITY_EVENT_RENDER_VISIBILITY_CHANGE = EEntityEvent::Ren
 constexpr EEntityEvent ENTITY_EVENT_LEVEL_LOADED = EEntityEvent::LevelLoaded;
 constexpr EEntityEvent ENTITY_EVENT_START_LEVEL = EEntityEvent::LevelStarted;
 constexpr EEntityEvent ENTITY_EVENT_START_GAME = EEntityEvent::GameplayStarted;
-constexpr EEntityEvent ENTITY_EVENT_ENTER_SCRIPT_STATE = EEntityEvent::EnterLuaScriptState;
-constexpr EEntityEvent ENTITY_EVENT_LEAVE_SCRIPT_STATE = EEntityEvent::LeaveLuaScriptState;
 constexpr EEntityEvent ENTITY_EVENT_PRE_SERIALIZE = EEntityEvent::DeserializeSaveGameStart;
 constexpr EEntityEvent ENTITY_EVENT_POST_SERIALIZE = EEntityEvent::DeserializeSaveGameDone;
 constexpr EEntityEvent ENTITY_EVENT_INVISIBLE = EEntityEvent::BecomeInvisible;
 constexpr EEntityEvent ENTITY_EVENT_VISIBLE = EEntityEvent::BecomeVisible;
 constexpr EEntityEvent ENTITY_EVENT_MATERIAL = EEntityEvent::OverrideMaterialChanged;
 constexpr EEntityEvent ENTITY_EVENT_ANIM_EVENT = EEntityEvent::AnimationEvent;
-constexpr EEntityEvent ENTITY_EVENT_SCRIPT_REQUEST_COLLIDERMODE = EEntityEvent::LuaScriptSetColliderMode;
 constexpr EEntityEvent ENTITY_EVENT_ACTIVATE_FLOW_NODE_OUTPUT = EEntityEvent::ActivateFlowNodeOutput;
 constexpr EEntityEvent ENTITY_EVENT_EDITOR_PROPERTY_CHANGED = EEntityEvent::EditorPropertyChanged;
 constexpr EEntityEvent ENTITY_EVENT_COMPONENT_PROPERTY_CHANGED = EEntityEvent::EditorPropertyChanged;
-constexpr EEntityEvent ENTITY_EVENT_RELOAD_SCRIPT = EEntityEvent::ReloadLuaScript;
 constexpr EEntityEvent ENTITY_EVENT_ACTIVATED = EEntityEvent::SubscribedForUpdates;
 constexpr EEntityEvent ENTITY_EVENT_DEACTIVATED = EEntityEvent::UnsubscribedFromUpdates;
 constexpr EEntityEvent ENTITY_EVENT_SET_AUTHORITY = EEntityEvent::NetworkAuthorityChanged;

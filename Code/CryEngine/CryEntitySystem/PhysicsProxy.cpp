@@ -227,7 +227,6 @@ void CEntityPhysics::OnEntityUnhiddenOrMadeVisible()
 	{
 		SEntityEvent e;
 		e.event = ENTITY_EVENT_RESET;
-		GetEntity()->GetScriptProxy()->ProcessEvent(e);
 		GetEntity()->SetInternalFlag(CEntity::EInternalFlag::PhysicsRemoved, false);
 	}
 	else

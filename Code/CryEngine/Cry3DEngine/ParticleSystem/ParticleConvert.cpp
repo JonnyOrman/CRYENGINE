@@ -183,39 +183,41 @@ void AddParamMods(XmlNodeRef mods, TVarParam<Color3F>& param)
 template<typename T>
 void AddCurve(XmlNodeRef node, const TCurve<T>& curve)
 {
-	AddValue(node, "Curve", curve.ToString());
+	throw "TODO"; // AddValue(node, "Curve", curve.ToString());
 }
 
 template<>
 void AddCurve(XmlNodeRef node, const TCurve<Color3F>& curve)
 {
-	XmlNodeRef paramNode = node->newChild("ColorCurve");
+	//XmlNodeRef paramNode = node->newChild("ColorCurve");
 
-	// Separate out color components into 3 curves
-	for (int c = 0; c < 3; ++c)
-	{
-		typedef spline::SplineKey<float> KeyType;
-		struct ScalarSpline : public spline::CSplineKeyInterpolator<KeyType>
-		{
-			virtual spline::Formatting GetFormatting() const override
-			{
-				return ";,:";
-			}
-		};
+	//// Separate out color components into 3 curves
+	//for (int c = 0; c < 3; ++c)
+	//{
+	//	typedef spline::SplineKey<float> KeyType;
+	//	struct ScalarSpline : public spline::CSplineKeyInterpolator<KeyType>
+	//	{
+	//		virtual spline::Formatting GetFormatting() const override
+	//		{
+	//			return ";,:";
+	//		}
+	//	};
 
-		ScalarSpline sspline;
+	//	ScalarSpline sspline;
 
-		for (int i = 0, n = curve.num_keys(); i < n; ++i)
-		{
-			auto key = curve.key(i);
-			KeyType scalarkey;
-			scalarkey.time = key.time;
-			scalarkey.flags = key.flags;
-			scalarkey.value = key.value[c];
-			sspline.insert_key(scalarkey);
-		}
-		AddValue(paramNode, "Element", sspline.ToString());
-	}
+	//	for (int i = 0, n = curve.num_keys(); i < n; ++i)
+	//	{
+	//		auto key = curve.key(i);
+	//		KeyType scalarkey;
+	//		scalarkey.time = key.time;
+	//		scalarkey.flags = key.flags;
+	//		scalarkey.value = key.value[c];
+	//		sspline.insert_key(scalarkey);
+	//	}
+	//	AddValue(paramNode, "Element", sspline.ToString());
+	//}
+	
+	throw "TODO";
 }
 
 template<typename T>

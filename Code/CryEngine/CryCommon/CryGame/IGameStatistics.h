@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <CryScriptSystem/IScriptSystem.h> // <> required for Interfuscator
 #include <CryEntitySystem/IEntitySystem.h>
 #include <CryMemory/CrySizer.h>
 
@@ -166,32 +165,6 @@ struct SStatAnyValue
 		: type(eSAT_NONE)
 	{
 		*this = other;
-	}
-
-	SStatAnyValue(const ScriptAnyValue& value)
-	{
-		switch (value.GetType())
-		{
-		case EScriptAnyType::Boolean:
-			type = eSAT_TINT;
-			iNumber = value.GetBool() ? 1 : 0;
-			break;
-		case EScriptAnyType::Handle:
-			type = eSAT_THANDLE;
-			ptr = reinterpret_cast<INT_PTR>(value.GetScriptHandle().ptr);
-			break;
-		case EScriptAnyType::Number:
-			type = eSAT_TFLOAT;
-			fNumber = value.GetNumber();
-			break;
-		case EScriptAnyType::String:
-			type = eSAT_TSTRING;
-			str = value.GetString();
-			break;
-		default:
-			CRY_ASSERT(false, "Invalid type for stat value");
-			type = eSAT_NONE;
-		}
 	}
 
 	SStatAnyValue& operator=(const SStatAnyValue& rhs)
@@ -679,7 +652,7 @@ struct IGameStatistics
 
 	//! Adds game element to the specified scope (scope should be on the stack).
 	//! Script table can be specified where the tracker should be placed.
-	virtual IStatsTracker* AddGameElement(const SNodeLocator& locator, IScriptTable* pTable = 0) = 0;
+	virtual IStatsTracker* AddGameElement(const SNodeLocator& locator) = 0;
 
 	//! Removes all elements who match predicate from the scope.
 	virtual void                    RemoveElement(const SNodeLocator& locator) = 0;

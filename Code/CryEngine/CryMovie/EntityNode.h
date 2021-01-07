@@ -147,10 +147,7 @@ protected:
 	virtual void UpdateDynamicParams_Editor();
 	virtual void UpdateDynamicParams_PureGame();
 
-	void         FindDynamicPropertiesRec(IScriptTable* pScriptTable, const string& currentPath, unsigned int depth);
 	void         AddPropertyToParamInfoMap(const char* pKey, const string& currentPath, SScriptPropertyParamInfo& paramInfo);
-	bool         ObtainPropertyTypeInfo(const char* pKey, IScriptTable* pScriptTable, SScriptPropertyParamInfo& paramInfo);
-	void         FindScriptTableForParameterRec(IScriptTable* pScriptTable, const string& path, string& propertyName, SmartScriptTable& propertyScriptTable);
 
 	virtual void InitializeTrackDefaultValue(IAnimTrack* pTrack, const CAnimParamType& paramType) override;
 
@@ -275,7 +272,6 @@ private:
 
 		string           variableName;
 		string           displayName;
-		SmartScriptTable scriptTable;
 		bool             isVectorTable;
 	};
 

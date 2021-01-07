@@ -190,9 +190,6 @@ L_continue:;
 		{
 			m_pOut->Put(name, value.GetSeconds());
 		}
-		void Value(const char* name, const ScriptAnyValue& value)
-		{
-		}
 		void Value(const char* name, const XmlNodeRef& value)
 		{
 		}

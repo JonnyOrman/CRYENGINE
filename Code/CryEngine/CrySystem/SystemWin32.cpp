@@ -12,7 +12,6 @@
 #include <CryEntitySystem/IEntitySystem.h>
 #include <CryInput/IInput.h>
 #include <CrySystem/ILog.h>
-#include <CryScriptSystem/IScriptSystem.h>
 #include <CryAnimation/ICryAnimation.h>
 #include <CryCore/Platform/CryLibrary.h>
 #include <CryGame/IGameFramework.h>
@@ -75,7 +74,6 @@ const char g_szGroupCore[] = "CryEngine";
 const char* g_szModuleGroups[][2] = {
 	{ "Sandbox.exe",         g_szGroupCore },
 	{ "CrySystem.dll",       g_szGroupCore },
-	{ "CryScriptSystem.dll", g_szGroupCore },
 	{ "CryNetwork.dll",      g_szGroupCore },
 	{ "CryPhysics.dll",      g_szGroupCore },
 	{ "CryMovie.dll",        g_szGroupCore },
@@ -402,21 +400,6 @@ void CSystem::CollectMemStats(ICrySizer* pSizer, MemStatsPurposeEnum nPurpose, s
 					pSizer->AddObject(info, static_cast<size_t>(info->memInfo.allocated - info->memInfo.requested));
 			}
 		}
-	}
-
-	if (m_env.pScriptSystem)
-	{
-		SIZER_COMPONENT_NAME(pSizer, "CryScriptSystem");
-		{
-			{
-				SIZER_COMPONENT_NAME(pSizer, "$Allocations waste");
-				const SmallModuleInfo* info = FindModuleInfo(stats, "CryScriptSystem.dll");
-				if (info)
-					pSizer->AddObject(info, static_cast<size_t>(info->memInfo.allocated - info->memInfo.requested));
-			}
-			m_env.pScriptSystem->GetMemoryStatistics(pSizer);
-		}
-
 	}
 
 	if (m_env.pGameFramework)

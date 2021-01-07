@@ -12,6 +12,7 @@
 
 #include <Cry3DEngine/IMeshObj.h>
 #include "CryCharAnimationParams.h"
+#include "CrySystem/IEngineModule.h"
 
 typedef int32 TJointId;
 

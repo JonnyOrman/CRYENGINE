@@ -19,10 +19,9 @@
 // CStatsTracker
 //////////////////////////////////////////////////////////////////////////
 
-CStatsTracker::CStatsTracker(const SNodeLocator& locator, CGameStatistics* pGameStats, IScriptTable* pTable)
+CStatsTracker::CStatsTracker(const SNodeLocator& locator, CGameStatistics* pGameStats)
 	: m_pGameStats(pGameStats)
 	, m_locator(locator)
-	, m_scriptTable(pTable)
 {
 	int eventCount = pGameStats->GetEventCount();
 	int stateCount = pGameStats->GetStateCount();
@@ -41,13 +40,6 @@ CStatsTracker::~CStatsTracker()
 SNodeLocator CStatsTracker::GetLocator() const
 {
 	return m_locator;
-}
-
-//////////////////////////////////////////////////////////////////////////
-
-IScriptTable* CStatsTracker::GetScriptTable() const
-{
-	return m_scriptTable.GetPtr();
 }
 
 //////////////////////////////////////////////////////////////////////////

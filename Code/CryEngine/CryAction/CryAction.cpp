@@ -15,17 +15,9 @@
 #include <CryCore/Platform/platform_impl.inl>
 
 #include "GameRulesSystem.h"
-#include "ScriptBind_ActorSystem.h"
-#include "ScriptBind_ItemSystem.h"
-#include "ScriptBind_Inventory.h"
-#include "ScriptBind_ActionMapManager.h"
-#include "Network/ScriptBind_Network.h"
-#include "ScriptBind_Action.h"
-#include "ScriptBind_VehicleSystem.h"
 
 #include "Network/GameClientChannel.h"
 #include "Network/GameServerChannel.h"
-#include "Network/ScriptRMI.h"
 #include "Network/GameQueryListener.h"
 #include "Network/GameContext.h"
 #include "Network/GameServerNub.h"
@@ -33,10 +25,6 @@
 #include "Network/GameStatsConfig.h"
 #include "Network/NetworkStallTicker.h"
 
-#include <CryAISystem/ICommunicationManager.h>
-#include <CryAISystem/IFactionMap.h>
-#include <CryAISystem/BehaviorTree/IBehaviorTree.h>
-#include <CryAISystem/INavigationSystem.h>
 #include <CrySandbox/IEditorGame.h>
 #include <CrySystem/SystemInitParams.h>
 #include <CrySystem/CryVersion.h>
@@ -57,20 +45,11 @@
 
 #include "CryActionCVars.h"
 
-// game object extensions
-#include "Inventory.h"
-
-#include "IVehicleSystem.h"
-
 #include "EffectSystem/EffectSystem.h"
-#include "VehicleSystem/ScriptBind_Vehicle.h"
-#include "VehicleSystem/ScriptBind_VehicleSeat.h"
-#include "VehicleSystem/Vehicle.h"
 #include "AnimationGraph/AnimatedCharacter.h"
 #include "AnimationGraph/AnimationGraphCVars.h"
 #include "MaterialEffects/MaterialEffects.h"
 #include "MaterialEffects/MaterialEffectsCVars.h"
-#include "MaterialEffects/ScriptBind_MaterialEffects.h"
 #include "GameObjects/GameObjectSystem.h"
 #include "ViewSystem/ViewSystem.h"
 #include "GameplayRecorder/GameplayRecorder.h"
@@ -83,13 +62,10 @@
 
 #include "LevelSystem.h"
 #include "ActorSystem.h"
-#include "ItemSystem.h"
-#include "VehicleSystem.h"
 #include "SharedParams/SharedParamsManager.h"
 #include "ActionMapManager.h"
 
 #include "Statistics/GameStatistics.h"
-#include "UIDraw/UIDraw.h"
 #include "GameRulesSystem.h"
 #include "ActionGame.h"
 #include "IGameObject.h"
@@ -103,7 +79,6 @@
 #include "CheckPoint/CheckPointSystem.h"
 #include "GameSession/GameSessionHandler.h"
 
-#include "AI/BehaviorTreeNodes_Action.h"
 #include "AIDebugRenderer.h"
 
 #include "AnimationGraph/DebugHistory.h"
@@ -251,7 +226,6 @@ CCryAction::CCryAction(SSystemInitParams& initParams)
 	m_pSystem(0),
 	m_pNetwork(0),
 	m_p3DEngine(0),
-	m_pScriptSystem(0),
 	m_pEntitySystem(0),
 	m_pTimer(0),
 	m_pLog(0),
@@ -259,8 +233,6 @@ CCryAction::CCryAction(SSystemInitParams& initParams)
 	m_pGame(0),
 	m_pLevelSystem(0),
 	m_pActorSystem(0),
-	m_pItemSystem(0),
-	m_pVehicleSystem(0),
 	m_pSharedParamsManager(0),
 	m_pActionMapManager(0),
 	m_pViewSystem(0),
@@ -268,8 +240,6 @@ CCryAction::CCryAction(SSystemInitParams& initParams)
 	m_pGameplayAnalyst(0),
 	m_pGameRulesSystem(0),
 	m_pGameObjectSystem(0),
-	m_pScriptRMI(0),
-	m_pUIDraw(0),
 	m_pAnimationGraphCvars(0),
 	m_pMannequin(0),
 	m_pMaterialEffects(0),
@@ -285,16 +255,6 @@ CCryAction::CCryAction(SSystemInitParams& initParams)
 	m_pDefaultTimeDemoRecorder(nullptr),
 	m_pGameQueryListener(0),
 	m_pRuntimeAreaManager(NULL),
-	m_pScriptA(0),
-	m_pScriptIS(0),
-	m_pScriptAS(0),
-	m_pScriptNet(0),
-	m_pScriptAMM(0),
-	m_pScriptVS(0),
-	m_pScriptBindVehicle(0),
-	m_pScriptBindVehicleSeat(0),
-	m_pScriptInventory(0),
-	m_pScriptBindMFX(0),
 	m_pPersistantDebug(0),
 #ifdef USE_NETWORK_STALL_TICKER_THREAD
 	m_pNetworkStallTickerThread(nullptr),
@@ -320,8 +280,6 @@ CCryAction::CCryAction(SSystemInitParams& initParams)
 	m_pbSvEnabled(false),
 	m_pbClEnabled(false),
 	m_pGameStatistics(0),
-	m_pAIDebugRenderer(0),
-	m_pAINetworkDebugRenderer(0),
 	m_pCooperativeAnimationManager(NULL),
 	m_pGameSessionHandler(0),
 	m_pCustomActionManager(0),
@@ -331,7 +289,6 @@ CCryAction::CCryAction(SSystemInitParams& initParams)
 	m_pGameVolumesManager(NULL),
 	m_pNetMsgDispatcher(nullptr),
 	m_pEntityContainerMgr(nullptr),
-	m_pAnimateFragmentNodeCreator(new BehaviorTree::NodeCreator<BehaviorTree::AnimateFragment>("AnimateFragment")),
 	m_gameGUID("{00000000-0000-0000-0000-000000000000}")
 {
 	CRY_ASSERT(!m_pThis);
@@ -1757,7 +1714,6 @@ bool CCryAction::Initialize(SSystemInitParams& startupParams)
 	// fill in interface pointers
 	m_pNetwork = gEnv->pNetwork;
 	m_p3DEngine = gEnv->p3DEngine;
-	m_pScriptSystem = gEnv->pScriptSystem;
 	m_pEntitySystem = gEnv->pEntitySystem;
 	m_pTimer = gEnv->pTimer;
 	m_pLog = gEnv->pLog;
@@ -1804,14 +1760,13 @@ bool CCryAction::Initialize(SSystemInitParams& startupParams)
 	m_pDefaultTimeDemoRecorder = stl::make_unique<CTimeDemoRecorder>();
 	SetITimeDemoRecorder(m_pDefaultTimeDemoRecorder.get());
 
-	CScriptRMI::RegisterCVars();
+	/*CScriptRMI::RegisterCVars();
 	CGameObject::CreateCVars();
-	m_pScriptRMI = new CScriptRMI();
+	m_pScriptRMI = new CScriptRMI();*/
 
 	// initialize subsystems
 	m_pEffectSystem = new CEffectSystem;
 	m_pEffectSystem->Init();
-	m_pUIDraw = new CUIDraw;
 	m_pLevelSystem = new CLevelSystem(m_pSystem);
 
 	InlineInitializationProcessing("CCryAction::Init CLevelSystem");
@@ -1820,10 +1775,6 @@ bool CCryAction::Initialize(SSystemInitParams& startupParams)
 	m_pCryActionCVars = new CCryActionCVars();
 
 	m_pActorSystem = new CActorSystem(m_pSystem, m_pEntitySystem);
-	if (CCryActionCVars::Get().g_legacyItemSystem)
-	{
-		m_pItemSystem = new CItemSystem(this, m_pSystem);
-	}
 	m_pActionMapManager = new CActionMapManager(gEnv->pInput);
 
 	InlineInitializationProcessing("CCryAction::Init CActionMapManager");
@@ -1833,7 +1784,6 @@ bool CCryAction::Initialize(SSystemInitParams& startupParams)
 	m_pViewSystem = new CViewSystem(m_pSystem);
 	m_pGameplayRecorder = new CGameplayRecorder(this);
 	m_pGameRulesSystem = new CGameRulesSystem(m_pSystem, this);
-	m_pVehicleSystem = new CVehicleSystem(m_pSystem, m_pEntitySystem);
 
 	m_pSharedParamsManager = new CSharedParamsManager;
 
@@ -1901,19 +1851,9 @@ bool CCryAction::Initialize(SSystemInitParams& startupParams)
 	if (movieSys != NULL)
 		movieSys->SetUser(m_pViewSystem);
 
-	if (m_pVehicleSystem)
-	{
-		m_pVehicleSystem->Init();
-	}
-
 	if (CCryActionCVars::Get().g_legacyItemSystem)
 	{
 		//REGISTER_FACTORY((IGameFramework*)this, "Inventory", CInventory, false);
-	}
-
-	if (m_pLevelSystem && m_pItemSystem)
-	{
-		m_pLevelSystem->AddListener(m_pItemSystem);
 	}
 
 	InitScriptBinds();
@@ -1962,8 +1902,6 @@ bool CCryAction::Initialize(SSystemInitParams& startupParams)
 	
 	InitGame(startupParams);
 
-	if (m_pVehicleSystem)
-		m_pVehicleSystem->RegisterVehicles(this);
 	if (m_pGameObjectSystem)
 		m_pGameObjectSystem->RegisterFactories(this);
 	CGameContext::RegisterExtensions(this);
@@ -2126,7 +2064,7 @@ bool CCryAction::CompleteInit()
 	// ---------------------------
 
 	m_pMaterialEffects = new CMaterialEffects();
-	m_pScriptBindMFX = new CScriptBind_MaterialEffects(m_pSystem, m_pMaterialEffects);
+	//m_pScriptBindMFX = new CScriptBind_MaterialEffects(m_pSystem, m_pMaterialEffects);
 	m_pSystem->SetIMaterialEffects(m_pMaterialEffects);
 
 	InlineInitializationProcessing("CCryAction::CompleteInit MaterialEffects");
@@ -2134,15 +2072,6 @@ bool CCryAction::CompleteInit()
 	m_pBreakableGlassSystem = new CBreakableGlassSystem();
 
 	InitForceFeedbackSystem();
-
-	// in pure game mode we load the equipment packs from disk
-	// in editor mode, this is done in GameEngine.cpp
-	if ((m_pItemSystem) && (gEnv->IsEditor() == false))
-	{
-		CRY_PROFILE_SECTION(PROFILE_LOADING_ONLY, "CCryAction::CompleteInit(): EquipmentPacks");
-		m_pItemSystem->GetIEquipmentManager()->DeleteAllEquipmentPacks();
-		m_pItemSystem->GetIEquipmentManager()->LoadEquipmentPacksFromPath("Libs/EquipmentPacks");
-	}
 
 	InlineInitializationProcessing("CCryAction::CompleteInit EquipmentPacks");
 
@@ -2159,13 +2088,8 @@ bool CCryAction::CompleteInit()
 	if (m_pMaterialEffects)
 		m_pMaterialEffects->LoadFlowGraphLibs();
 
-	if (!m_pScriptRMI->Init())
-		return false;
-
-	// after everything is initialized, run our main script
-	m_pScriptSystem->ExecuteFile("scripts/main.lua");
-	m_pScriptSystem->BeginCall("OnInit");
-	m_pScriptSystem->EndCall();
+	/*if (!m_pScriptRMI->Init())
+		return false;*/
 
 	InlineInitializationProcessing("CCryAction::CompleteInit RunMainScript");
 
@@ -2221,7 +2145,7 @@ bool CCryAction::CompleteInit()
 //------------------------------------------------------------------------
 void CCryAction::InitScriptBinds()
 {
-	CRY_PROFILE_FUNCTION(PROFILE_LOADING_ONLY);
+	/*CRY_PROFILE_FUNCTION(PROFILE_LOADING_ONLY);
 
 	m_pScriptNet = new CScriptBind_Network(m_pSystem, this);
 	m_pScriptA = new CScriptBind_Action(this);
@@ -2239,35 +2163,7 @@ void CCryAction::InitScriptBinds()
 	if (CCryActionCVars::Get().g_legacyItemSystem)
 	{
 		m_pScriptInventory = new CScriptBind_Inventory(m_pSystem, this);
-	}
-}
-
-//------------------------------------------------------------------------
-void CCryAction::ReleaseScriptBinds()
-{
-	// before we release script binds call out main "OnShutdown"
-	if (m_pScriptSystem)
-	{
-		m_pScriptSystem->BeginCall("OnShutdown");
-		m_pScriptSystem->EndCall();
-	}
-
-	SAFE_RELEASE(m_pScriptA);
-	SAFE_RELEASE(m_pScriptIS);
-	SAFE_RELEASE(m_pScriptAS);
-	SAFE_RELEASE(m_pScriptAMM);
-	SAFE_RELEASE(m_pScriptVS);
-	SAFE_RELEASE(m_pScriptNet);
-	SAFE_RELEASE(m_pScriptBindVehicle);
-	SAFE_RELEASE(m_pScriptBindVehicleSeat);
-	SAFE_RELEASE(m_pScriptInventory);
-	SAFE_RELEASE(m_pScriptBindMFX);
-}
-
-//------------------------------------------------------------------------
-IScriptTable* CCryAction::GetActionScriptBindTable()
-{ 
-	return m_pScriptA ? m_pScriptA->GetMethodsTable() : nullptr; 
+	}*/
 }
 
 //------------------------------------------------------------------------
@@ -2301,9 +2197,6 @@ void CCryAction::ShutDown()
 	ShutdownGame();
 
 	XMLCPB::ShutdownCompressorThread();
-
-	SAFE_DELETE(m_pAIDebugRenderer);
-	SAFE_DELETE(m_pAINetworkDebugRenderer);
 
 	if (s_rcon_server)
 		s_rcon_server->Stop();
@@ -2342,20 +2235,16 @@ void CCryAction::ShutDown()
 		m_pPlayerProfileManager->Shutdown();
 
 	SAFE_RELEASE(m_pActionMapManager);
-	SAFE_RELEASE(m_pItemSystem);
 	SAFE_RELEASE(m_pLevelSystem);
 	SAFE_RELEASE(m_pViewSystem);
 	SAFE_RELEASE(m_pGameplayRecorder);
 	SAFE_RELEASE(m_pGameplayAnalyst);
 	SAFE_RELEASE(m_pGameRulesSystem);
 	SAFE_RELEASE(m_pSharedParamsManager);
-	SAFE_RELEASE(m_pVehicleSystem);
 	SAFE_DELETE(m_pMaterialEffects);
 	SAFE_DELETE(m_pBreakableGlassSystem);
 	SAFE_RELEASE(m_pActorSystem);
 	SAFE_DELETE(m_pForceFeedBackSystem);
-	SAFE_DELETE(m_pUIDraw);
-	SAFE_DELETE(m_pScriptRMI);
 	SAFE_DELETE(m_pEffectSystem);
 	SAFE_DELETE(m_pAnimationGraphCvars);
 	SAFE_DELETE(m_pGameObjectSystem);
@@ -2376,7 +2265,6 @@ void CCryAction::ShutDown()
 
 	SAFE_DELETE(m_pRuntimeAreaManager);
 
-	ReleaseScriptBinds();
 	ReleaseCVars();
 
 	SAFE_DELETE(m_pDevMode);
@@ -2536,17 +2424,11 @@ bool CCryAction::PostSystemUpdate(bool haveFocus, CEnumFlags<ESystemUpdateFlags>
 
 	if (!isGamePaused)
 	{
-		if (m_pItemSystem)
-			m_pItemSystem->Update();
-
 		if (m_pMaterialEffects)
 			m_pMaterialEffects->Update(frameTime);
 
 		if (m_pBreakableGlassSystem)
 			m_pBreakableGlassSystem->Update(frameTime);
-
-		if (m_pVehicleSystem)
-			m_pVehicleSystem->Update(frameTime);
 
 		if (m_pCooperativeAnimationManager)
 			m_pCooperativeAnimationManager->Update(frameTime);
@@ -2810,7 +2692,7 @@ bool CCryAction::StartGameContext(const SGameStartParams* pGameStartParams)
 		// is not supposed to end the previous game context (level heap issues)
 		//EndGameContext();
 
-		m_pGame = new CActionGame(m_pScriptRMI);
+		m_pGame = new CActionGame();
 	}
 
 	// Unlock shared parameters manager. This must happen after the level heap is initialized and before level load.
@@ -2937,19 +2819,9 @@ void CCryAction::EndGameContext()
 		m_pSharedParamsManager->Reset();
 	}
 
-	if (m_pVehicleSystem)
-	{
-		m_pVehicleSystem->Reset();
-	}
-
-	if (m_pScriptRMI)
-	{
-		m_pScriptRMI->UnloadLevel();
-	}
-
 	if (gEnv && gEnv->IsEditor() && m_pCryActionCVars->g_enableActionGame)
 	{
-		m_pGame = new CActionGame(m_pScriptRMI);
+		m_pGame = new CActionGame();
 	}
 
 	if (m_pActorSystem)
@@ -3450,9 +3322,6 @@ void CCryAction::OnEditorSetGameMode(int iMode)
 		m_pGame->ClearBreakHistory();
 	}
 
-	const char* szResetCameraCommand = "CryAction.ResetToNormalCamera()";
-	gEnv->pScriptSystem->ExecuteBuffer(szResetCameraCommand, strlen(szResetCameraCommand));
-
 	// reset any pending camera blending
 	if (m_pViewSystem)
 	{
@@ -3688,11 +3557,6 @@ bool CCryAction::LoadingScreenEnabled() const
 	return m_pEnableLoadingScreen ? m_pEnableLoadingScreen->GetIVal() != 0 : true;
 }
 
-int CCryAction::NetworkExposeClass(IFunctionHandler* pFH)
-{
-	return m_pScriptRMI->ExposeClass(pFH);
-}
-
 //------------------------------------------------------------------------
 void CCryAction::RegisterFactory(const char* name, ISaveGame*(*func)(), bool)
 {
@@ -3893,11 +3757,6 @@ IActionMapManager* CCryAction::GetIActionMapManager()
 	return m_pActionMapManager;
 }
 
-IUIDraw* CCryAction::GetIUIDraw()
-{
-	return m_pUIDraw;
-}
-
 IMannequin& CCryAction::GetMannequinInterface()
 {
 	CRY_ASSERT(m_pMannequin != NULL);
@@ -3914,19 +3773,9 @@ IActorSystem* CCryAction::GetIActorSystem()
 	return m_pActorSystem;
 }
 
-IItemSystem* CCryAction::GetIItemSystem()
-{
-	return m_pItemSystem;
-}
-
 IBreakReplicator* CCryAction::GetIBreakReplicator()
 {
 	return CBreakReplicator::GetIBreakReplicator();
-}
-
-IVehicleSystem* CCryAction::GetIVehicleSystem()
-{
-	return m_pVehicleSystem;
 }
 
 ISharedParamsManager* CCryAction::GetISharedParamsManager()
@@ -4013,17 +3862,15 @@ IGameVolumes* CCryAction::GetIGameVolumesManager() const
 	return m_pGameVolumesManager;
 }
 
-void CCryAction::PreloadAnimatedCharacter(IScriptTable* pEntityScript)
-{
-	animatedcharacter::Preload(pEntityScript);
-}
+//void CCryAction::PreloadAnimatedCharacter()
+//{
+//	animatedcharacter::Preload();
+//}
 
 //------------------------------------------------------------------------
 // NOTE: This function must be thread-safe.
 void CCryAction::PrePhysicsTimeStep(float deltaTime)
 {
-	if (m_pVehicleSystem)
-		m_pVehicleSystem->OnPrePhysicsTimeStep(deltaTime);
 }
 
 void CCryAction::RegisterExtension(ICryUnknownPtr pExtension)
@@ -4354,12 +4201,8 @@ void CCryAction::CheckEndLevelSchedule()
 	IEntity* pGameRules = CCryAction::GetCryAction()->GetIGameRulesSystem()->GetCurrentGameRulesEntity();
 	if (pGameRules != 0)
 	{
-		IScriptSystem* pSS = gEnv->pScriptSystem;
-		SmartScriptTable table = pGameRules->GetScriptTable();
-		SmartScriptTable params(pSS);
-		if (bHaveNextLevel)
-			params->SetValue("nextlevel", m_pLocalAllocs->m_nextLevelToLoad.c_str());
-		Script::CallMethod(table, "EndLevel", params);
+		//if (bHaveNextLevel)
+			//params->SetValue("nextlevel", m_pLocalAllocs->m_nextLevelToLoad.c_str());
 	}
 
 	CALL_FRAMEWORK_LISTENERS(OnLevelEnd(m_pLocalAllocs->m_nextLevelToLoad.c_str()));
@@ -4463,8 +4306,6 @@ void CCryAction::ClearNextFrameCommand()
 
 void CCryAction::PrefetchLevelAssets(const bool bEnforceAll)
 {
-	if (m_pItemSystem)
-		m_pItemSystem->PrecacheLevel();
 }
 
 void CCryAction::ShowPageInBrowser(const char* szUrl)
@@ -4700,15 +4541,11 @@ void CCryAction::GetMemoryUsage(ICrySizer* s) const
 	s->AddObject(m_pCustomActionManager);
 	s->AddObject(m_pCustomEventManager);
 	CHILD_STATISTICS(m_pActorSystem);
-	s->AddObject(m_pItemSystem);
-	CHILD_STATISTICS(m_pVehicleSystem);
 	CHILD_STATISTICS(m_pSharedParamsManager);
 	CHILD_STATISTICS(m_pActionMapManager);
 	s->AddObject(m_pViewSystem);
 	CHILD_STATISTICS(m_pGameRulesSystem);
-	CHILD_STATISTICS(m_pUIDraw);
 	s->AddObject(m_pGameObjectSystem);
-	CHILD_STATISTICS(m_pScriptRMI);
 	if (m_pAnimationGraphCvars)
 		s->Add(*m_pAnimationGraphCvars);
 	s->AddObject(m_pMaterialEffects);
@@ -4725,16 +4562,6 @@ void CCryAction::GetMemoryUsage(ICrySizer* s) const
 	CHILD_STATISTICS(m_pGameplayAnalyst);
 	CHILD_STATISTICS(m_pTimeOfDayScheduler);
 	CHILD_STATISTICS(m_pGameStatistics);
-	s->Add(*m_pScriptA);
-	s->Add(*m_pScriptIS);
-	s->Add(*m_pScriptAS);
-	s->Add(*m_pScriptNet);
-	s->Add(*m_pScriptAMM);
-	s->Add(*m_pScriptVS);
-	s->Add(*m_pScriptBindVehicle);
-	s->Add(*m_pScriptBindVehicleSeat);
-	s->Add(*m_pScriptInventory);
-	s->Add(*m_pScriptBindMFX);
 	s->Add(*m_pMaterialEffectsCVars);
 	s->AddObject(*m_pGFListeners);
 	s->Add(*m_nextFrameCommand);

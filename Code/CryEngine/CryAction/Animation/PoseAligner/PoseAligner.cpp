@@ -10,6 +10,8 @@
 #include <CryRenderer/IRenderAuxGeom.h>
 #include <CrySystem/ConsoleRegistration.h>
 
+#include "CryPhysics/physinterface.h"
+
 #define UNKNOWN_GROUND_HEIGHT -1E10f
 
 namespace {

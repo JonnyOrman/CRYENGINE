@@ -18,7 +18,6 @@
 #pragma once
 
 #include "IAnimationGraph.h"
-#include <CryAISystem/IAgent.h> // For enums
 #include "ICryMannequin.h"
 
 // ============================================================================
@@ -78,7 +77,6 @@ struct SActorTargetParams
 		directionTolerance(0.0f),
 		startArcAngle(0.0f),
 		startWidth(0.0f),
-		stance(STANCE_NULL),
 		pQueryStart(NULL),
 		pQueryEnd(NULL),
 		prepareRadius(3.0f),//
@@ -101,7 +99,6 @@ struct SActorTargetParams
 	float                     directionTolerance; // allowed direction tolerance (radians)
 	float                     startArcAngle;      // arc angle used to bend the starting line (radians)
 	float                     startWidth;         // width of the starting line
-	EStance                   stance;
 	TExactPositioningQueryID* pQueryStart;
 	TExactPositioningQueryID* pQueryEnd;
 	_smart_ptr<IAction>       pAction;
@@ -205,36 +202,15 @@ public:
 		ClearFlag(eMRF_LookTarget);
 	}
 
-	void SetLookStyle(ELookStyle eLookStyle)
-	{
-		m_eLookStyle = eLookStyle;
-		SetFlag(eMRF_LookStyle);
-		// MTJ: Might set remove flag, but I don't think we need one
-	}
-
 	void ClearLookStyle()
 	{
 		ClearFlag(eMRF_LookStyle);
-		m_eLookStyle = (ELookStyle) - 1; // Just to help debugging
 		// MTJ: Might set remove flag, but I don't think we need one
 	}
 
 	bool HasLookStyle()
 	{
 		return CheckFlag(eMRF_LookStyle);
-	}
-
-	ELookStyle GetLookStyle()
-	{
-		CRY_ASSERT(HasLookStyle());
-		return m_eLookStyle;
-	}
-
-	void SetBodyOrientationMode(const EBodyOrientationMode bodyOrientationMode)
-	{
-		m_bodyOrientationMode = bodyOrientationMode;
-		SetFlag(eMRF_BodyOrientationMode);
-		ClearFlag(eMRF_RemoveBodyOrientationMode);
 	}
 
 	void ClearBodyOrientationMode()
@@ -246,11 +222,6 @@ public:
 	bool HasBodyOrientationMode() const
 	{
 		return CheckFlag(eMRF_BodyOrientationMode);
-	}
-
-	EBodyOrientationMode GetBodyOrientationMode() const
-	{
-		return m_bodyOrientationMode;
 	}
 
 	void SetAimTarget(const Vec3& position)
@@ -474,13 +445,6 @@ public:
 		return CheckFlag(eMRF_AllowLowerBodyToTurn);
 	}
 
-	void SetStance(EStance stance)
-	{
-		m_stance = stance;
-		SetFlag(eMRF_Stance);
-		ClearFlag(eMRF_RemoveStance);
-	}
-
 	void ClearStance()
 	{
 		ClearFlag(eMRF_Stance);
@@ -691,12 +655,6 @@ public:
 		return CheckFlag(eMRF_RemoveStance);
 	}
 
-	EStance GetStance() const
-	{
-		CRY_ASSERT(HasStance());
-		return m_stance;
-	}
-
 	bool HasMoveTarget() const
 	{
 		return CheckFlag(eMRF_MoveTarget);
@@ -872,21 +830,6 @@ public:
 		m_mannequinTagRequest.Clear();
 	}
 
-	void SetAICoverRequest(const SAICoverRequest& aiCoverRequest)
-	{
-		m_aiCoverRequest = aiCoverRequest;
-	}
-
-	const SAICoverRequest& GetAICoverRequest() const
-	{
-		return m_aiCoverRequest;
-	}
-
-	void ClearAICoverRequest()
-	{
-		m_aiCoverRequest = SAICoverRequest();
-	}
-
 private:
 
 	// Márcio: Changed this from an enum since some compilers don't support 64bit enums
@@ -964,7 +907,6 @@ private:
 	float                     m_lookImportance;
 	float                     m_distanceToPathEnd;
 	Vec3                      m_dirOffFromPath;
-	EStance                   m_stance;
 	Vec3                      m_moveTarget;
 	Vec3                      m_inflectionPoint; // Estimated position of the next move target after reaching the current move target
 	Vec3                      m_desiredBodyDirectionAtTarget;
@@ -978,11 +920,8 @@ private:
 	float                     m_pseudoSpeed;
 	SPredictedCharacterStates m_prediction;
 	Vec3                      m_forcedNavigation;
-	ELookStyle                m_eLookStyle;
 	unsigned int              m_context;
 	SMannequinTagRequest      m_mannequinTagRequest;
-	SAICoverRequest           m_aiCoverRequest;
-	EBodyOrientationMode      m_bodyOrientationMode;
 };
 
 struct SStanceState
@@ -1025,7 +964,6 @@ struct SMovementState : public SStanceState
 	SMovementState() :
 		SStanceState(),
 		fireTarget(ZERO),
-		stance(STANCE_NULL),
 		animationEyeDirection(FORWARD_DIRECTION),
 		movementDirection(ZERO),
 		lastMovementDirection(ZERO),
@@ -1045,7 +983,6 @@ struct SMovementState : public SStanceState
 
 	Vec3    fireTarget;            // Target position to fire at, note the direction from weapon to the fire target
 	                               // can be different than aim direction. This value is un-smoothed target set by AI.
-	EStance stance;                // Stance of the character.
 	Vec3    animationEyeDirection; // Eye direction reported from Animation [used for cinematic look-ats]
 	Vec3    movementDirection, lastMovementDirection;
 	float   desiredSpeed;
@@ -1063,29 +1000,8 @@ struct SMovementState : public SStanceState
 
 struct SStanceStateQuery
 {
-	SStanceStateQuery(const Vec3& pos, const Vec3& trg, EStance _stance, float _lean = 0.0f, float _peekOver = 0.0f, bool _defaultPose = false)
-		: stance(_stance)
-		, lean(_lean)
-		, peekOver(_peekOver)
-		, defaultPose(_defaultPose)
-		, position(pos)
-		, target(trg)
-	{
-	}
-
-	SStanceStateQuery(EStance _stance, float _lean = 0.0f, float _peekOver = 0.0f, bool _defaultPose = false)
-		: stance(_stance)
-		, lean(_lean)
-		, peekOver(_peekOver)
-		, defaultPose(_defaultPose)
-		, position(ZERO)
-		, target(ZERO)
-	{
-	}
-
 	SStanceStateQuery()
-		: stance(STANCE_NULL)
-		, lean(0.0f)
+		: lean(0.0f)
 		, peekOver(0.0f)
 		, defaultPose(true)
 		, position(ZERO)
@@ -1093,7 +1009,6 @@ struct SStanceStateQuery
 	{
 	}
 
-	EStance stance;
 	float   lean;
 	float   peekOver;
 	bool    defaultPose;

@@ -2,9 +2,7 @@
 
 #include "stdafx.h"
 #include "EntityClass.h"
-#include "EntityScript.h"
 #include "EntityArchetype.h"
-#include "ScriptProperties.h"
 #include <CryString/CryPath.h>
 #include <Cry3DEngine/I3DEngine.h>
 #include "EntitySystem.h"
@@ -17,69 +15,11 @@ CEntityArchetype::CEntityArchetype(IEntityClass* pClass)
 	assert(pClass);
 	assert(pClass->GetScriptFile());
 	m_pClass = pClass;
-
-	// Try to load the script if it is not yet valid.
-	if (CEntityScript* pScript = static_cast<CEntityScript*>(m_pClass->GetIEntityScript()))
-	{
-		pScript->LoadScript();
-
-		if (pScript->GetPropertiesTable())
-		{
-			m_pProperties.Create(gEnv->pScriptSystem);
-			m_pProperties->Clone(pScript->GetPropertiesTable(), true, true);
-		}
-	}
 }
 
 //////////////////////////////////////////////////////////////////////////
 void CEntityArchetype::LoadFromXML(XmlNodeRef& propertiesNode, XmlNodeRef& objectVarsNode)
 {
-	// Lua specific behavior
-	if (m_pClass->GetScriptTable() != nullptr)
-	{
-		m_ObjectVars = objectVarsNode->clone();
-
-		if (!m_pProperties)
-			return;
-
-		CScriptProperties scriptProps;
-		// Initialize properties.
-		scriptProps.Assign(propertiesNode, m_pProperties);
-
-		// Here we add the additional archetype properties, which are not
-		// loaded before, as they are not supposed to have equivalent script
-		// properties.
-		// Still, we inject those properties into the script environment so
-		// they will be available during entity creation.
-		XmlNodeRef rAdditionalProperties = propertiesNode->findChild("AdditionalArchetypeProperties");
-		if (rAdditionalProperties)
-		{
-			const int nNumberOfAttributes(rAdditionalProperties->getNumAttributes());
-			int nCurrentAttribute(0);
-
-			const char* pszKey(NULL);
-			const char* pszValue(NULL);
-
-			const char* pszCurrentValue(NULL);
-
-			for (/*nCurrentAttribute=0*/; nCurrentAttribute < nNumberOfAttributes; ++nCurrentAttribute)
-			{
-				rAdditionalProperties->getAttributeByIndex(nCurrentAttribute, &pszKey, &pszValue);
-				if (!m_pProperties->GetValue(pszKey, pszCurrentValue))
-				{
-					m_pProperties->SetValue(pszKey, pszValue);
-				}
-				else
-				{
-					// In editor this will happen, but shouldn't generate a warning.
-					if (!gEnv->IsEditor())
-					{
-						CryLog("[EntitySystem] CEntityArchetype::LoadFromXML: attribute %s couldn't be injected into the script, as it was already present there.", pszKey);
-					}
-				}
-			}
-		}
-	}
 }
 
 //////////////////////////////////////////////////////////////////////////

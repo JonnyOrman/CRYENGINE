@@ -4,7 +4,6 @@
 #include "SurfaceTypeManager.h"
 #include <CryAction/IMaterialEffects.h>
 
-#include <CryScriptSystem/IScriptSystem.h>
 #include <CrySystem/File/ICryPak.h>
 #include <Cry3DEngine/ISurfaceType.h>
 #include <CrySystem/ConsoleRegistration.h>

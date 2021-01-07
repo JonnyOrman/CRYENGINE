@@ -231,7 +231,6 @@ struct IEntityArchetype
 	virtual IEntityClass* GetClass() const = 0;
 
 	virtual const char*   GetName() const = 0;
-	virtual IScriptTable* GetProperties() = 0;
 	virtual XmlNodeRef    GetObjectVars() = 0;
 	virtual void          LoadFromXML(XmlNodeRef& propertiesNode, XmlNodeRef& objectVarsNode) = 0;
 	// </interfuscator:shuffle>

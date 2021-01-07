@@ -11,9 +11,7 @@
 #include <CryGame/IGameTokens.h>
 #include "ILevelSystem.h"
 #include "IActorSystem.h"
-#include "IItemSystem.h"
 #include "IGameRulesSystem.h"
-#include "IVehicleSystem.h"
 #include <CryMovie/IMovieSystem.h>
 #include "IPlayerProfiles.h"
 #include <CrySystem/IStreamEngine.h>
@@ -876,7 +874,6 @@ ELoadGameResult CGameSerialize::LoadGame(CCryAction* pCryAction, const char* met
 	//clear old entities from the systems [could become obsolete]
 	//gEnv->pGameFramework->GetIItemSystem()->Reset(); //this respawns ammo, moved before serialization
 	gEnv->pGameFramework->GetIActorSystem()->Reset();
-	gEnv->pGameFramework->GetIVehicleSystem()->Reset();
 	//We need to reset particles to get rid of certain effects from before the load
 	gEnv->pParticleManager->Reset();
 	checkpoint.Check("ResetSubSystems");
@@ -918,9 +915,6 @@ ELoadGameResult CGameSerialize::LoadGame(CCryAction* pCryAction, const char* met
 		GameWarning("Errors during Game Loading");
 	}
 	checkpoint.Check("EntityPostSerialize");
-
-	if (gEnv->pScriptSystem)
-		gEnv->pScriptSystem->ForceGarbageCollection();
 
 	checkpoint.Check("Lua GC Cycle");
 
@@ -1007,11 +1001,6 @@ void CGameSerialize::SaveEngineSystems(SSaveEnvironment& savEnv)
 	savEnv.m_pCryAction->GetIViewSystem()->Serialize(savEnv.m_pSaveGame->AddSection(SAVEGAME_VIEWSYSTEM_SECTION));
 	savEnv.m_checkpoint.Check("ViewSystem");
 
-	//itemsystem - LTL inventory only
-	if (savEnv.m_pCryAction->GetIItemSystem())
-		savEnv.m_pCryAction->GetIItemSystem()->Serialize(savEnv.m_pSaveGame->AddSection(SAVEGAME_LTLINVENTORY_SECTION));
-	savEnv.m_checkpoint.Check("Inventory");
-
 	CMaterialEffects* pMatFX = static_cast<CMaterialEffects*>(savEnv.m_pCryAction->GetIMaterialEffects());
 	if (pMatFX)
 		pMatFX->Serialize(savEnv.m_pSaveGame->AddSection(SAVEGAME_MATERIALEFFECTS_SECTION));
@@ -1022,9 +1011,6 @@ void CGameSerialize::SaveEngineSystems(SSaveEnvironment& savEnv)
 bool CGameSerialize::SaveEntities(SSaveEnvironment& savEnv)
 {
 	TSerialize gameState = savEnv.m_pSaveGame->AddSection(SAVEGAME_GAMESTATE_SECTION);
-
-	ICVar* pUseNoSaveFlag = gEnv->pConsole->GetCVar("es_SaveLoadUseLUANoSaveFlag");
-	bool bUseNoSaveFlag = (pUseNoSaveFlag && pUseNoSaveFlag->GetIVal() != 0);
 
 	TEntitiesToSerialize entities;
 	entities.reserve(gEnv->pEntitySystem->GetNumEntities());
@@ -1064,18 +1050,6 @@ bool CGameSerialize::SaveEntities(SSaveEnvironment& savEnv)
 				}
 
 				bed.ignorePosRotScl = false;
-				//lua flag
-				if (bUseNoSaveFlag)
-				{
-					IScriptTable* pEntityScript = pEntity->GetScriptTable();
-					SmartScriptTable props;
-					if (pEntityScript && pEntityScript->GetValue("Properties", props))
-					{
-						bool bSerialize = true;
-						if (props->GetValue("bSerialize", bSerialize) && (bSerialize == false))
-							bed.ignorePosRotScl = true;
-					}
-				}
 
 				IEntity* pParentEntity = pEntity->GetParent();
 				IPhysicalEntity* pPhysEnt;
@@ -1351,14 +1325,6 @@ void CGameSerialize::LoadEngineSystems(SLoadEnvironment& loadEnv)
 
 	loadEnv.m_checkpoint.Check("ViewSystem");
 
-	if (loadEnv.m_pCryAction->GetIItemSystem())
-	{
-		loadEnv.m_pSer = loadEnv.m_pLoadGame->GetSection(SAVEGAME_LTLINVENTORY_SECTION);
-		if (loadEnv.m_pSer.get())
-			loadEnv.m_pCryAction->GetIItemSystem()->Serialize(*loadEnv.m_pSer);
-		else
-			GameWarning("Unable to open section %s", SAVEGAME_LTLINVENTORY_SECTION);
-	}
 	loadEnv.m_checkpoint.Check("ItemSystem");
 
 	loadEnv.m_checkpoint.Check("FlowSystem");
@@ -1510,9 +1476,6 @@ bool CGameSerialize::LoadEntities(SLoadEnvironment& loadEnv, std::unique_ptr<TSe
 
 	loadEnv.m_pCryAction->Serialize(*loadEnv.m_pSer); //breakable object
 	loadEnv.m_checkpoint.Check("SerializeBreakables");
-
-	//reset item system, used to be after entity serialization
-	gEnv->pGameFramework->GetIItemSystem()->Reset();
 
 	//lock entity system
 	pEntitySystem->LockSpawning(true);

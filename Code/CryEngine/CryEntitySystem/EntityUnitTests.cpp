@@ -369,23 +369,18 @@ CRY_TEST_SUITE(EntityTestsSuit)
 		public:
 			virtual void ProcessEvent(const SEntityEvent& event) override
 			{
-				CRY_TEST_ASSERT(event.event == ENTITY_EVENT_PHYSICS_CHANGE_STATE || event.event == ENTITY_EVENT_SCRIPT_EVENT);
+				CRY_TEST_ASSERT(event.event == ENTITY_EVENT_PHYSICS_CHANGE_STATE);
 
 				m_receivedEvents++;
 
 				if (event.event == ENTITY_EVENT_PHYSICS_CHANGE_STATE)
 				{
 					CRY_TEST_CHECK_EQUAL(m_receivedEvents, 1);
-					m_pEntity->SendEvent(SEntityEvent(ENTITY_EVENT_SCRIPT_EVENT));
-					CRY_TEST_CHECK_EQUAL(m_receivedEvents, 2);
-				}
-				else if (event.event == ENTITY_EVENT_SCRIPT_EVENT)
-				{
 					CRY_TEST_CHECK_EQUAL(m_receivedEvents, 2);
 				}
 			}
 
-			virtual Cry::Entity::EventFlags GetEventMask() const override { return ENTITY_EVENT_PHYSICS_CHANGE_STATE | ENTITY_EVENT_SCRIPT_EVENT; }
+			virtual Cry::Entity::EventFlags GetEventMask() const override { return ENTITY_EVENT_PHYSICS_CHANGE_STATE; }
 
 			uint8 m_receivedEvents = 0;
 		};
@@ -397,7 +392,6 @@ CRY_TEST_SUITE(EntityTestsSuit)
 
 		// Ensure that we can send the events without any issues
 		entity.pEntity->SendEvent(SEntityEvent(ENTITY_EVENT_PHYSICS_CHANGE_STATE));
-		entity.pEntity->SendEvent(SEntityEvent(ENTITY_EVENT_SCRIPT_EVENT));
 	}
 
 	CRY_TEST(TestSpawnedTransformation)

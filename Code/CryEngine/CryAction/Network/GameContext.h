@@ -20,7 +20,6 @@
 
 #include <CryGame/IGameFramework.h>
 #include <CryEntitySystem/IEntitySystem.h>
-#include <CryScriptSystem/IScriptSystem.h>
 #include "ClassRegistryReplicator.h"
 #include <CryNetwork/INetworkService.h>
 #include <CryPhysics/IPhysics.h>
@@ -101,7 +100,7 @@ class CGameContext :
 	public IHostMigrationEventListener
 {
 public:
-	CGameContext(CCryAction* pFramework, CScriptRMI*, CActionGame* pGame);
+	CGameContext(CCryAction* pFramework, CActionGame* pGame);
 	virtual ~CGameContext();
 
 	void Init(INetContext* pNetContext);
@@ -114,7 +113,6 @@ public:
 	virtual void                ObjectInitClient(EntityId id, INetChannel* pChannel);
 	virtual bool                SendPostSpawnObject(EntityId id, INetChannel* pChannel);
 	virtual void                UnboundObject(EntityId id);
-	virtual INetAtSyncItem*     HandleRMI(bool bClient, EntityId objID, uint8 funcID, TSerialize ser, INetChannel* pChannel);
 	virtual void                ControlObject(EntityId id, bool bHaveControl);
 	virtual void                PassDemoPlaybackMappedOriginalServerPlayer(EntityId id);
 	virtual void                OnStartNetworkFrame();
@@ -209,8 +207,6 @@ public:
 
 	void   DefineContextProtocols(IProtocolBuilder* pBuilder, bool server);
 
-	void        AddControlObjectCallback(EntityId id, bool willHaveControl, HSCRIPTFUNCTION func);
-
 	static void RegisterExtensions(IGameFramework* pFW);
 
 	void        AllowCallOnClientConnect();
@@ -265,7 +261,6 @@ private:
 	INetContext*         m_pNetContext;
 	CCryAction*          m_pFramework;
 	CActionGame*         m_pGame;
-	CScriptRMI*          m_pScriptRMI;
 	CPhysicsSync*        m_pPhysicsSync;
 #ifndef OLD_VOICE_SYSTEM_DEPRECATED
 	CVoiceController*    m_pVoiceController;
@@ -308,8 +303,6 @@ private:
 
 		void GetMemoryUsage(ICrySizer* pSizer) const { /*nothing*/ }
 	};
-	typedef std::multimap<SDelegateCallbackIndex, HSCRIPTFUNCTION> DelegateCallbacks;
-	DelegateCallbacks                    m_delegateCallbacks;
 
 	std::unique_ptr<IContextEstablisher> m_pContextEstablisher;
 	std::unique_ptr<CBreakReplicator>    m_pBreakReplicator;

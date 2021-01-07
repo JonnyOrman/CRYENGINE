@@ -628,15 +628,6 @@ const char* CTimeDemoRecorder::GetCurrentLevelPath()
 	static char buf[_MAX_PATH];
 	gEnv->pGameFramework->GetAbsLevelPath(buf, sizeof(buf));
 	return buf;
-	/*
-	   ILevel *pLevel = gEnv->pGameFramework->GetILevelSystem()->GetCurrentLevel();
-	   if (!pLevel)
-	    return "";
-	   ILevelInfo *pLevelInfo = pLevel->GetLevelInfo();
-	   if (!pLevelInfo)
-	    return "";
-	   return pLevelInfo->GetPath();
-	 */
 }
 
 std::array<EEntityEvent, 8> g_recordedEntityEvents =
@@ -648,8 +639,7 @@ std::array<EEntityEvent, 8> g_recordedEntityEvents =
 		ENTITY_EVENT_ATTACH,
 		ENTITY_EVENT_DETACH,
 		ENTITY_EVENT_DETACH_THIS,
-		ENTITY_EVENT_ENABLE_PHYSICS,
-		ENTITY_EVENT_ENTER_SCRIPT_STATE } };
+		ENTITY_EVENT_ENABLE_PHYSICS } };
 
 //////////////////////////////////////////////////////////////////////////
 void CTimeDemoRecorder::Record(bool bEnable)
@@ -2239,7 +2229,6 @@ void CTimeDemoRecorder::OnEntityEvent(IEntity* pEntity, const SEntityEvent& even
 	case ENTITY_EVENT_DETACH:
 	case ENTITY_EVENT_DETACH_THIS:
 	case ENTITY_EVENT_ENABLE_PHYSICS:
-	case ENTITY_EVENT_ENTER_SCRIPT_STATE:
 		{
 			EntityEventRecord rec;
 			memset(&rec, 0, sizeof(rec));
@@ -2299,15 +2288,6 @@ void CTimeDemoRecorder::PlayBackEntityEvent(const EntityEventRecord& rec)
 			pEntity->EnablePhysics(false);
 		else
 			pEntity->EnablePhysics(true);
-		break;
-	case ENTITY_EVENT_ENTER_SCRIPT_STATE:
-		{
-			IEntityScriptComponent* pScriptProxy = (IEntityScriptComponent*)pEntity->GetProxy(ENTITY_PROXY_SCRIPT);
-			if (pScriptProxy)
-			{
-				pScriptProxy->GotoStateId((int)rec.nParam[0]);
-			}
-		}
 		break;
 	}
 }

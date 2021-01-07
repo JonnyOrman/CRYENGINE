@@ -9,6 +9,7 @@
 #include <CryLobby/CommonICryMatchMaking.h>
 #include <CryNetwork/INetwork.h>
 #include "Cry3DEngine/IStatObj.h"
+#include "CryCore/Functor.h"
 
 struct EventPhysRemoveEntityParts;
 struct IActionMapManager;
@@ -42,8 +43,6 @@ struct IGameStatistics;
 struct IGameToEditorInterface;
 struct IGameTokenSystem;
 struct IGameVolumes;
-struct IItem;
-struct IItemSystem;
 struct ILanQueryListener;
 struct ILevelSystem;
 struct ILoadGame;
@@ -56,13 +55,9 @@ struct IPhysicalEntity;
 struct IPlayerProfileManager;
 struct IRealtimeRemoteUpdate;
 struct ISaveGame;
-struct IScriptTable;
 struct ISerializeHelper;
 struct ISystem;
 struct ITimeDemoRecorder;
-struct IUIDraw;
-struct IVehicle;
-struct IVehicleSystem;
 struct IViewSystem;
 struct IWeapon;
 struct pe_explosion;
@@ -664,9 +659,6 @@ struct IGameFramework
 	//! \return Pointer to the ILanQueryListener interface.
 	virtual ILanQueryListener* GetILanQueryListener() = 0;
 
-	//! \return Pointer to the IUIDraw interface.
-	virtual IUIDraw*    GetIUIDraw() = 0;
-
 	virtual IMannequin& GetMannequinInterface() = 0;
 
 	//! Returns a pointer to the IGameObjectSystem interface.
@@ -680,10 +672,6 @@ struct IGameFramework
 	//! Returns a pointer to the IActorSystem interface.
 	//! \return Pointer to IActorSystem interface.
 	virtual IActorSystem* GetIActorSystem() = 0;
-
-	//! Returns a pointer to the IItemSystem interface.
-	//! \return Pointer to IItemSystem interface.
-	virtual IItemSystem* GetIItemSystem() = 0;
 
 	//! Returns a pointer to the IBreakReplicator interface.
 	//! \return Pointer to IBreakReplicator interface.
@@ -700,10 +688,6 @@ struct IGameFramework
 	//! Returns a pointer to the IGameplayRecorder interface.
 	//! \return Pointer to IGameplayRecorder interface.
 	virtual IGameplayRecorder* GetIGameplayRecorder() = 0;
-
-	//! Returns a pointer to the IVehicleSystem interface.
-	//! \return Pointer to IVehicleSystem interface.
-	virtual IVehicleSystem* GetIVehicleSystem() = 0;
 
 	//! Returns a pointer to the IGameRulesSystem interface.
 	//! \return Pointer to IGameRulesSystem interface.
@@ -1003,8 +987,6 @@ struct IGameFramework
 	//! Retrieves manager which handles game objects tied to editor shapes and volumes.
 	virtual IGameVolumes* GetIGameVolumesManager() const = 0;
 
-	virtual void          PreloadAnimatedCharacter(IScriptTable* pEntityScript) = 0;
-
 	//! Gets called from the physics thread just before doing a time step.
 	//! \param deltaTime - the time interval that will be simulated.
 	virtual void PrePhysicsTimeStep(float deltaTime) = 0;
@@ -1039,8 +1021,6 @@ struct IGameFramework
 	//! Internal, client uses 'QueryExtension<ExtensionInterface>()
 	//! \param interfaceID Interface id.
 	virtual ICryUnknownPtr QueryExtensionInterfaceById(const CryInterfaceID& interfaceID) const = 0;
-
-	virtual IScriptTable* GetActionScriptBindTable() = 0;
 
 	// </interfuscator:shuffle>
 };

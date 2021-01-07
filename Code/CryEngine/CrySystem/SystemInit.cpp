@@ -41,7 +41,6 @@
 #include <CryNetwork/INetwork.h>
 #include <CryPhysics/IPhysics.h>
 #include <CryRenderer/IRenderer.h>
-#include <CryScriptSystem/IScriptSystem.h>
 #include <CrySystem/File/ICryPak.h>
 #include <CrySystem/ICmdLine.h>
 #include <CrySystem/ILog.h>
@@ -1624,30 +1623,12 @@ bool CSystem::InitMovieSystem(const SSystemInitParams& startupParams)
 	return true;
 }
 
-/////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////
-bool CSystem::InitScriptSystem(const SSystemInitParams& startupParams)
-{
-	CRY_PROFILE_FUNCTION(PROFILE_LOADING_ONLY);
-	MEMSTAT_CONTEXT(EMemStatContextType::LUA, "Init Script System");
-
-	if (!InitializeEngineModule(startupParams, DLL_SCRIPTSYSTEM, cryiidof<IScriptSystemEngineModule>(), true))
-		return false;
-
-	if (m_env.pScriptSystem == NULL)
-	{
-		CryFatalError("Error creating Script System!");
-		return (false);
-	}
-
-	m_env.pScriptSystem->PostInit();
-
-	// Load script surface types.
-	if (m_env.pScriptSystem)
-		m_env.pScriptSystem->LoadScriptedSurfaceTypes("Scripts/Materials", false);
-
-	return (true);
-}
+///////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////
+//bool CSystem::InitScriptSystem(const SSystemInitParams& startupParams)
+//{
+//	return (true);
+//}
 
 /////////////////////////////////////////////////////////////////////////////////
 bool CSystem::InitFileSystem(const SSystemInitParams& startupParams)
@@ -3304,7 +3285,7 @@ bool CSystem::Initialize(SSystemInitParams& startupParams)
 		//////////////////////////////////////////////////////////////////////////
 		// We need script materials for now
 
-		if (!startupParams.bShaderCacheGen)
+		/*if (!startupParams.bShaderCacheGen)
 		{
 			CryLogAlways("Script System Initialization");
 			INDENT_LOG_DURING_SCOPE();
@@ -3313,7 +3294,7 @@ bool CSystem::Initialize(SSystemInitParams& startupParams)
 				return false;
 		}
 
-		InlineInitializationProcessing("CSystem::Init InitScripts");
+		InlineInitializationProcessing("CSystem::Init InitScripts");*/
 
 		//////////////////////////////////////////////////////////////////////////
 

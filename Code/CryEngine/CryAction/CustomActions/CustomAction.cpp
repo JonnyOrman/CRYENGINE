@@ -120,25 +120,6 @@ void CCustomAction::Serialize(TSerialize ser)
 			int currentState = (int)m_currentState;
 			ser.Value("m_currentState", currentState);
 		}
-
-		//if (ser.BeginOptionalGroup("m_pFlowGraph", m_pFlowGraph != NULL))
-		//{
-		//	if (ser.IsReading())
-		//	{
-		//		ICustomAction* pAction = gEnv->pGameFramework->GetICustomActionManager()->GetCustomActionFromLibrary(m_customActionGraphName);
-		//		CRY_ASSERT(pAction);
-		//		if (pAction)
-		//			m_pFlowGraph = pAction->GetFlowGraph()->Clone();
-		//		if (m_pFlowGraph)
-		//			m_pFlowGraph->SetCustomAction(this);
-		//	}
-		//	if (m_pFlowGraph)
-		//	{
-		//		m_pFlowGraph->SetGraphEntity(objectId, 0);
-		//		m_pFlowGraph->Serialize(ser);
-		//	}
-		//	ser.EndGroup(); //m_pFlowGraph
-		//}
 	}
 	ser.EndGroup();
 }
@@ -157,69 +138,5 @@ bool CCustomAction::SwitchState(const ECustomActionState newState,
 	m_currentState = newState;
 	this->NotifyListeners(event, *this);
 
-	// Notify entity
-	if (szLuaFuncToCall && szLuaFuncToCall[0] != '\0')
-	{
-		if (IScriptTable* entityScriptTable = m_pObjectEntity->GetScriptTable())
-		{
-			HSCRIPTFUNCTION functionToCall = 0;
-
-			if (entityScriptTable->GetValue(szLuaFuncToCall, functionToCall))
-			{
-				Script::CallMethod(entityScriptTable, functionToCall);
-				gEnv->pScriptSystem->ReleaseFunc(functionToCall);
-			}
-		}
-	}
-
-	// Activate action on all matching flownodes
-	//if (m_pFlowGraph && szNodeToCall && szNodeToCall[0] != '\0') // Has a custom graph, otherwise its an instance custom action
-	//{
-	//	int idNode = 0;
-	//	TFlowNodeTypeId nodeTypeId;
-	//	TFlowNodeTypeId actionTypeId = gEnv->pFlowSystem->GetTypeId(szNodeToCall);
-	//	while ((nodeTypeId = m_pFlowGraph->GetNodeTypeId(idNode)) != InvalidFlowNodeTypeId)
-	//	{
-	//		if (nodeTypeId == actionTypeId)
-	//		{
-	//			m_pFlowGraph->SetRegularlyUpdated(idNode, true);
-	//		}
-	//		++idNode;
-	//	}
-	//}
-
 	return true;
 }
-
-//------------------------------------------------------------------------------------------------------------------------
-/*
-   void CCustomAction::AttachToNodes()
-   {
-    TFlowNodeTypeId startActionTypeId = gEnv->pFlowSystem->GetTypeId("CustomAction:Start");
-    TFlowNodeTypeId succeedActionTypeId = gEnv->pFlowSystem->GetTypeId("CustomAction:Succeed");
-    TFlowNodeTypeId endActionTypeId = gEnv->pFlowSystem->GetTypeId("CustomAction:End");
-    TFlowNodeTypeId abortActionTypeId = gEnv->pFlowSystem->GetTypeId("CustomAction:Abort");
-
-    int idNode = 0;
-    TFlowNodeTypeId nodeTypeId;
-    while ( (nodeTypeId = m_pFlowGraph->GetNodeTypeId( idNode )) != InvalidFlowNodeTypeId )
-    {
-      if ( (nodeTypeId == startActionTypeId ) ||
-           (nodeTypeId == succeedActionTypeId ) ||
-           (nodeTypeId == endActionTypeId ) ||
-           (nodeTypeId == abortActionTypeId ) )
-      {
-        IFlowNodeData* pFlowNodeData = m_pFlowGraph->GetNodeData(idNode);
-        if (pFlowNodeData)
-        {
-          CFlowNode_CustomActionBase* pCustomActionBaseNode = static_cast<CFlowNode_CustomActionBase*>(pFlowNodeData->GetNode());
-          CRY_ASSERT(pCustomActionBaseNode != NULL);
-          if (pCustomActionBaseNode != NULL)
-          {
-            pCustomActionBaseNode->SetCustomAction(this);
-          }
-        }
-      }
-    }
-   }
- */

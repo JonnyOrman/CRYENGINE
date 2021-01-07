@@ -32,7 +32,6 @@ public:
 		return true;
 	}
 
-	bool Value(const char* name, ScriptAnyValue& value);
 	bool Value(const char* name, int8& value);
 	bool Value(const char* name, string& value);
 	bool Value(const char* name, CTimeValue& value);
@@ -86,8 +85,6 @@ private:
 	std::vector<XMLCPB::CNodeLiveReaderRef> m_nodeStack;
 	XMLCPB::CReaderInterface&               m_binReader;
 
-	bool ReadScript(XMLCPB::CNodeLiveReaderRef node, ScriptAnyValue& value);
-
 	//////////////////////////////////////////////////////////////////////////
 	// Set Defaults.
 	//////////////////////////////////////////////////////////////////////////
@@ -105,7 +102,6 @@ private:
 	void DefaultValue(Vec3& v) const               { v.x = 0; v.y = 0; v.z = 0; };
 	void DefaultValue(Ang3& v) const               { v.x = 0; v.y = 0; v.z = 0; };
 	void DefaultValue(Quat& v) const               { v.w = 1.0f; v.v.x = 0; v.v.y = 0; v.v.z = 0; };
-	void DefaultValue(ScriptAnyValue& v) const     {};
 	void DefaultValue(CTimeValue& v) const         { v.SetValue(0); };
 	//void DefaultValue( char *str ) const { if (str) str[0] = 0; };
 	void DefaultValue(string& str) const           { str = ""; };

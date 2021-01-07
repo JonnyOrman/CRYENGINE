@@ -3,7 +3,6 @@
 #include "StdAfx.h"
 #include "GameStatistics.h"
 #include <CryGame/GameUtils.h>
-#include "ScriptBind_GameStatistics.h"
 #include "IGameRulesSystem.h"
 #include "CryAction.h"
 #include "CryActionCVars.h"
@@ -200,16 +199,8 @@ IStatsTracker* CGameStatistics::PushGameScope(size_t scopeID)
 	if (tracker == 0)
 		return 0;
 
-	if (m_gameScopes.GetStackSize() == 1)
-	{
-		CRY_ASSERT(!m_scriptBind.get());
-		m_scriptBind.reset(new CScriptBind_GameStatistics(this));
-	}
-
 	if (m_gsCallback)
 		m_gsCallback->OnNodeAdded(tracker->GetLocator());
-
-	m_scriptBind->BindTracker(GetGameRulesTable(), GetScopeDesc(scopeID)->trackerName, tracker);
 
 	return tracker;
 }
@@ -228,8 +219,6 @@ void CGameStatistics::PopGameScope(size_t checkScopeID)
 
 	RemoveAllElements(m_gameScopes.GetStackSize() - 1);
 
-	m_scriptBind->UnbindTracker(GetGameRulesTable(), GetScopeDesc(locator.scopeID)->trackerName, tracker);
-
 	SDeadStatNode* deadScope = m_gameScopes.PopGameScope();
 	m_cachedDeadMemory += deadScope->GetMemoryStatistics();
 
@@ -240,7 +229,6 @@ void CGameStatistics::PopGameScope(size_t checkScopeID)
 	if (!m_gameScopes.GetStackSize())
 	{
 		SaveDeadNodesRec(deadScope);
-		m_scriptBind.reset();
 	}
 	else
 	{
@@ -343,14 +331,13 @@ bool CGameStatistics::RegisterGameElements(const SGameElementDesc* elemDescs, si
 
 //////////////////////////////////////////////////////////////////////////
 
-IStatsTracker* CGameStatistics::AddGameElement(const SNodeLocator& locator, IScriptTable* pTable)
+IStatsTracker* CGameStatistics::AddGameElement(const SNodeLocator& locator)
 {
 	CRY_PROFILE_FUNCTION(PROFILE_ACTION);
 
 	if (!ValidateAddElement(locator))
 		return 0;
 
-	const SGameElementDesc* desc = m_elemRegistry.GetDesc(locator.elemID);
 	size_t stackPos = m_gameScopes.FindScopePos(locator.scopeID);
 
 	CStatsTracker* tracker = NULL;
@@ -361,12 +348,9 @@ IStatsTracker* CGameStatistics::AddGameElement(const SNodeLocator& locator, IScr
 		SNodeLocator newLocator(locator);
 		newLocator.timeStamp = ++m_currTimeStamp;
 
-		tracker = new CStatsTracker(newLocator, this, pTable);
+		tracker = new CStatsTracker(newLocator, this);
 
 		scope.elements.insert(std::make_pair(newLocator, tracker));
-
-		if (pTable)
-			m_scriptBind->BindTracker(pTable, desc->trackerName, tracker);
 
 		if (m_gsCallback)
 			m_gsCallback->OnNodeAdded(newLocator);
@@ -442,9 +426,6 @@ bool CGameStatistics::DoRemoveElement(size_t scopePos, const SNodeLocator& locat
 	m_gameScopes.GetScopeAt(scopePos).deadNodes.push_back(deadNode);
 
 	m_cachedDeadMemory += deadNode->GetMemoryStatistics();
-
-	if (tracker->GetScriptTable())
-		m_scriptBind->UnbindTracker(tracker->GetScriptTable(), desc->trackerName, tracker);
 
 	if (m_gsCallback)
 		m_gsCallback->OnNodeRemoved(locator, tracker);
@@ -803,19 +784,3 @@ void CGameStatistics::OnTrackedState(const SNodeLocator& locator, size_t stateID
 
 	CheckMemoryOverflow();
 }
-
-//////////////////////////////////////////////////////////////////////////
-
-IScriptTable* CGameStatistics::GetGameRulesTable()
-{
-	IGameRulesSystem* pGameRulesSystem = CCryAction::GetCryAction()->GetIGameRulesSystem();
-	IGameRules* pGameRules = pGameRulesSystem ? pGameRulesSystem->GetCurrentGameRules() : NULL;
-	IEntity* pRulesEntity = pGameRules ? pGameRules->GetEntity() : NULL;
-	IScriptTable* gameRulesTable = pRulesEntity ? pRulesEntity->GetScriptTable() : NULL;
-
-	//-- LEAVING THIS ASSERT HERE BECAUSE WE'RE USING THIS FUNCTION WRONG AT THE END OF A SESSION FOR TELEMTERY AND WE NEED TO FIX IT LATER
-	CRY_ASSERT(gameRulesTable);
-	return gameRulesTable;
-}
-
-//////////////////////////////////////////////////////////////////////////

@@ -42,7 +42,7 @@ public:
 	virtual const SGameScopeDesc*    GetScopeDesc(size_t scopeID) const;
 
 	virtual bool                     RegisterGameElements(const SGameElementDesc* elemDescs, size_t numElems);
-	virtual IStatsTracker*           AddGameElement(const SNodeLocator& locator, IScriptTable* pTable);
+	virtual IStatsTracker*           AddGameElement(const SNodeLocator& locator);
 	virtual void                     RemoveElement(const SNodeLocator& locator);
 	virtual size_t                   GetElementCount() const;
 	virtual size_t                   GetElementID(const char* scriptName) const;
@@ -85,9 +85,7 @@ private:
 	const char*          GetSerializeName(const SNodeLocator& locator) const;
 	void                 NotifyVisitNode(const SNodeLocator& locator, const char* serializeName, IStatsContainer& container, EStatNodeState state);
 	void                 NotifyLeaveNode(const SNodeLocator& locator, const char* serializeName, IStatsContainer& container, EStatNodeState state);
-	static IScriptTable* GetGameRulesTable();
 
-	std::unique_ptr<CScriptBind_GameStatistics> m_scriptBind;
 	IGameStatisticsCallback*                    m_gsCallback;
 	IStatsStorageFactory*                       m_storageFactory;
 	CDefaultStorageFactory                      m_defaultStorageFactory;

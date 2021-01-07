@@ -303,7 +303,6 @@ public:
 	ICryPak*                     GetIPak() override              { return m_env.pCryPak; }
 	IConsole*                    GetIConsole() override          { return m_env.pConsole; }
 	IRemoteConsole*              GetIRemoteConsole() override;
-	IScriptSystem*               GetIScriptSystem() override     { return m_env.pScriptSystem; }
 	I3DEngine*                   GetI3DEngine() override         { return m_env.p3DEngine; }
 	ICharacterManager*           GetIAnimationSystem() override  { return m_env.pCharacterManager; }
 	CryAudio::IAudioSystem*      GetIAudioSystem() override      { return m_env.pAudioSystem; }

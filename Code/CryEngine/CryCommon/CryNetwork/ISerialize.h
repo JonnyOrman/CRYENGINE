@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include <CryScriptSystem/IScriptSystem.h> // <> required for Interfuscator
 #include <CryCore/CountedValue.h>
 #include <CryCore/Containers/MiniQueue.h>
 #include <CryCore/Containers/VectorSet.h>
@@ -384,25 +383,6 @@ public:
 			T_Value temp;
 			Value(szName, temp);
 			(pInst->*set)(temp);
-		}
-	}
-
-	void Value(const char* name, IScriptTable* pTable)
-	{
-		ScriptAnyValue any(pTable);
-		Value(name, any);
-	}
-
-	void Value(const char* name, SmartScriptTable& pTable)
-	{
-		ScriptAnyValue any(pTable);
-		Value(name, any);
-		if (IsReading())
-		{
-			if (any.GetType() == EScriptAnyType::Table)
-				pTable = any.GetScriptTable();
-			else
-				pTable = SmartScriptTable();
 		}
 	}
 

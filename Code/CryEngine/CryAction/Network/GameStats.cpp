@@ -1130,16 +1130,6 @@ void CGameStats::StartGame(bool server)
 		IGameRules* pR = pGR->GetCurrentGameRules();
 		if (pR)
 		{
-			IEntityScriptComponent* pScriptProxy = static_cast<IEntityScriptComponent*>(pR->GetEntity()->GetProxy(ENTITY_PROXY_SCRIPT));
-			if (pScriptProxy)
-			{
-				string gameState = pScriptProxy->GetState();
-				if (gameState == "InGame")
-				{
-					m_playing = true;
-					m_gameMode = pR->GetEntity()->GetClass()->GetName();
-				}
-			}
 		}
 	}
 
@@ -1190,10 +1180,6 @@ void CGameStats::ResetStats()
 		it->second.stats.push_back(new SPlayerStats(time));
 		if (IActor* pActor = m_pGameFramework->GetIActorSystem()->GetActor(it->first))
 		{
-			if (IItem* pI = pActor->GetCurrentItem())
-			{
-				it->second.stats.back()->SelectWeapon(pI->GetEntity()->GetClass()->GetName(), time);
-			}
 		}
 	}
 }
@@ -1299,10 +1285,6 @@ void CGameStats::NewPlayer(int plr, int team, bool spectator, bool restored)
 
 	if (IActor* pActor = m_pGameFramework->GetIActorSystem()->GetActor(plr))
 	{
-		if (IItem* pI = pActor->GetCurrentItem())
-		{
-			it->second.stats.back()->SelectWeapon(pI->GetEntity()->GetClass()->GetName(), time);
-		}
 	}
 
 	if (!restored)
@@ -1488,16 +1470,6 @@ void CGameStats::Connected()
 			IGameRules* pR = pGR->GetCurrentGameRules();
 			if (pR)
 			{
-				IEntityScriptComponent* pScriptProxy = static_cast<IEntityScriptComponent*>(pR->GetEntity()->GetProxy(ENTITY_PROXY_SCRIPT));
-				if (pScriptProxy)
-				{
-					string gameState = pScriptProxy->GetState();
-					if (gameState == "InGame")
-					{
-						m_playing = true;
-						m_gameMode = pR->GetEntity()->GetClass()->GetName();
-					}
-				}
 			}
 		}
 		if (m_statsTrack)
@@ -1818,20 +1790,10 @@ void CGameStats::ProcessPlayerStat(IEntity* pEntity, const GameplayEvent& event)
 		break;
 	case eGE_EnteredVehicle:
 		{
-			if (IVehicle* pV = CCryAction::GetCryAction()->GetIVehicleSystem()->GetVehicle((EntityId)(TRUNCATE_PTR)event.extra))
-			{
-				vehicle_name.Format("%s_%s", pV->GetEntity()->GetClass()->GetName(), pV->GetModification());
-				plr.EnterVehicle(vehicle_name, time);
-			}
 		}
 		break;
 	case eGE_LeftVehicle:
 		{
-			if (IVehicle* pV = CCryAction::GetCryAction()->GetIVehicleSystem()->GetVehicle((EntityId)(TRUNCATE_PTR)event.extra))
-			{
-				vehicle_name.Format("%s_%s", pV->GetEntity()->GetClass()->GetName(), pV->GetModification());
-				plr.LeaveVehicle(vehicle_name, time);
-			}
 		}
 		break;
 	case eGE_ItemSelected:

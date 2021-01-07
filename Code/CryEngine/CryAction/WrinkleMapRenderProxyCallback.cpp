@@ -7,6 +7,11 @@
 #include <CryAnimation/ICryAnimation.h>
 #include <CryExtension/CryCreateClassInstance.h>
 
+
+#include "Cry3DEngine/IMaterial.h"
+#include "CryAnimation/IAttachment.h"
+#include "CryRenderer/IShader.h"
+
 //////////////////////////////////////////////////////////////////////////
 
 #define WRINKLE_BONE_PREFIX "blend_control"

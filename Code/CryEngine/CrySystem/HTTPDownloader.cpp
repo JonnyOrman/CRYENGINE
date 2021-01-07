@@ -19,8 +19,7 @@ CHTTPDownloader::CHTTPDownloader()
 	m_iState(HTTP_STATE_NONE),
 	m_bContinue(false),
 	m_pSystem(nullptr),
-	m_pParent(nullptr),
-	m_pScriptSystem(nullptr)
+	m_pParent(nullptr)
 {
 }
 
@@ -243,112 +242,18 @@ void CHTTPDownloader::Release()
 void CHTTPDownloader::OnError()
 {
 	m_pSystem->GetILog()->LogError("DOWNLOAD ERROR: %s", CHTTPDownloader::GetURL().c_str());
-
-	IScriptTable* pScriptObject = GetScriptObject();
-
-	HSCRIPTFUNCTION pScriptFunction = 0;
-
-	if (!pScriptObject->GetValue("OnError", pScriptFunction))
-	{
-		return;
-	}
-
-	m_pScriptSystem->BeginCall(pScriptFunction);
-	m_pScriptSystem->PushFuncParam(pScriptObject);
-	m_pScriptSystem->EndCall();
 }
 
 //-------------------------------------------------------------------------------------------------
 void CHTTPDownloader::OnComplete()
 {
 	m_pSystem->GetILog()->Log("DOWNLOAD COMPLETE: %s", CHTTPDownloader::GetURL().c_str());
-
-	IScriptTable* pScriptObject = GetScriptObject();
-
-	HSCRIPTFUNCTION pScriptFunction = 0;
-
-	if (!pScriptObject->GetValue("OnComplete", pScriptFunction))
-	{
-		return;
-	}
-
-	m_pScriptSystem->BeginCall(pScriptFunction);
-	m_pScriptSystem->PushFuncParam(pScriptObject);
-	m_pScriptSystem->EndCall();
 }
 
 //-------------------------------------------------------------------------------------------------
 void CHTTPDownloader::OnCancel()
 {
 	m_pSystem->GetILog()->Log("DOWNLOAD CANCELED: %s", CHTTPDownloader::GetURL().c_str());
-
-	IScriptTable* pScriptObject = GetScriptObject();
-
-	HSCRIPTFUNCTION pScriptFunction = 0;
-
-	if (!pScriptObject->GetValue("OnCancel", pScriptFunction))
-	{
-		return;
-	}
-
-	m_pScriptSystem->BeginCall(pScriptFunction);
-	m_pScriptSystem->PushFuncParam(pScriptObject);
-	m_pScriptSystem->EndCall();
-}
-
-//-------------------------------------------------------------------------------------------------
-// Script Functions
-//-------------------------------------------------------------------------------------------------
-int CHTTPDownloader::Download(IFunctionHandler* pH)
-{
-	SCRIPT_CHECK_PARAMETERS(2);
-
-	char* szURL = 0;
-	char* szFileName = 0;
-
-	pH->GetParam(1, szURL);
-	pH->GetParam(2, szFileName);
-
-	if (szURL && szFileName)
-	{
-		CHTTPDownloader::Download(szURL, szFileName);
-	}
-
-	return pH->EndFunction();
-}
-
-//-------------------------------------------------------------------------------------------------
-int CHTTPDownloader::Cancel(IFunctionHandler* pH)
-{
-	CHTTPDownloader::Cancel();
-
-	return pH->EndFunction();
-}
-
-//-------------------------------------------------------------------------------------------------
-int CHTTPDownloader::Release(IFunctionHandler* pH)
-{
-	CHTTPDownloader::Release();
-
-	return pH->EndFunction();
-}
-
-//-------------------------------------------------------------------------------------------------
-int CHTTPDownloader::GetURL(IFunctionHandler* pH)
-{
-	return pH->EndFunction(CHTTPDownloader::GetURL().c_str());
-}
-
-//-------------------------------------------------------------------------------------------------
-int CHTTPDownloader::GetFileSize(IFunctionHandler* pH)
-{
-	return pH->EndFunction(CHTTPDownloader::GetFileSize());
-}
-
-//-------------------------------------------------------------------------------------------------
-int CHTTPDownloader::GetFileName(IFunctionHandler* pH)
-{
-	return pH->EndFunction(CHTTPDownloader::GetDstFileName().c_str());
 }
 
 #endif

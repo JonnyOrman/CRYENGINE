@@ -77,14 +77,6 @@ private:
 
 	string            m_queryMethods;
 
-	SmartScriptTable  m_pGameRules;
-	HSCRIPTFUNCTION   m_funcIsUsable;
-	HSCRIPTFUNCTION   m_funcOnNewUsable;
-	HSCRIPTFUNCTION   m_funcOnUsableMessage;
-	HSCRIPTFUNCTION   m_funcOnLongHover;
-
-	SmartScriptTable  m_areUsableEntityList;
-	HSCRIPTFUNCTION   m_funcAreUsable;
 	TQueryVector      m_frameQueryVector;
 	TUsableClassesMap m_usableEntityClasses;
 
@@ -103,7 +95,6 @@ private:
 
 	float             m_lastRadius;
 
-	static ScriptAnyValue EntityIdToScript(EntityId id);
 	void                  PerformQueries(EntityId& id, int& idx);
 	void                  UpdateTimers(EntityId id, int idx);
 

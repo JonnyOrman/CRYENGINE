@@ -16,19 +16,7 @@ struct IBreakableGlassSystem;
 struct IForceFeedbackSystem;
 struct IGameVolumes;
 
-class CAIDebugRenderer;
-class CAINetworkDebugRenderer;
 class CGameRulesSystem;
-class CScriptBind_Action;
-class CScriptBind_ActorSystem;
-class CScriptBind_ItemSystem;
-class CScriptBind_ActionMapManager;
-class CScriptBind_Network;
-class CScriptBind_VehicleSystem;
-class CScriptBind_Vehicle;
-class CScriptBind_VehicleSeat;
-class CScriptBind_Inventory;
-class CScriptBind_MaterialEffects;
 
 class CFlowSystem;
 class CDevMode;
@@ -46,10 +34,7 @@ class CallbackTimer;
 class CGameClientNub;
 class CGameContext;
 class CGameServerNub;
-class CItemSystem;
 class CLevelSystem;
-class CUIDraw;
-class CVehicleSystem;
 class CViewSystem;
 class CGameplayRecorder;
 class CPersistantDebug;
@@ -78,12 +63,6 @@ struct ITimeDemoRecorder;
 class CNetMessageDistpatcher;
 class CEntityContainerMgr;
 
-namespace BehaviorTree
-{
-	struct INodeCreator;
-}
-
-
 class CCryAction :
 	public IGameFramework
 {
@@ -108,10 +87,6 @@ public:
 
 	virtual uint32                        GetPreUpdateTicks();
 
-	/*virtual void                          RegisterFactory(const char* name, IActorCreator* pCreator, bool isAI);
-	virtual void                          RegisterFactory(const char* name, IItemCreator* pCreator, bool isAI);
-	virtual void                          RegisterFactory(const char* name, IVehicleCreator* pCreator, bool isAI);
-	virtual void                          RegisterFactory(const char* name, IGameObjectExtensionCreator* pCreator, bool isAI);*/
 	virtual void                          RegisterFactory(const char* name, ISaveGame*(*func)(), bool);
 	virtual void                          RegisterFactory(const char* name, ILoadGame*(*func)(), bool);
 
@@ -133,13 +108,10 @@ public:
 
 	virtual ISystem*                      GetISystem()           { return m_pSystem; }
 	virtual ILanQueryListener*            GetILanQueryListener() { return m_pLanQueryListener; }
-	virtual IUIDraw*                      GetIUIDraw();
 	virtual IMannequin&                   GetMannequinInterface();
 	virtual ILevelSystem*                 GetILevelSystem();
 	virtual IActorSystem*                 GetIActorSystem();
-	virtual IItemSystem*                  GetIItemSystem();
 	virtual IBreakReplicator*             GetIBreakReplicator();
-	virtual IVehicleSystem*               GetIVehicleSystem();
 	virtual IActionMapManager*            GetIActionMapManager();
 	virtual IViewSystem*                  GetIViewSystem();
 	virtual IGameplayRecorder*            GetIGameplayRecorder();
@@ -255,7 +227,6 @@ public:
 
 	virtual IGameVolumes*         GetIGameVolumesManager() const;
 
-	virtual void                  PreloadAnimatedCharacter(IScriptTable* pEntityScript);
 	virtual void                  PrePhysicsTimeStep(float deltaTime);
 
 	virtual void                  RegisterExtension(ICryUnknownPtr pExtension);
@@ -266,8 +237,6 @@ public:
 
 	void DefineProtocolRMI(IProtocolBuilder* pBuilder);
 	virtual void DoInvokeRMI(_smart_ptr<IRMIMessageBody> pBody, unsigned where, int channel, const bool isGameObjectRmi);
-
-	virtual IScriptTable* GetActionScriptBindTable();
 
 protected:
 	virtual ICryUnknownPtr        QueryExtensionInterfaceById(const CryInterfaceID& interfaceID) const;
@@ -280,9 +249,6 @@ public:
 	virtual CGameServerNub*     GetGameServerNub();
 	CGameClientNub*             GetGameClientNub();
 	CGameContext*               GetGameContext();
-	CScriptBind_Vehicle*        GetVehicleScriptBind()     { return m_pScriptBindVehicle; }
-	CScriptBind_VehicleSeat*    GetVehicleSeatScriptBind() { return m_pScriptBindVehicleSeat; }
-	CScriptBind_Inventory*      GetInventoryScriptBind()   { return m_pScriptInventory; }
 	CPersistantDebug*           GetPersistantDebug()       { return m_pPersistantDebug; }
 	virtual IPersistantDebug*   GetIPersistantDebug();
 	virtual IGameStatsConfig*   GetIGameStatsConfig();
@@ -309,8 +275,6 @@ public:
 
 	//	INetQueryListener* GetLanQueryListener() {return m_pLanQueryListener;}
 	bool                          LoadingScreenEnabled() const;
-
-	int                           NetworkExposeClass(IFunctionHandler* pFH);
 
 	void                          NotifyGameFrameworkListeners(ISaveGame* pSaveGame);
 	void                          NotifyGameFrameworkListeners(ILoadGame* pLoadGame);
@@ -355,7 +319,6 @@ private:
 	bool Initialize(SSystemInitParams& initParams);
 
 	void InitScriptBinds();
-	void ReleaseScriptBinds();
 
 	bool InitGame(SSystemInitParams& startupParams);
 	bool ShutdownGame();
@@ -465,7 +428,6 @@ private:
 	ISystem*                      m_pSystem;
 	INetwork*                     m_pNetwork;
 	I3DEngine*                    m_p3DEngine;
-	IScriptSystem*                m_pScriptSystem;
 	IEntitySystem*                m_pEntitySystem;
 	ITimer*                       m_pTimer;
 	ILog*                         m_pLog;
@@ -477,8 +439,6 @@ private:
 
 	CLevelSystem*                 m_pLevelSystem;
 	CActorSystem*                 m_pActorSystem;
-	CItemSystem*                  m_pItemSystem;
-	CVehicleSystem*               m_pVehicleSystem;
 	CSharedParamsManager*         m_pSharedParamsManager;
 	CActionMapManager*            m_pActionMapManager;
 	CViewSystem*                  m_pViewSystem;
@@ -486,8 +446,6 @@ private:
 	CGameRulesSystem*             m_pGameRulesSystem;
 
 	CGameObjectSystem*            m_pGameObjectSystem;
-	CUIDraw*                      m_pUIDraw;
-	CScriptRMI*                   m_pScriptRMI;
 	CAnimationGraphCVars*         m_pAnimationGraphCvars;
 	IMannequin*                   m_pMannequin;
 	CMaterialEffects*             m_pMaterialEffects;
@@ -527,21 +485,8 @@ private:
 	CRuntimeAreaManager* m_pRuntimeAreaManager;
 
 	// script binds
-	CScriptBind_Action*           m_pScriptA;
-	CScriptBind_ItemSystem*       m_pScriptIS;
-	CScriptBind_ActorSystem*      m_pScriptAS;
-	CScriptBind_Network*          m_pScriptNet;
-	CScriptBind_ActionMapManager* m_pScriptAMM;
-	CScriptBind_VehicleSystem*    m_pScriptVS;
-	CScriptBind_Vehicle*          m_pScriptBindVehicle;
-	CScriptBind_VehicleSeat*      m_pScriptBindVehicleSeat;
-	CScriptBind_Inventory*        m_pScriptInventory;
-	CScriptBind_MaterialEffects*  m_pScriptBindMFX;
 	CTimeOfDayScheduler*          m_pTimeOfDayScheduler;
 	CPersistantDebug*             m_pPersistantDebug;
-
-	CAIDebugRenderer*             m_pAIDebugRenderer;
-	CAINetworkDebugRenderer*      m_pAINetworkDebugRenderer;
 
 	CNetworkCVars*                m_pNetworkCVars;
 	CCryActionCVars*              m_pCryActionCVars;
@@ -652,6 +597,5 @@ private:
 	IGameLevelLoadListener*                      m_pGameLevelLoadListener = nullptr;
 	std::vector<INetworkedClientListener*> m_networkClientListeners;
 
-	std::unique_ptr<BehaviorTree::INodeCreator> m_pAnimateFragmentNodeCreator;
 	_smart_ptr<CActionGame>                m_pGame;
 };

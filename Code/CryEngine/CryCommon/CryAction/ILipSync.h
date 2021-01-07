@@ -35,7 +35,7 @@ struct ILipSync
 	virtual bool UnloadRandomExpressions() = 0;
 
 	//! Loads a dialog for later playback.
-	virtual bool LoadDialog(const char* pszFilename, int nSoundVolume, float fMinSoundRadius, float fMaxSoundRadius, float fClipDist, int nSoundFlags = 0, IScriptTable* pAITable = NULL) = 0;
+	virtual bool LoadDialog(const char* pszFilename, int nSoundVolume, float fMinSoundRadius, float fMaxSoundRadius, float fClipDist, int nSoundFlags = 0) = 0;
 
 	//! Releases all resources.
 	virtual bool UnloadDialog() = 0;

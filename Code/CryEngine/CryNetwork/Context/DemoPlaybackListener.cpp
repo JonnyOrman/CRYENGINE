@@ -119,11 +119,6 @@ bool DecodeString(const char* buf, CTimeValue& value)
 	return ok;
 }
 
-bool DecodeString(const char* buf, ScriptAnyValue& value)
-{
-	return false;
-}
-
 	#define KINDA_INT_TYPE(type)                       \
 	  bool DecodeString(const char* buf, type & value) \
 	  {                                                \
@@ -487,10 +482,10 @@ CDemoPlaybackListener::EInputResult CDemoPlaybackListener::ScriptRMI()
 		return eIR_AbortRead;
 	CDemoPlaybackSerializeImpl serImpl(*m_pInput, this);
 	CSimpleSerialize<CDemoPlaybackSerializeImpl> ser(serImpl);
-	INetAtSyncItem* pAtSyncItem = m_pContext->GetGameContext()->HandleRMI(true, rmiObj, funcId, TSerialize(&ser), m_pClientChannel);
+	/*INetAtSyncItem* pAtSyncItem = m_pContext->GetGameContext()->HandleRMI(true, rmiObj, funcId, TSerialize(&ser), m_pClientChannel);
 	if (!pAtSyncItem)
-		return eIR_AbortRead;
-	TO_GAME(pAtSyncItem, m_pClientChannel);
+		return eIR_AbortRead;*/
+	//TO_GAME(pAtSyncItem, m_pClientChannel);
 	return eIR_Ok;
 }
 

@@ -6,7 +6,6 @@
 #include "StdAfx.h"
 
 #include "ICryMannequin.h"
-#include <CryAISystem/ISignal.h>
 #include <Mannequin/Serialization.h>
 
 struct SProceduralClipAISignalParams

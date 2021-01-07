@@ -173,7 +173,6 @@ private:
 
 	WeaponAnalysis& GetWeapon(EntityId playerId, EntityId weaponId);
 	WeaponAnalysis& GetWeapon(EntityId playerId, const char* weapon);
-	WeaponAnalysis& GetCurrentWeapon(EntityId playerId);
 
 	GameAnalysis    m_gameanalysis;
 };

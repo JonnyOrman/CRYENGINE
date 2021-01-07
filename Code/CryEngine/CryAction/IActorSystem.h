@@ -20,7 +20,6 @@
 
 #include <CryEntitySystem/IEntity.h>
 #include <CryEntitySystem/IEntitySystem.h>
-#include <CryScriptSystem/IScriptSystem.h>
 #include "IGameObjectSystem.h"
 #include "IGameObject.h"
 
@@ -41,7 +40,6 @@ struct IAnimationGraphState;
 struct SViewParams;
 class CGameObject;
 struct IGameObjectExtension;
-struct IInventory;
 struct IAnimatedCharacter;
 struct ICharacterInstance;
 struct AnimEventInstance;
@@ -100,13 +98,8 @@ struct IActor : public IGameObjectExtension
 
 	virtual void                 CameraShake(float angle, float shift, float duration, float frequency, Vec3 pos, int ID, const char* source = "") = 0;
 
-	virtual IItem*               GetHolsteredItem() const = 0;
 	virtual void                 HolsterItem(bool holster, bool playSelect = true, float selectSpeedBias = 1.0f, bool hideLeftHandObject = true) = 0;
-	//virtual IItem *GetCurrentItem() const = 0;
-	virtual IItem*               GetCurrentItem(bool includeVehicle = false) const = 0;
 	virtual bool                 DropItem(EntityId itemId, float impulseScale = 1.0f, bool selectNext = true, bool byDeath = false) = 0;
-	virtual IInventory*          GetInventory() const = 0;
-	virtual void                 NotifyCurrentItemChanged(IItem* newItem) = 0;
 
 	virtual IMovementController* GetMovementController() const = 0;
 
@@ -197,7 +190,6 @@ struct IActor : public IGameObjectExtension
 	virtual void SetCustomHead(const char* customHead) {};// = 0;
 
 	// IVehicle
-	virtual IVehicle* GetLinkedVehicle() const = 0;
 	virtual bool      GetValidPositionNearby(const Vec3& proposedPosition, Vec3& adjustedPosition) const = 0;
 	virtual void      SetExpectedPhysicsPos(const Vec3& expectedPosition) = 0;
 

@@ -6,7 +6,6 @@
 #include "XConsole.h"
 #include <CrySystem/File/CryFile.h>
 
-#include <CryScriptSystem/IScriptSystem.h>
 #include "SystemCFG.h"
 #if CRY_PLATFORM_LINUX || CRY_PLATFORM_ANDROID || CRY_PLATFORM_APPLE
 	#include <CryCore/Project/Version.h>

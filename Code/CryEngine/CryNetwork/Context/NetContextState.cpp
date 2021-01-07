@@ -1381,21 +1381,13 @@ bool CNetContextState::HandleRMI(SNetObjectID objID, bool bClient, TSerialize se
 	if (!obj.main)
 		return false;
 
-	//	ASSERT_PRIMARY_THREAD;  - this function is threadsafe
-	INetAtSyncItem* pItem = m_pGameContext->HandleRMI(bClient, obj.main->userID, funcId, ser, pChannel);
-	if (!pItem)
-	{
-		NetWarning("Failed handling %s RMI on entity %d @ index %d", bClient ? "client" : "server", obj.main->userID, funcId);
-		return false;
-	}
-
 	if (m_pContext)
 	{
-		TO_GAME(pItem, pChannel);
+		//TO_GAME(pItem, pChannel);
 	}
 	else
 	{
-		pItem->DeleteThis();
+		//pItem->DeleteThis();
 	}
 	return true;
 }

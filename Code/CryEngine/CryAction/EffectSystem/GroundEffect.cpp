@@ -150,17 +150,6 @@ void CGroundEffect::Update()
 
 		if (DeferredRayCasts())
 		{
-			if (m_raycastID == 0)
-			{
-				PhysSkipList skipList;
-
-				if (IPhysicalEntity* pPhysics = m_pEntity->GetPhysics())
-				{
-					skipList.push_back(pPhysics);
-				}
-
-				m_raycastID = CCryAction::GetCryAction()->GetPhysicQueues().GetRayCaster().Queue(RayCastRequest::HighPriority, RayCastRequest(rayPos, Vec3(0.0f, 0.0f, -m_height), objTypes, flags, &skipList[0], skipList.size()), functor(*this, &CGroundEffect::OnRayCastDataReceived));
-			}
 		}
 		else
 		{

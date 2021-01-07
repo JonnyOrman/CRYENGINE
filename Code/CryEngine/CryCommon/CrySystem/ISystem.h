@@ -78,7 +78,6 @@ struct IRemoteConsole;
 struct IRenderAuxGeom;
 struct IRenderer;
 struct IResourceManager;
-struct IScriptSystem;
 struct IServiceNetwork;
 struct IStatoscope;
 struct IStreamEngine;
@@ -720,7 +719,6 @@ struct SSystemGlobalEnvironment
 	INetwork*                      pNetwork = nullptr;
 	INetContext*                   pNetContext = nullptr;
 	ICryLobby*                     pLobby = nullptr;
-	IScriptSystem*                 pScriptSystem = nullptr;
 	IPhysicalWorld*                pPhysicalWorld = nullptr;
 	IInput*                        pInput = nullptr;
 	IStatoscope*                   pStatoscope = nullptr;
@@ -1163,7 +1161,6 @@ struct ISystem
 	virtual IPhysicalWorld*         GetIPhysicalWorld() = 0;
 	virtual CryAudio::IAudioSystem* GetIAudioSystem() = 0;
 	virtual I3DEngine*              GetI3DEngine() = 0;
-	virtual IScriptSystem*          GetIScriptSystem() = 0;
 	virtual IConsole*               GetIConsole() = 0;
 	virtual IRemoteConsole*         GetIRemoteConsole() = 0;
 	virtual Cry::IPluginManager*    GetIPluginManager() = 0;

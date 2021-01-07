@@ -5,6 +5,8 @@
 #include <CrySerialization/Forward.h>
 #include <CrySystem/ICryPlugin.h>
 
+
+#include "../../../CryPlugins/CryDefaultEntities/Module/IDefaultComponentsPlugin.h"
 #include "CrySchematyc/FundamentalTypes.h"
 #include "CrySchematyc/Utils/Delegate.h"
 

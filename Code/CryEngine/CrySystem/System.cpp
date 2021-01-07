@@ -32,7 +32,6 @@
 #include <CrySystem/SystemInitParams.h>
 #include <CryAudio/IAudioSystem.h>
 #include <CryAnimation/ICryAnimation.h>
-#include <CryScriptSystem/IScriptSystem.h>
 #include <CrySystem/IProcess.h>
 #include <CrySystem/IBudgetingSystem.h>
 #include <CryGame/IGameFramework.h>
@@ -1884,13 +1883,6 @@ bool CSystem::Update(CEnumFlags<ESystemUpdateFlags> updateFlags, int nPauseMode)
 	if (m_env.pNetwork)
 	{
 		m_env.pNetwork->SyncWithGame(eNGS_FrameStart);
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	// Update script system.
-	if (m_env.pScriptSystem && bNotLoading)
-	{
-		m_env.pScriptSystem->Update();
 	}
 
 	if (m_env.pInput)

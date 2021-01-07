@@ -31,7 +31,6 @@ public:
 	}
 
 	bool Value(const char* name, CTimeValue value);
-	bool Value(const char* name, ScriptAnyValue& value);
 	bool Value(const char* name, XmlNodeRef& value);
 	bool ValueByteArray(const char* name, const uint8* data, uint32 len);
 
@@ -42,7 +41,6 @@ public:
 private:
 	CTimeValue                              m_curTime;
 	std::vector<XMLCPB::CNodeLiveWriterRef> m_nodeStack;  // TODO: look to get rid of this. it should be useless, because can access all necesary data from the XMLCPBin object
-	std::vector<IScriptTable*>              m_savedTables;
 	std::vector<const char*>                m_luaSaveStack;
 	XMLCPB::CWriterInterface&               m_binWriter;
 
@@ -105,16 +103,11 @@ private:
 		//		}
 	}
 
-	void WriteTable(XMLCPB::CNodeLiveWriterRef addTo, SmartScriptTable tbl, bool bCheckEntityOnScript);
-	void ScriptValue(XMLCPB::CNodeLiveWriterRef addTo, const char* tag, const char* name, const ScriptAnyValue& value, bool bCheckEntityOnScript);
-
 	// Used for printing current stack info for warnings.
 	const char* GetStackInfo() const;
 	const char* GetLuaStackInfo() const;
 
-	static bool ShouldSkipValue(const char* name, const ScriptAnyValue& value);
-	static bool IsVector(SmartScriptTable tbl);
-	bool        IsEntity(SmartScriptTable tbl, EntityId& entityId);
+	bool        IsEntity(EntityId& entityId);
 
 	//////////////////////////////////////////////////////////////////////////
 	// Check For Defaults.
@@ -133,7 +126,6 @@ private:
 	bool IsDefaultValue(const Vec3& v) const                 { return v.x == 0 && v.y == 0 && v.z == 0; };
 	bool IsDefaultValue(const Ang3& v) const                 { return v.x == 0 && v.y == 0 && v.z == 0; };
 	bool IsDefaultValue(const Quat& v) const                 { return v.w == 1.0f && v.v.x == 0 && v.v.y == 0 && v.v.z == 0; };
-	bool IsDefaultValue(const ScriptAnyValue& v) const       { return false; };
 	bool IsDefaultValue(const CTimeValue& v) const           { return v.GetValue() == 0; };
 	bool IsDefaultValue(const char* str) const               { return !str || !*str; };
 	bool IsDefaultValue(const string& str) const             { return str.empty(); };

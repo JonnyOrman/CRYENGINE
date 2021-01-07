@@ -329,13 +329,13 @@ bool CActorSystem::ScanXML(const XmlNodeRef& root, const char* xmlFile)
 		dit = result.first;
 	}
 
-	SActorParamsDesc& desc = dit->second;
+	//SActorParamsDesc& desc = dit->second;
 
-	if (desc.params)
+	/*if (desc.params)
 		desc.params->Release();
 
 	desc.params = new CItemParamsNode();
-	desc.params->ConvertFromXML(root);
+	desc.params->ConvertFromXML(root);*/
 
 	return true;
 }
@@ -346,7 +346,7 @@ const IItemParamsNode* CActorSystem::GetActorParams(const char* actorClass) cons
 	TActorParamsMap::const_iterator it = m_actorParams.find(CONST_TEMP_STRING(actorClass));
 	if (it != m_actorParams.end())
 	{
-		return it->second.params;
+		//return it->second.params;
 	}
 
 	return 0;

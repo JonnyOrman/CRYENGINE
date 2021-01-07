@@ -16,8 +16,6 @@
 #include "CameraProxy.h"
 #include "EntitySlot.h"
 #include "RopeProxy.h"
-#include <CryAISystem/IAISystem.h>
-#include <CryAISystem/IAIObjectManager.h>
 #include <CryRenderer/IRenderAuxGeom.h>
 #include <CryAnimation/ICryAnimation.h>
 #include "EntityLayer.h"
@@ -67,18 +65,6 @@ void CEntity::PreInit(SEntitySpawnParams& params)
 	m_worldTM = Matrix34::Create(m_scale, m_rotation, m_position);
 
 	//////////////////////////////////////////////////////////////////////////
-	// Check if entity needs to create a script proxy.
-	if (IEntityScript* pEntityScript = m_pClass->GetIEntityScript())
-	{
-		// Creates a script proxy.
-		CEntityScript* pCEntityScript = static_cast<CEntityScript*>(pEntityScript);
-		if (pCEntityScript->LoadScript())
-		{
-			auto pScriptProxy = GetOrCreateComponent<IEntityScriptComponent>();
-			pScriptProxy->ChangeScript(pEntityScript, &params);
-		}
-	}
-
 	// #netentity Will be addressed in BindToNetwork-refactoring
 	m_pNetEntity = std::unique_ptr<INetEntity>(new CNetEntity(this, params));
 }
@@ -860,15 +846,6 @@ void CEntity::InvalidateTM(EntityTransformationFlagsMask transformReasons, bool 
 }
 
 //////////////////////////////////////////////////////////////////////////
-IScriptTable* CEntity::GetScriptTable() const
-{
-	IEntityScriptComponent* pScriptProxy = (IEntityScriptComponent*)GetProxy(ENTITY_PROXY_SCRIPT);
-	if (pScriptProxy)
-		return pScriptProxy->GetScriptTable();
-	return NULL;
-}
-
-//////////////////////////////////////////////////////////////////////////
 void CEntity::SetPos(const Vec3& vPos, EntityTransformationFlagsMask transformReasons, bool bRecalcPhyBounds, bool bForce)
 {
 	CHECKQNAN_VEC(vPos);
@@ -1463,9 +1440,7 @@ bool CEntity::LoadComponentLegacy(XmlNodeRef entityNode, XmlNodeRef componentNod
 	if (!pComponent)
 	{
 		// Script proxy cannot be created from list of components.
-		bool bCanCreateComponent = componentTypeId != CEntityComponentLuaScript::GetCID() &&
-		                           componentTypeId != cryiidof<IEntityScriptComponent>() &&
-		                           componentTypeId != cryiidof<ICryUnknown>() &&
+		bool bCanCreateComponent = componentTypeId != cryiidof<ICryUnknown>() &&
 		                           componentTypeId != cryiidof<IEntityComponent>();
 
 		if (bCanCreateComponent)
@@ -2247,44 +2222,10 @@ void CEntity::Serialize(TSerialize ser, int nFlags)
 
 			ser.EndGroup(); //EntityProxies
 		}
-
-		//////////////////////////////////////////////////////////////////////////
-		// for usable on BasicEntity.
-		//////////////////////////////////////////////////////////////////////////
-		{
-			IScriptTable* pScriptTable = GetScriptTable();
-			if (pScriptTable)
-			{
-				if (ser.IsWriting())
-				{
-					if (pScriptTable->HaveValue("__usable"))
-					{
-						bool bUsable = false;
-						pScriptTable->GetValue("__usable", bUsable);
-						int nUsable = (bUsable) ? 1 : -1;
-						ser.Value("__usable", nUsable);
-					}
-				}
-				else
-				{
-					int nUsable = 0;
-					ser.Value("__usable", nUsable);
-					if (nUsable == 1)
-						pScriptTable->SetValue("__usable", 1);
-					else if (nUsable == -1)
-						pScriptTable->SetValue("__usable", 0);
-					else
-						pScriptTable->SetToNull("__usable");
-				}
-			}
-		}
 	}
 
 	if (nFlags & ENTITY_SERIALIZE_PROPERTIES)
 	{
-		CEntityComponentLuaScript* pScriptProxy = static_cast<CEntityComponentLuaScript*>(GetProxy(ENTITY_PROXY_SCRIPT));
-		if (pScriptProxy)
-			pScriptProxy->SerializeProperties(ser);
 	}
 }
 

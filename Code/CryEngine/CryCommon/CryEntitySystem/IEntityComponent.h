@@ -28,14 +28,12 @@ struct IBSPTree3D;
 struct IClipVolume;
 struct IEntity;
 struct IEntityEventListener;
-struct IEntityScript;
 struct IFlowGraph;
 struct IMaterial;
 struct INetworkSpawnParams;
 struct IPhysicalEntity;
 struct IRenderMesh;
 struct IRenderNode;
-struct IScriptTable;
 struct IShaderPublicParams;
 struct SEntityEvent;
 struct SEntityPreviewContext;
@@ -602,63 +600,6 @@ protected:
 
 	//! Optional Entity SlotId for storing component data like geometry of character
 	int m_entitySlotId = EmptySlotId;
-};
-
-//! Lua Script component interface.
-struct IEntityScriptComponent : public IEntityComponent
-{
-	CRY_ENTITY_COMPONENT_INTERFACE_GUID(IEntityScriptComponent, "bd6403cf-3b49-f39e-9540-3fd1c6d4f755"_cry_guid)
-
-	virtual void          SetScriptUpdateRate(float fUpdateEveryNSeconds) = 0;
-	virtual IScriptTable* GetScriptTable() = 0;
-	virtual void          CallEvent(const char* sEvent) = 0;
-	virtual void          CallEvent(const char* sEvent, float fValue) = 0;
-	virtual void          CallEvent(const char* sEvent, bool bValue) = 0;
-	virtual void          CallEvent(const char* sEvent, const char* sValue) = 0;
-	virtual void          CallEvent(const char* sEvent, const Vec3& vValue) = 0;
-	virtual void          CallEvent(const char* sEvent, EntityId nEntityId) = 0;
-
-	//! Change current state of the entity script.
-	//! \return If state was successfully set.
-	virtual bool GotoState(const char* sStateName) = 0;
-
-	//! Change current state of the entity script.
-	//! \return If state was successfully set.
-	virtual bool GotoStateId(int nStateId) = 0;
-
-	//! Check if entity is in specified state.
-	//! \param sStateName Name of state table within entity script (case sensitive).
-	//! \return If entity script is in specified state.
-	virtual bool IsInState(const char* sStateName) = 0;
-
-	//! Retrieves name of the currently active entity script state.
-	//! \return Name of current state.
-	virtual const char* GetState() = 0;
-
-	//! Retrieves the id of the currently active entity script state.
-	//! \return Index of current state.
-	virtual int GetStateId() = 0;
-
-	//! Fires an event in the entity script.
-	//! This will call OnEvent(id,param) Lua function in entity script, so that script can handle this event.
-	virtual void SendScriptEvent(int Event, IScriptTable* pParamters, bool* pRet = NULL) = 0;
-	virtual void SendScriptEvent(int Event, const char* str, bool* pRet = NULL) = 0;
-	virtual void SendScriptEvent(int Event, int nParam, bool* pRet = NULL) = 0;
-
-	//! Change the Entity Script used by the Script Component.
-	//! Caller is responsible for making sure new script is initialised and script bound as required
-	//! \param pScript an entity script object that has already been loaded with the new script.
-	//! \param params parameters used to set the properties table if required.
-	virtual void ChangeScript(IEntityScript* pScript, SEntitySpawnParams* params) = 0;
-
-	//! Sets physics parameters from an existing script table
-	//! \param type - one of PHYSICPARAM_... values
-	//! \param params script table containing the values to set
-	virtual void SetPhysParams(int type, IScriptTable* params) = 0;
-
-	//! Determines whether or not the script should receive update callbacks
-	//! Replaces IEntity::Activate for legacy projects
-	virtual void EnableScriptUpdate(bool bEnable) = 0;
 };
 
 //! Interface to the trigger component, exposing support for tracking enter / leave events for other entities entering a predefined trigger box

@@ -117,43 +117,6 @@ struct SMannequinSettings
 //! Initializes SMannequinSettings based on existing entity components.
 static SMannequinSettings RetrieveMannequinSettingsFromEntity(IEntity& entity)
 {
-	const auto pScriptComponent = entity.GetComponent<IEntityScriptComponent>();
-	if (pScriptComponent)
-	{
-		const auto pScriptTable = pScriptComponent->GetScriptTable();
-		if (pScriptTable)
-		{
-			if (pScriptTable->HaveValue("ActionController") || pScriptTable->HaveValue("fileActionController"))
-			{
-				SMannequinSettings settings;
-
-				if (!pScriptTable->GetValue("ActionController", settings.actionController))
-				{
-					pScriptTable->GetValue("fileActionController", settings.actionController);
-				}
-
-				if (!pScriptTable->GetValue("AnimDatabase3P", settings.animDatabase3P))
-				{
-					pScriptTable->GetValue("fileAnimDatabase3P", settings.animDatabase3P);
-				}
-
-				if (!pScriptTable->GetValue("AnimDatabase1P", settings.animDatabase1P))
-				{
-					pScriptTable->GetValue("fileAnimDatabase1P", settings.animDatabase1P);
-				}
-
-				if (!pScriptTable->GetValue("SoundDatabase", settings.soundDatabase))
-				{
-					pScriptTable->GetValue("fileSoundDatabase", settings.soundDatabase);
-				}
-
-				pScriptTable->GetValue("UseMannequinAGState", settings.useMannequinAGState);
-
-				return settings;
-			}
-		}
-	}
-
 	IEntityComponent* const pMannequinObject = entity.GetComponent<CMannequinObject>();
 	if (pMannequinObject)
 	{
@@ -1266,14 +1229,6 @@ void CAnimatedCharacter::ProcessEvent(const SEntityEvent& event)
 			}
 		}
 		break;
-	case ENTITY_EVENT_SCRIPT_REQUEST_COLLIDERMODE:
-		{
-			VALIDATE_CHARACTER_PTRS
-
-			EColliderMode mode = (EColliderMode)event.nParam[0];
-			RequestPhysicalColliderMode(mode, eColliderModeLayer_Script);
-		}
-		break;
 	case ENTITY_EVENT_DONE:
 		{
 			// Delete the ActionController before everything is deleted.
@@ -1294,7 +1249,7 @@ void CAnimatedCharacter::ProcessEvent(const SEntityEvent& event)
 
 Cry::Entity::EventFlags CAnimatedCharacter::GetEventMask() const
 {
-	return ENTITY_EVENT_PRE_SERIALIZE | ENTITY_EVENT_ANIM_EVENT | ENTITY_EVENT_XFORM | ENTITY_EVENT_SCRIPT_REQUEST_COLLIDERMODE | ENTITY_EVENT_DONE | ENTITY_EVENT_INIT | ENTITY_EVENT_RESET;
+	return ENTITY_EVENT_PRE_SERIALIZE | ENTITY_EVENT_ANIM_EVENT | ENTITY_EVENT_XFORM | ENTITY_EVENT_DONE | ENTITY_EVENT_INIT | ENTITY_EVENT_RESET;
 }
 
 float CAnimatedCharacter::FilterView(SViewParams& viewParams) const
@@ -1806,12 +1761,6 @@ void CAnimatedCharacter::UpdateGroundAlignment()
 			{
 				bNeedUpdate = false;
 			}
-			else if ((currentStance == STANCE_SWIM) ||
-			         (currentStance == STANCE_ZEROG) ||
-			         (currentStance == STANCE_PRONE))
-			{
-				bNeedUpdate = false;
-			}
 			else if (NoMovementOverride() && !m_groundAlignmentParams.IsFlag(eGA_AllowWithNoCollision))
 			{
 				bNeedUpdate = false;
@@ -1908,47 +1857,3 @@ void CAnimatedCharacter::PrepareAnimatedCharacterForUpdate()
 	GetCurrentEntityLocation();
 	RefreshAnimTarget();
 }
-
-namespace animatedcharacter
-{
-
-void Preload(struct IScriptTable* pEntityScript)
-{
-	// Cache Mannequin related files
-	bool hasActionController = false;
-	{
-		IMannequin& mannequinSystem = gEnv->pGameFramework->GetMannequinInterface();
-		IAnimationDatabaseManager& animationDatabaseManager = mannequinSystem.GetAnimationDatabaseManager();
-
-		const char* szAnimationDatabase1p = 0;
-		if (pEntityScript->GetValue("AnimDatabase1P", szAnimationDatabase1p) &&
-		    szAnimationDatabase1p && szAnimationDatabase1p[0])
-		{
-			animationDatabaseManager.Load(szAnimationDatabase1p);
-		}
-
-		const char* szAnimationDatabase3p = 0;
-		if (pEntityScript->GetValue("AnimDatabase3P", szAnimationDatabase3p) &&
-		    szAnimationDatabase3p && szAnimationDatabase3p[0])
-		{
-			animationDatabaseManager.Load(szAnimationDatabase3p);
-		}
-
-		const char* szSoundDatabase = 0;
-		if (pEntityScript->GetValue("SoundDatabase", szSoundDatabase) &&
-		    szSoundDatabase && szSoundDatabase[0])
-		{
-			animationDatabaseManager.Load(szSoundDatabase);
-		}
-
-		const char* szControllerDef = 0;
-		if (pEntityScript->GetValue("ActionController", szControllerDef) &&
-		    szControllerDef && szControllerDef[0])
-		{
-			const SControllerDef* pControllerDef = animationDatabaseManager.LoadControllerDef(szControllerDef);
-			hasActionController = (pControllerDef != NULL);
-		}
-	}
-}
-
-} // namespace animatedcharacter

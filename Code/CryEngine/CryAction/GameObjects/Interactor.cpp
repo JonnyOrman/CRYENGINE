@@ -11,14 +11,11 @@
 CInteractor::CInteractor()
 {
 	m_pQuery = 0;
-	m_pGameRules = 0;
 
 	m_nextOverId = m_overId = 0;
 	m_nextOverIdx = m_overIdx = -100;
 	m_nextOverTime = m_overTime = 0.0f;
 	m_sentLongHover = m_sentMessageHover = false;
-
-	m_funcIsUsable = m_funcAreUsable = m_funcOnNewUsable = m_funcOnUsableMessage = m_funcOnLongHover = 0;
 
 	m_pTimer = gEnv->pTimer;
 	m_pEntitySystem = gEnv->pEntitySystem;
@@ -47,19 +44,8 @@ bool CInteractor::Init(IGameObject* pGameObject)
 
 	m_pQuery->SetProximityRadius(CCryActionCVars::Get().playerInteractorRadius);
 
-	m_pGameRules = CCryAction::GetCryAction()->GetIGameRulesSystem()->GetCurrentGameRulesEntity()->GetScriptTable();
-	m_pGameRules->GetValue("IsUsable", m_funcIsUsable);
-	m_pGameRules->GetValue("AreUsable", m_funcAreUsable);
-	m_pGameRules->GetValue("OnNewUsable", m_funcOnNewUsable);
-	m_pGameRules->GetValue("OnUsableMessage", m_funcOnUsableMessage);
-	m_pGameRules->GetValue("OnLongHover", m_funcOnLongHover);
-
-	m_areUsableEntityList.Create(gEnv->pScriptSystem);
-
 	//Should be more than enough for average situation
 	m_frameQueryVector.reserve(16);
-
-	m_queryMethods = (m_funcAreUsable) ? "m" : "rb";  //m is optimized for Crysis2, "rb" is Crysis1 compatible
 
 	return true;
 }
@@ -82,30 +68,11 @@ CInteractor::~CInteractor()
 {
 	if (m_pQuery)
 		GetGameObject()->ReleaseExtension("WorldQuery");
-	gEnv->pScriptSystem->ReleaseFunc(m_funcIsUsable);
-	gEnv->pScriptSystem->ReleaseFunc(m_funcAreUsable);
-	gEnv->pScriptSystem->ReleaseFunc(m_funcOnNewUsable);
-	gEnv->pScriptSystem->ReleaseFunc(m_funcOnUsableMessage);
-	gEnv->pScriptSystem->ReleaseFunc(m_funcOnLongHover);
 }
 
 void CInteractor::Release()
 {
 	delete this;
-}
-
-ScriptAnyValue CInteractor::EntityIdToScript(EntityId id)
-{
-	if (id)
-	{
-		ScriptHandle hdl;
-		hdl.n = id;
-		return ScriptAnyValue(hdl);
-	}
-	else
-	{
-		return ScriptAnyValue();
-	}
 }
 
 void CInteractor::Update(SEntityUpdateContext&, int)
@@ -445,74 +412,11 @@ float CInteractor::LinePointDistanceSqr(const Line& line, const Vec3& point)
 
 int CInteractor::PerformUsableTest(IEntity* pEntity) const
 {
-	if (pEntity && m_funcIsUsable)
-	{
-		SmartScriptTable pScriptTable = pEntity->GetScriptTable();
-		if (pScriptTable.GetPtr())
-		{
-			int usableIdx;
-			bool scriptOk = Script::CallReturn(
-			  m_pGameRules->GetScriptSystem(),
-			  m_funcIsUsable,
-			  m_pGameRules,
-			  EntityIdToScript(GetEntityId()),
-			  EntityIdToScript(pEntity->GetId()),
-			  usableIdx);
-			if (scriptOk && usableIdx)
-			{
-				return usableIdx;
-			}
-		}
-	}
 	return 0;
 }
 
 void CInteractor::PerformUsableTestOnEntities(TQueryVector& queryList)
 {
-	if (queryList.empty() || !m_funcAreUsable)
-		return;
-
-	//Prepare script parameters
-
-	if (m_areUsableEntityList)
-	{
-		m_areUsableEntityList->Clear();
-
-		SQueryResult queryResult;
-		int tableIndex = 0;
-
-		TQueryVector::const_iterator endCit = queryList.end();
-		for (TQueryVector::const_iterator elementCit = queryList.begin(); elementCit != endCit; ++elementCit)
-		{
-			const TQueryElement& element = *elementCit;
-
-			CRY_ASSERT(element.first);
-			CRY_ASSERT(element.first->GetScriptTable());
-
-			m_areUsableEntityList->SetAt(++tableIndex, element.first->GetScriptTable());
-		}
-
-		//Call script side
-		SmartScriptTable scriptResults;
-		bool scriptOk = Script::CallReturn(m_pGameRules->GetScriptSystem(), m_funcAreUsable, m_pGameRules, GetEntity()->GetScriptTable(), m_areUsableEntityList, scriptResults);
-
-		if (scriptOk && scriptResults)
-		{
-			const int resultCount = scriptResults->Count();
-			const int queryCount = queryList.size();
-
-			CRY_ASSERT(queryCount <= resultCount);
-
-			if (queryCount <= resultCount)
-			{
-				for (int i = 0; i < queryCount; ++i)
-				{
-					scriptResults->GetAt((i + 1), queryList[i].second.slotIdx);
-				}
-			}
-
-		}
-	}
 }
 
 bool CInteractor::PerformUsableTestAndCompleteIds(IEntity* pEntity, SQueryResult& r) const
@@ -554,19 +458,6 @@ void CInteractor::UpdateTimers(EntityId newOverId, int usableIdx)
 		m_overIdx = m_nextOverIdx;
 		m_overTime = m_nextOverTime;
 		m_sentMessageHover = m_sentLongHover = false;
-		if (m_funcOnNewUsable)
-			Script::CallMethod(m_pGameRules, m_funcOnNewUsable, EntityIdToScript(GetEntityId()), EntityIdToScript(m_overId), m_overIdx);
-	}
-	if (m_funcOnUsableMessage && !m_sentMessageHover && (now - m_overTime).GetSeconds() > m_messageHoverTime)
-	{
-		Script::CallMethod(m_pGameRules, m_funcOnUsableMessage, EntityIdToScript(GetEntityId()), EntityIdToScript(m_overId), m_overId, m_overIdx);
-
-		m_sentMessageHover = true;
-	}
-	if (m_funcOnLongHover && !m_sentLongHover && (now - m_overTime).GetSeconds() > m_longHoverTime)
-	{
-		Script::CallMethod(m_pGameRules, m_funcOnLongHover, EntityIdToScript(GetEntityId()), EntityIdToScript(m_overId), m_overIdx);
-		m_sentLongHover = true;
 	}
 }
 
@@ -654,9 +545,6 @@ void CInteractor::PostSerialize()
 	//?fix? : was invalid sometimes after QL
 	if (!m_pQuery)
 		m_pQuery = (CWorldQuery*) GetGameObject()->AcquireExtension("WorldQuery");
-
-	if (m_funcOnNewUsable)
-		Script::CallMethod(m_pGameRules, m_funcOnNewUsable, EntityIdToScript(GetEntityId()), EntityIdToScript(m_overId), m_overIdx);
 }
 
 bool CInteractor::IsEntityUsable(const IEntity* pEntity)
@@ -667,15 +555,11 @@ bool CInteractor::IsEntityUsable(const IEntity* pEntity)
 	TUsableClassesMap::const_iterator cit = m_usableEntityClasses.find(pEntityClass);
 	if (cit != m_usableEntityClasses.end())
 	{
-		return (cit->second && pEntity->GetScriptTable() && !pEntity->IsHidden() && !pEntity->IsInvisible());
+		return false;
 	}
 	else
 	{
 		bool hasIsUsableMethod = false;
-		if (IScriptTable* pEntityScript = pEntity->GetScriptTable())
-		{
-			hasIsUsableMethod = pEntityScript->HaveValue("IsUsable");
-		}
 		m_usableEntityClasses.insert(TUsableClassesMap::value_type(pEntityClass, hasIsUsableMethod));
 
 		return hasIsUsableMethod && !pEntity->IsHidden() && !pEntity->IsInvisible();

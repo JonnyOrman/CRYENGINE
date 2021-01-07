@@ -26,7 +26,7 @@ struct SEnumHelper
 {
 	static const CTypeInfo& TypeInfo(const T* t)
 	{
-		return t->TypeInfo();
+		throw "TODO";// return t->TypeInfo();
 	}
 };
 

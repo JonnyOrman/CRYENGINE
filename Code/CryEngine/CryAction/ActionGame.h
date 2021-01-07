@@ -25,7 +25,6 @@ struct INetContext;
 struct INetwork;
 struct IActor;
 struct IGameTokenSystem;
-struct IScriptTable;
 class CScriptRMI;
 class CGameStats;
 
@@ -259,7 +258,7 @@ struct SBrokenMeshSize
 class CActionGame : public IHitListener, public CMultiThreadRefCount, public IHostMigrationEventListener, public ISystemEventListener
 {
 public:
-	CActionGame(CScriptRMI*);
+	CActionGame();
 	~CActionGame();
 
 	virtual void  OnSystemEvent(ESystemEvent event, UINT_PTR wparam, UINT_PTR lparam);

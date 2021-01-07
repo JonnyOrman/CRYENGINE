@@ -12,7 +12,6 @@
 #include "AnimSequence.h"
 #include "EntityNode.h"
 #include "CVarNode.h"
-#include "ScriptVarNode.h"
 #include "AnimCameraNode.h"
 #include "SceneNode.h"
 #include "MaterialNode.h"

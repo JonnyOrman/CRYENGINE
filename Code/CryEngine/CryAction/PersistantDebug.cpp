@@ -4,7 +4,6 @@
 #include "PersistantDebug.h"
 #include "CryAction.h"
 #include <CryRenderer/IRenderAuxGeom.h>
-#include <IUIDraw.h>
 #include <CrySystem/ILocalizationManager.h>
 #include <CrySystem/ConsoleRegistration.h>
 

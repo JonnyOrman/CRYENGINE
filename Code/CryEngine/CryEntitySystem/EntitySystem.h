@@ -38,7 +38,6 @@ class CGeomCacheAttachmentManager;
 class CPartitionGrid;
 class CPhysicsEventListener;
 class CProximityTriggerSystem;
-class CScriptBind_Entity;
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -270,10 +269,6 @@ public:
 
 	IEntity*     SpawnPreallocatedEntity(CEntity* pPrecreatedEntity, SEntitySpawnParams& params, bool bAutoInit);
 
-	// Access to class that binds script to entity functions.
-	// Used by Script proxy.
-	CScriptBind_Entity* GetScriptBindEntity() { return m_pEntityScriptBinding; }
-
 	// Access to area manager.
 	IAreaManager* GetAreaManager() const final { return (IAreaManager*)(m_pAreaManager); }
 
@@ -382,9 +377,6 @@ private:
 	EntityTimersVector m_currentTimers;
 	bool               m_bTimersPause;
 	CTimeValue         m_nStartPause;
-
-	// Binding entity.
-	CScriptBind_Entity* m_pEntityScriptBinding;
 
 	// Entity class registry.
 	CEntityClassRegistry*  m_pClassRegistry;

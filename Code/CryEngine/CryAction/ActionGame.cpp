@@ -29,6 +29,8 @@
 
 #include <CrySystem/ConsoleRegistration.h>
 
+#include "IMovementController.h"
+
 CActionGame* CActionGame::s_this = 0;
 int CActionGame::g_procedural_breaking = 0;
 int CActionGame::g_joint_breaking = 1;
@@ -188,7 +190,7 @@ private:
 	float m_oldInactivityTimeoutDev;
 };
 
-CActionGame::CActionGame(CScriptRMI* pScriptRMI)
+CActionGame::CActionGame()
 	: m_pEntitySystem(gEnv->pEntitySystem)
 	, m_pNetwork(gEnv->pNetwork)
 	, m_pClientNub(0)
@@ -214,7 +216,7 @@ CActionGame::CActionGame(CScriptRMI* pScriptRMI)
 	m_pNetwork->AddHostMigrationEventListener(this, "CActionGame", ELPT_PostEngine);
 	GetISystem()->GetISystemEventDispatcher()->RegisterListener(this, "CActionGame");
 
-	m_pGameContext = new CGameContext(CCryAction::GetCryAction(), pScriptRMI, this);
+	m_pGameContext = new CGameContext(CCryAction::GetCryAction(), this);
 	m_inDeleteEntityCallback = 0;
 }
 
@@ -2608,7 +2610,6 @@ void CActionGame::OnCollisionLogged_Breakable(const EventPhys* pEvent)
 
 	ISurfaceTypeManager* pSurfaceTypeManager = gEnv->p3DEngine->GetMaterialManager()->GetSurfaceTypeManager();
 	ISurfaceType* pMat = pSurfaceTypeManager->GetSurfaceType(pCEvent->idmat[1]), * pMat0;
-	SmartScriptTable props;
 	float energy, hitenergy;
 
 	Vec3 vloc0 = pCEvent->vloc[0];
@@ -4724,16 +4725,6 @@ void CActionGame::OnEditorSetGameMode(bool bGameMode)
 
 void CActionGame::CallOnEditorSetGameMode(IEntity* pEntity, bool bGameMode)
 {
-	IScriptTable* pScriptTable(pEntity->GetScriptTable());
-	if (!pScriptTable)
-		return;
-
-	if ((pScriptTable->GetValueType("OnEditorSetGameMode") == svtFunction) && pScriptTable->GetScriptSystem()->BeginCall(pScriptTable, "OnEditorSetGameMode"))
-	{
-		pScriptTable->GetScriptSystem()->PushFuncParam(pScriptTable);
-		pScriptTable->GetScriptSystem()->PushFuncParam(bGameMode);
-		pScriptTable->GetScriptSystem()->EndCall();
-	}
 }
 
 void CActionGame::ClearBreakHistory()

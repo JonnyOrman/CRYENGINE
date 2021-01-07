@@ -22,7 +22,6 @@
 #include <CryCore/Platform/CryLibrary.h>
 #include <CrySystem/IBudgetingSystem.h>
 #include "PhysRenderer.h"
-#include <CryScriptSystem/IScriptSystem.h>
 #include <CryEntitySystem/IEntitySystem.h>
 #include <CryParticleSystem/IParticles.h>
 #include <CryMovie/IMovieSystem.h>
@@ -473,18 +472,6 @@ void CSystem::RenderPhysicsStatistics(IPhysicalWorld* pWorld)
 
 			if (inrange(m_iJumpToPhysProfileEnt, 0, nEnts))
 			{
-				ScriptHandle hdl;
-				hdl.n = ~0;
-				m_env.pScriptSystem->GetGlobalValue("g_localActorId", hdl);
-				IEntity* pPlayerEnt   = m_env.pEntitySystem->GetEntity((EntityId)hdl.n);
-				IPhysicalEntity* pent = pWorld->GetPhysicalEntityById(pInfos[m_iJumpToPhysProfileEnt - 1].id);
-				if (pPlayerEnt && pent)
-				{
-					pe_params_bbox pbb;
-					pent->GetParams(&pbb);
-					pPlayerEnt->SetPos((pbb.BBox[0] + pbb.BBox[1]) * 0.5f + Vec3(0, -3.0f, 1.5f));
-					pPlayerEnt->SetRotation(Quat(IDENTITY));
-				}
 				m_iJumpToPhysProfileEnt = 0;
 			}
 		}
@@ -1008,13 +995,11 @@ void CSystem::RenderMemoryInfo()
 	//////////////////////////////////////////////////////////////////////////
 	uint64 memUsage = 0;//CryMemoryGetAllocatedSize();
 	int64 totalAll = 0;
-	int luaMemUsage = gEnv->pScriptSystem->GetScriptAllocSize();
 
 	row++; // reserve for static.
 	row++;
 	row++;
-
-	cry_sprintf(szText, "Lua Allocated Memory: %d KB", luaMemUsage / 1024);
+		
 	DrawLabel(col, row++, HeaderColor, szText);
 
 	if (m_logMemoryInfo) pLog->Log("%s", szText);

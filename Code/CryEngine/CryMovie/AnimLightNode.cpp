@@ -2,7 +2,6 @@
 
 #include "StdAfx.h"
 #include "AnimLightNode.h"
-#include <CryScriptSystem/IScriptSystem.h>
 
 namespace AnimLightNode
 {
@@ -122,20 +121,6 @@ void CAnimLightNode::Animate(SAnimContext& ec)
 		m_bIgnoreSetParam = true;
 		if (m_pOwner)
 			m_pOwner->OnNodeAnimated(this);
-		IEntity* pEntity = GetEntity();
-		if (pEntity)
-		{
-			IScriptTable* scriptObject = pEntity->GetScriptTable();
-			if (scriptObject)
-			{
-				scriptObject->SetValue("Radius", m_fRadius);
-				scriptObject->SetValue("clrDiffuse", m_clrDiffuseColor);
-				scriptObject->SetValue("fDiffuseMultiplier", m_fDiffuseMultiplier);
-				scriptObject->SetValue("fSpecularMultiplier", m_fSpecularMultiplier);
-				scriptObject->SetValue("fHDRDynamic", m_fHDRDynamic);
-				scriptObject->SetValue("fSpecularPercentage", m_fSpecularPercentage);
-			}
-		}
 		m_bIgnoreSetParam = false;
 	}
 }

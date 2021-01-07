@@ -93,14 +93,6 @@ bool CGameRulesSystem::CreateGameRules(const char* rulesName)
 	IGameObject* pGameObject = gEnv->pGameFramework->GetGameObject(pEntity->GetId());
 	pGameObject->ForceUpdate(true);
 
-	if (pEntity->GetScriptTable())
-	{
-		IScriptSystem* pSS = gEnv->pScriptSystem;
-
-		pSS->SetGlobalValue(GAMERULES_GLOBAL_VARIABLE, pEntity->GetScriptTable());
-		pSS->SetGlobalValue(GAMERULESID_GLOBAL_VARIABLE, ScriptHandle((UINT_PTR)m_currentGameRules));
-	}
-
 	//since we re-instantiating game rules, let's get rid of everything related to previous match
 
 	if (IGameplayRecorder* pGameplayRecorder = CCryAction::GetCryAction()->GetIGameplayRecorder())
@@ -127,11 +119,6 @@ bool CGameRulesSystem::DestroyGameRules()
 
 		gEnv->pEntitySystem->RemoveEntity(m_currentGameRules, true);
 		SetCurrentGameRules(0);
-
-		IScriptSystem* pSS = gEnv->pScriptSystem;
-
-		pSS->SetGlobalToNull(GAMERULES_GLOBAL_VARIABLE);
-		pSS->SetGlobalToNull(GAMERULESID_GLOBAL_VARIABLE);
 	}
 
 	return true;

@@ -154,10 +154,6 @@ public:
 	virtual IGameObjectExtension* QueryExtension(const char* extension) const = 0;
 	virtual IGameObjectExtension* QueryExtension(IGameObjectSystem::ExtensionID id) const = 0;
 
-	// set extension parameters
-	virtual bool                  SetExtensionParams(const char* extension, SmartScriptTable params) = 0;
-	// get extension parameters
-	virtual bool                  GetExtensionParams(const char* extension, SmartScriptTable params) = 0;
 	// send a game object event
 	virtual void                  SendEvent(const SGameObjectEvent&) = 0;
 	// force the object to update even if extensions' slots are "sleeping"...

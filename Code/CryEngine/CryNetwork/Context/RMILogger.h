@@ -38,7 +38,6 @@ private:
 	    }                                                             \
 	  }
 
-NOTIMPLEMENTED_RMI_LOGGER(ScriptAnyValue);
 NOTIMPLEMENTED_RMI_LOGGER(CTimeValue);
 
 class CRMILoggerImpl : public CSimpleSerializeImpl<true, eST_Network>
