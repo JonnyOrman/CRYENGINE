@@ -26,7 +26,6 @@ struct INetwork;
 struct IActor;
 struct IGameTokenSystem;
 class CScriptRMI;
-class CGameStats;
 
 //////////////////////////////////////////////////////////////////////////
 struct SProcBrokenObjRec
@@ -319,14 +318,9 @@ public:
 
 	INetNub* GetServerNetNub() { return m_pServerNub; }
 	INetNub* GetClientNetNub() { return m_pClientNub; }
-
-	void     DumpStats();
-
+	
 	void     GetMemoryUsage(ICrySizer* s) const;
-
-	//
-	void                ReleaseGameStats();
-
+	
 	void                FreeBrokenMeshesForEntity(IPhysicalEntity* pEntity);
 
 	static CActionGame* Get() { return s_this; }
@@ -356,8 +350,7 @@ private:
 	}
 
 	void         EnablePhysicsEvents(bool enable);
-
-	void         CreateGameStats();
+	
 	void         ApplyBreakToClonedObjectFromEvent(const SRenderNodeCloneLookup& renderNodeLookup, int iBrokenObjIndex, int i);
 
 	void         LogModeInformation(const bool isMultiplayer, const char* hostname) const;
@@ -487,9 +480,7 @@ private:
 	int                                          m_iCurBreakEvent;
 	int                                          m_totBreakageSize;
 	int                                          m_inDeleteEntityCallback;
-
-	CGameStats*                                  m_pGameStats;
-
+	
 	SEntityCollHist*                             m_pCHSlotPool, * m_pFreeCHSlot0;
 	std::map<int, SEntityCollHist*>              m_mapECH;
 

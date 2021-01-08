@@ -1892,22 +1892,7 @@ void CLevelSystem::OnLoadingComplete(ILevelInfo* pLevelInfo)
 		SAnimMemoryTracker amt;
 		gEnv->pCharacterManager->SetAnimMemoryTracker(amt);
 	}
-	/*
-	   if( IStatsTracker* tr = CCryAction::GetCryAction()->GetIGameStatistics()->GetSessionTracker() )
-	   {
-	   string mapName = "no_map_assigned";
-	   if( pLevelInfo )
-	    if (ILevelInfo * pInfo = pLevelInfo->GetLevelInfo())
-	    {
-	      mapName = pInfo->GetName();
-	      PathUtil::RemoveExtension(mapName);
-	      mapName = PathUtil::GetFileName(mapName);
-	      mapName.MakeLower();
-	    }
-	   tr->StateValue(eSP_Map, mapName.c_str());
-	   }
-	 */
-
+	
 	// LoadLevel is not called in the editor, hence OnLoadingComplete is not invoked on the ILevelSystemListeners
 	if (gEnv->IsEditor() && pLevelInfo)
 	{

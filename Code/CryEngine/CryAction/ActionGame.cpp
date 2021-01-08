@@ -19,7 +19,6 @@
 #include <Cry3DEngine/ITimeOfDay.h>
 #include "TimeOfDayScheduler.h"
 #include "PersistantDebug.h"
-#include "Network/GameStats.h"
 #include "Animation/PoseModifier/IKTorsoAim.h"
 #include "IForceFeedbackSystem.h"
 #include <CryGame/IGameTokens.h>
@@ -29,6 +28,8 @@
 
 #include <CrySystem/ConsoleRegistration.h>
 
+
+#include "ILevelSystem.h"
 #include "IMovementController.h"
 
 CActionGame* CActionGame::s_this = 0;
@@ -200,7 +201,6 @@ CActionGame::CActionGame()
 	, m_pGameContext(0)
 	, m_pGameTokenSystem(0)
 	, m_pPhysicalWorld(0)
-	, m_pGameStats(0)
 	, m_pEntHits0(0)
 	, m_pCHSlotPool(0)
 	, m_lastDynPoolSize(0)
@@ -230,10 +230,7 @@ CActionGame::~CActionGame()
 	GetISystem()->GetISystemEventDispatcher()->RemoveListener(this);
 
 	m_pNetwork->RemoveHostMigrationEventListener(this);
-
-	if (m_pGameStats)
-		m_pGameStats->EndSession();
-
+	
 	{
 		IGameSessionHandler* pGameSessionHandler = CCryAction::GetCryAction()->GetIGameSessionHandler();
 		pGameSessionHandler->OnGameShutdown();
@@ -290,9 +287,6 @@ CActionGame::~CActionGame()
 	CCryAction* pCryAction = CCryAction::GetCryAction();
 	if (pCryAction)
 		pCryAction->GetIGameRulesSystem()->DestroyGameRules();
-
-	// ~CGameRules uses game stats so destroy game stats after the game rules
-	ReleaseGameStats();
 
 	if (!gEnv->IsDedicated())
 	{
@@ -596,9 +590,7 @@ bool CActionGame::Init(const SGameStartParams* pGameStartParams)
 	{
 		ServerInit(pGameStartParams, &ok, &hasPbSvStarted);
 	}
-
-	CreateGameStats();//Initialize stats tracking object
-
+	
 	if (ok && (m_pGameContext->HasContextFlag(eGSF_Client) || m_pGameContext->HasContextFlag(eGSF_DemoRecorder)))
 	{
 		ClientInit(pGameStartParams, &ok, &hasPbSvStarted, &clientRequiresBlockingConnection);
@@ -756,10 +748,7 @@ void CActionGame::PostInit(const SGameStartParams* pGameStartParams, bool* io_ok
 		{
 			ok = false;
 		}
-
-		if (ok && m_pGameStats)
-			m_pGameStats->StartSession();
-
+		
 		if (ok && m_pGameContext->HasContextFlag(eGSF_BlockingClientConnect) && !m_pGameContext->HasContextFlag(eGSF_NoSpawnPlayer) && m_pGameContext->HasContextFlag(eGSF_Client))
 		{
 			ok &= BlockingConnect(&CActionGame::ConditionHavePlayer, true, "have player");
@@ -1084,10 +1073,7 @@ bool CActionGame::Update()
 				m_throttling.m_numGlassEvents--;
 			UpdateFadeEntities(deltaTime);
 		}
-
-		if (m_pGameStats && IsServer())
-			m_pGameStats->Update();
-
+		
 		if (s_waterMaterialId == -1)
 		{
 			s_waterMaterialId = gEnv->p3DEngine->GetMaterialManager()->GetSurfaceTypeManager()->GetSurfaceTypeByName("mat_water")->GetId();
@@ -1120,12 +1106,7 @@ bool CActionGame::Update()
 						m_initState = eIS_InitError;
 						break;
 					}
-
-					if (m_pGameStats)
-					{
-						m_pGameStats->StartSession();
-					}
-
+					
 					m_initState = eIS_WaitForPlayer;
 				}
 				break;
@@ -4959,12 +4940,6 @@ void CActionGame::OnExplosion(const ExplosionInfo& ei)
 	}
 }
 
-void CActionGame::DumpStats()
-{
-	if (m_pGameStats)
-		m_pGameStats->Dump();
-}
-
 void CActionGame::GetMemoryUsage(ICrySizer* s) const
 {
 	{
@@ -4977,7 +4952,6 @@ void CActionGame::GetMemoryUsage(ICrySizer* s) const
 	{
 		SIZER_SUBCOMPONENT_NAME(s, "ActionGame");
 		s->Add(*this);
-		s->AddObject(m_pGameStats);
 		s->AddObject(m_brokenObjs);
 		s->AddObject(m_breakEvents);
 		s->AddObject(m_brokenEntParts);
@@ -4991,15 +4965,4 @@ void CActionGame::GetMemoryUsage(ICrySizer* s) const
 		s->AddObject(m_treeBreakStatus);
 
 	}
-}
-
-void CActionGame::CreateGameStats()
-{
-	m_pGameStats = new CGameStats(CCryAction::GetCryAction());
-}
-
-void CActionGame::ReleaseGameStats()
-{
-	delete m_pGameStats;
-	m_pGameStats = 0;
 }

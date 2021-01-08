@@ -43,7 +43,6 @@ class CGameplayAnalyst;
 class CTimeOfDayScheduler;
 class CNetworkCVars;
 class CCryActionCVars;
-class CGameStatsConfig;
 class CommunicationVoiceLibrary;
 class CCustomActionManager;
 class CCustomEventManager;
@@ -136,8 +135,6 @@ public:
 	virtual bool                          StartedGameContext() const;
 	virtual bool                          StartingGameContext() const;
 	virtual bool                          BlockingSpawnPlayer();
-
-	virtual void                          ReleaseGameStats();
 
 	virtual void                          ResetBrokenGameObjects();
 	virtual void                          CloneBrokenObjectsAndRevertToStateAtTime(int32 iFirstBreakEventIndex, uint16* pBreakEventIndices, int32& iNumBreakEvents, IRenderNode** outClonedNodes, int32& iNumClonedNodes, SRenderNodeCloneLookup& renderNodeLookup);
@@ -251,7 +248,6 @@ public:
 	CGameContext*               GetGameContext();
 	CPersistantDebug*           GetPersistantDebug()       { return m_pPersistantDebug; }
 	virtual IPersistantDebug*   GetIPersistantDebug();
-	virtual IGameStatsConfig*   GetIGameStatsConfig();
 
 	virtual void                AddBreakEventListener(IBreakEventListener* pListener);
 	virtual void                RemoveBreakEventListener(IBreakEventListener* pListener);
@@ -263,10 +259,7 @@ public:
 	virtual void                UnregisterListener(IGameFrameworkListener* pGameFrameworkListener);
 
 	CTimeOfDayScheduler*        GetTimeOfDayScheduler() const { return m_pTimeOfDayScheduler; }
-
-	CGameStatsConfig*           GetGameStatsConfig();
-	IGameStatistics*            GetIGameStatistics();
-
+	
 	IGameSessionHandler*        GetIGameSessionHandler();
 	void                        SetGameSessionHandler(IGameSessionHandler* pSessionHandler);
 
@@ -374,7 +367,6 @@ private:
 	static void TestNSNat(IConsoleCmdArgs* args);
 	static void TestPlayerBoundsCmd(IConsoleCmdArgs* args);
 	static void DelegateCmd(IConsoleCmdArgs* args);
-	static void DumpStatsCmd(IConsoleCmdArgs* args);
 
 	// console commands for the remote control system
 	//static void rcon_password(IConsoleCmdArgs* args);
@@ -461,11 +453,7 @@ private:
 	ILanQueryListener*            m_pLanQueryListener;
 	CCustomActionManager*         m_pCustomActionManager;
 	CCustomEventManager*          m_pCustomEventManager;
-
-	CGameStatsConfig*             m_pGameStatsConfig;
-
-	IGameStatistics*              m_pGameStatistics;
-
+	
 	ICooperativeAnimationManager* m_pCooperativeAnimationManager;
 	IGameSessionHandler*          m_pGameSessionHandler;
 

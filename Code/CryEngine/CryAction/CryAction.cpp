@@ -22,7 +22,6 @@
 #include "Network/GameContext.h"
 #include "Network/GameServerNub.h"
 #include "Network/NetworkCVars.h"
-#include "Network/GameStatsConfig.h"
 #include "Network/NetworkStallTicker.h"
 
 #include <CrySandbox/IEditorGame.h>
@@ -65,7 +64,6 @@
 #include "SharedParams/SharedParamsManager.h"
 #include "ActionMapManager.h"
 
-#include "Statistics/GameStatistics.h"
 #include "GameRulesSystem.h"
 #include "ActionGame.h"
 #include "IGameObject.h"
@@ -279,7 +277,6 @@ CCryAction::CCryAction(SSystemInitParams& initParams)
 	m_lastFrameTimeUI(0.0f),
 	m_pbSvEnabled(false),
 	m_pbClEnabled(false),
-	m_pGameStatistics(0),
 	m_pCooperativeAnimationManager(NULL),
 	m_pGameSessionHandler(0),
 	m_pCustomActionManager(0),
@@ -1879,14 +1876,7 @@ bool CCryAction::Initialize(SSystemInitParams& startupParams)
 #endif
 
 	m_nextFrameCommand = new string();
-
-	m_pGameStatsConfig = new CGameStatsConfig();
-	m_pGameStatsConfig->ReadConfig();
-
-	//	InlineInitializationProcessing("CCryAction::Init m_pCharacterPartsManager");
-
-	m_pGameStatistics = new CGameStatistics();
-
+	
 	if (gEnv->IsEditor())
 		CreatePhysicsQueues();
 
@@ -2882,23 +2872,6 @@ void CCryAction::EndGameContext()
 	}
 }
 
-void CCryAction::ReleaseGameStats()
-{
-	if (m_pGame)
-	{
-		m_pGame->ReleaseGameStats();
-	}
-
-	/*
-	   #if STATS_MODE_CVAR
-	   if(CCryActionCVars::Get().g_statisticsMode == 2)
-	   #endif
-
-	    // Fran: need to be ported to the new interface
-	    GetIGameStatistics()->EndSession();
-	 */
-}
-
 void CCryAction::InitEditor(IGameToEditorInterface* pGameToEditor)
 {
 	CRY_PROFILE_FUNCTION(PROFILE_LOADING_ONLY);
@@ -3488,7 +3461,6 @@ void CCryAction::InitCommands()
 	REGISTER_COMMAND("open_url", OpenURLCmd, VF_NULL, "");
 
 	REGISTER_COMMAND("test_playersBounds", TestPlayerBoundsCmd, VF_CHEAT, "");
-	REGISTER_COMMAND("g_dump_stats", DumpStatsCmd, VF_CHEAT, "");
 
 	REGISTER_COMMAND("kick", KickPlayerCmd, 0, "Kicks player from game");
 	REGISTER_COMMAND("kickid", KickPlayerByIdCmd, 0, "Kicks player from game");
@@ -3995,16 +3967,9 @@ IPersistantDebug* CCryAction::GetIPersistantDebug()
 	return m_pPersistantDebug;
 }
 
-IGameStatsConfig* CCryAction::GetIGameStatsConfig()
-{
-	return m_pGameStatsConfig;
-}
-
 void CCryAction::TestResetCmd(IConsoleCmdArgs* args)
 {
 	GetCryAction()->Reset(true);
-	//	if (CGameContext * pCtx = GetCryAction()->GetGameContext())
-	//		pCtx->GetNetContext()->RequestReconfigureGame();
 }
 
 void CCryAction::TestPlayerBoundsCmd(IConsoleCmdArgs* args)
@@ -4050,14 +4015,6 @@ void CCryAction::DelegateCmd(IConsoleCmdArgs* args)
 			CCryAction::GetCryAction()->GetNetContext()->DelegateAuthority(pEntity->GetId(), pCh);
 		}
 	}
-}
-
-void CCryAction::DumpStatsCmd(IConsoleCmdArgs* args)
-{
-	CActionGame* pG = CActionGame::Get();
-	if (!pG)
-		return;
-	pG->DumpStats();
 }
 
 void CCryAction::AddBreakEventListener(IBreakEventListener* pListener)
@@ -4136,16 +4093,6 @@ void CCryAction::UnregisterListener(IGameFrameworkListener* pGameFrameworkListen
 			return;
 		}
 	}
-}
-
-CGameStatsConfig* CCryAction::GetGameStatsConfig()
-{
-	return m_pGameStatsConfig;
-}
-
-IGameStatistics* CCryAction::GetIGameStatistics()
-{
-	return m_pGameStatistics;
 }
 
 void CCryAction::SetGameSessionHandler(IGameSessionHandler* pSessionHandler)
@@ -4561,7 +4508,6 @@ void CCryAction::GetMemoryUsage(ICrySizer* s) const
 	CHILD_STATISTICS(m_pGameplayRecorder);
 	CHILD_STATISTICS(m_pGameplayAnalyst);
 	CHILD_STATISTICS(m_pTimeOfDayScheduler);
-	CHILD_STATISTICS(m_pGameStatistics);
 	s->Add(*m_pMaterialEffectsCVars);
 	s->AddObject(*m_pGFListeners);
 	s->Add(*m_nextFrameCommand);

@@ -39,7 +39,6 @@ struct IGameRules;
 struct IGameRulesSystem;
 struct IGameServerNub;
 struct IGameSessionHandler;
-struct IGameStatistics;
 struct IGameToEditorInterface;
 struct IGameTokenSystem;
 struct IGameVolumes;
@@ -325,18 +324,6 @@ struct SRenderNodeCloneLookup
 	IRenderNode** pClonedNodes;
 	int           iNumPairs;
 };
-
-//! Provides an interface to game so game will be able to display numeric stats in user-friendly way.
-struct IGameStatsConfig
-{
-	// <interfuscator:shuffle>
-	virtual ~IGameStatsConfig(){}
-	virtual int         GetStatsVersion() = 0;
-	virtual int         GetCategoryMod(const char* cat) = 0;
-	virtual const char* GetValueNameByCode(const char* cat, int id) = 0;
-	// </interfuscator:shuffle>
-};
-//! \endcond
 
 struct IBreakReplicator
 {
@@ -707,10 +694,7 @@ struct IGameFramework
 
 	//! Returns a pointer to the IRealtimeUpdate Interface.
 	virtual IRealtimeRemoteUpdate* GetIRealTimeRemoteUpdate() = 0;
-
-	//! Returns a pointer to the IGameStatistics interface.
-	virtual IGameStatistics* GetIGameStatistics() = 0;
-
+	
 	//! Pointer to ICooperativeAnimationManager interface.
 	virtual ICooperativeAnimationManager* GetICooperativeAnimationManager() = 0;
 
@@ -951,8 +935,6 @@ struct IGameFramework
 	//! To avoid stalls during gameplay and to get a list of all assets needed for the level (bEnforceAll=true).
 	//! \param bEnforceAll true to ensure all possible assets become registered (list should not be too conservative - to support level stripification).
 	virtual void PrefetchLevelAssets(const bool bEnforceAll) = 0;
-
-	virtual void ReleaseGameStats() = 0;
 
 	//! Inform that an IEntity was spawned from breakage.
 	virtual void OnBreakageSpawnedEntity(IEntity* pEntity, IPhysicalEntity* pPhysEntity, IPhysicalEntity* pSrcPhysEntity) = 0;
