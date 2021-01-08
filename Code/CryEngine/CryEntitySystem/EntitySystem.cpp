@@ -1975,9 +1975,6 @@ void CEntitySystem::DebugDrawBBox(const CEntity& entity, const CVar::EEntityDebu
 			case PE_RIGID:
 				cry_strcat(szProfInfo, " (PE_RIGID)");
 				break;
-			case PE_WHEELEDVEHICLE:
-				cry_strcat(szProfInfo, " (PE_WHEELEDVEHICLE)");
-				break;
 			case PE_LIVING:
 				cry_strcat(szProfInfo, " (PE_LIVING)");
 				break;

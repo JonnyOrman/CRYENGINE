@@ -3020,7 +3020,7 @@ int CPhysicalEntity::UpdateStructure(float time_interval, pe_explosion *pexpl, i
 									}
 
 									if (m_iSimClass==0 && !m_pWorld->m_vars.bMultiplayer && 
-											(m_parts[i].flags & (geom_constraint_on_break|geom_colltype_vehicle))==(geom_constraint_on_break|geom_colltype_vehicle)) 
+											(m_parts[i].flags & (geom_constraint_on_break))==(geom_constraint_on_break)) 
 									{
 										pe_action_add_constraint aac;
 										aac.pBuddy = this; aac.id = 1000000;

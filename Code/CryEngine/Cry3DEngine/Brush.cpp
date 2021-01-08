@@ -25,8 +25,7 @@
 #include <Cry3DEngine/ISurfaceType.h>
 
 CBrush::CBrush()
-	: m_bVehicleOnlyPhysics(0)
-	, m_bDrawLast(0)
+	: m_bDrawLast(0)
 	, m_bNoPhysicalize(0)
 {
 	m_WSBBox.min = m_WSBBox.max = Vec3(ZERO);
@@ -362,18 +361,14 @@ void CBrush::PhysicalizeOnHeap(IGeneralMemoryHeap* pHeap, bool bInstant)
 	{
 		if (GetRndFlags() & ERF_COLLISION_PROXY)
 		{
-			// Collision proxy only collides with players and vehicles.
-			params.flags = geom_colltype_player | geom_colltype_vehicle;
+			// Collision proxy only collides with players.
+			params.flags = geom_colltype_player;
 		}
 		if (GetRndFlags() & ERF_RAYCAST_PROXY)
 		{
-			// Collision proxy only collides with players and vehicles.
+			// Collision proxy only collides with players.
 			params.flags = geom_colltype_ray;
 		}
-		/*if (m_pStatObj->m_arrPhysGeomInfo[PHYS_GEOM_TYPE_NO_COLLIDE])
-		   params.flags &= ~geom_colltype_ray;*/
-		if (m_bVehicleOnlyPhysics || (m_pStatObj->GetVehicleOnlyPhysics() != 0))
-			params.flags = geom_colltype_vehicle;
 		if (GetCVars()->e_ObjQuality != CONFIG_LOW_SPEC)
 		{
 			params.idmatBreakable = m_pStatObj->GetIDMatBreakable();
@@ -500,7 +495,7 @@ void CBrush::UpdatePhysicalMaterials(int bThreadSafe)
 	{
 		pe_params_part ppart;
 		ppart.flagsAND = 0;
-		ppart.flagsOR = geom_colltype_player | geom_colltype_vehicle;
+		ppart.flagsOR = geom_colltype_player;
 		m_pPhysEnt->SetParams(&ppart);
 	}
 
@@ -517,20 +512,10 @@ void CBrush::UpdatePhysicalMaterials(int bThreadSafe)
 		// Assign custom material to physics.
 		int surfaceTypesId[MAX_SUB_MATERIALS];
 		memset(surfaceTypesId, 0, sizeof(surfaceTypesId));
-		int i, numIds = m_pMaterial->FillSurfaceTypeIds(surfaceTypesId);
-		ISurfaceTypeManager* pSurfaceTypeManager = Get3DEngine()->GetMaterialManager()->GetSurfaceTypeManager();
+		int numIds = m_pMaterial->FillSurfaceTypeIds(surfaceTypesId);
 		ISurfaceType* pMat;
 		bool bBreakable = false;
-
-		for (i = 0, m_bVehicleOnlyPhysics = false; i < numIds; i++)
-			if (pMat = pSurfaceTypeManager->GetSurfaceType(surfaceTypesId[i]))
-			{
-				if (pMat->GetFlags() & SURFACE_TYPE_VEHICLE_ONLY_COLLISION)
-					m_bVehicleOnlyPhysics = true;
-				if (pMat->GetBreakability())
-					bBreakable = true;
-			}
-
+		
 		if (bBreakable && m_pStatObj)
 		{
 			// mark the rendermesh as KepSysMesh so that it is kept in system memory
@@ -542,21 +527,9 @@ void CBrush::UpdatePhysicalMaterials(int bThreadSafe)
 		pe_params_part ppart;
 		ppart.nMats = numIds;
 		ppart.pMatMapping = surfaceTypesId;
-		if (m_bVehicleOnlyPhysics)
-			ppart.flagsAND = geom_colltype_vehicle;
 		if ((pMat = m_pMaterial->GetSurfaceType()) && pMat->GetPhyscalParams().collType >= 0)
 			ppart.flagsAND = ~(geom_collides | geom_floats), ppart.flagsOR = pMat->GetPhyscalParams().collType;
 		m_pPhysEnt->SetParams(&ppart, bThreadSafe);
-	}
-	else if (m_bVehicleOnlyPhysics)
-	{
-		m_bVehicleOnlyPhysics = false;
-		if (!m_pStatObj->GetVehicleOnlyPhysics())
-		{
-			pe_params_part ppart;
-			ppart.flagsOR = geom_colltype_solid | geom_colltype_ray | geom_floats | geom_colltype_explosion;
-			m_pPhysEnt->SetParams(&ppart, bThreadSafe);
-		}
 	}
 }
 
@@ -696,8 +669,7 @@ IRenderNode* CBrush::Clone() const
 	//pDestBrush->m_pPhysEnt		//Don't want to copy the phys ent pointer
 	pDestBrush->m_pMaterial = m_pMaterial;
 	pDestBrush->m_pStatObj = m_pStatObj;
-
-	pDestBrush->m_bVehicleOnlyPhysics = m_bVehicleOnlyPhysics;
+	
 	pDestBrush->m_bDrawLast = m_bDrawLast;
 	pDestBrush->m_WSBBox = m_WSBBox;
 

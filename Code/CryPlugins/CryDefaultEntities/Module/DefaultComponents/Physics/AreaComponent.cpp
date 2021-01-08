@@ -2,7 +2,6 @@
 #include "AreaComponent.h"
 
 #include "CharacterControllerComponent.h"
-#include "Vehicles/VehicleComponent.h"
 #include "RigidBodyComponent.h"
 
 #include <Cry3DEngine/IRenderNode.h>

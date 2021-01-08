@@ -32,7 +32,6 @@
 #include "walkingrigidentity.h"
 #include "particleentity.h"
 #include "livingentity.h"
-#include "wheeledvehicleentity.h"
 #include "articulatedentity.h"
 #include "ropeentity.h"
 #include "softentity.h"
@@ -1345,133 +1344,6 @@ struct CRigidEntitySerializer : CPhysicalEntitySerializer {
 };
 
 
-struct CSuspSerializer : CPhysSerializer {
-	CSuspSerializer() {
-		suspension_point trg;
-		DECLARE_PROC("Driving", &CSuspSerializer::SerializeDriving)
-		DECLARE_MEMBER("Axle", ft_int, iAxle)
-		DECLARE_MEMBER("Pt", ft_vector, pt)
-		DECLARE_MEMBER("FullLen", ft_float, fullen)
-		DECLARE_MEMBER("Stiffness", ft_float, kStiffness)
-		DECLARE_MEMBER("StiffnessWeight", ft_float, kStiffnessWeight)
-		DECLARE_MEMBER("Damping", ft_float, kDamping)
-		DECLARE_MEMBER("Damping0", ft_float, kDamping0)
-		DECLARE_MEMBER("Len0", ft_float, len0)
-		DECLARE_MEMBER("Mpt", ft_float, Mpt)
-		DECLARE_MEMBER("Quat0", ft_quaternion, q0)
-		DECLARE_MEMBER("Pos0", ft_vector, pos0)
-		DECLARE_MEMBER("Ptc0", ft_vector, ptc0)
-		DECLARE_MEMBER("Iinv", ft_float, Iinv)
-		DECLARE_MEMBER("minFriction", ft_float, minFriction)
-		DECLARE_MEMBER("maxFriction", ft_float, maxFriction)
-		DECLARE_MEMBER("Flags0", ft_uint, flags0)
-		DECLARE_MEMBER("FlagsCollider0", ft_uint, flagsCollider0)
-		DECLARE_PROC("CanBrake", &CSuspSerializer::SerializeCanBrake)
-		DECLARE_PROC("CanSteer", &CSuspSerializer::SerializeCanSteer)
-		DECLARE_MEMBER("iBuddy", ft_int, iBuddy)
-		DECLARE_MEMBER("r", ft_float, r)
-		DECLARE_MEMBER("Width", ft_float, width)
-		DECLARE_MEMBER("Tscale", ft_float, Tscale)
-		DECLARE_MEMBER("kLatFriction", ft_float, kLatFriction)
-		DECLARE_PROC("end", &CSuspSerializer::Finalize)
-	}
-	DEFINE_MEMBER_PROC(suspension_point, SerializeDriving, bDriving)
-	DEFINE_MEMBER_PROC(suspension_point, SerializeCanBrake, bCanBrake)
-	DEFINE_MEMBER_PROC(suspension_point, SerializeCanSteer, bCanSteer)
-
-	int Finalize(parse_context &ctx, char *str) {
-		suspension_point *psusp = (suspension_point*)ctx.pobj;
-		if (!ctx.bSaving) {
-			psusp->curlen = psusp->len0; psusp->rinv = 1/psusp->r;
-			psusp->steer=psusp->rot=psusp->w=psusp->wa=psusp->T=psusp->prevw=psusp->prevTdt = 0;
-			psusp->bSlip=psusp->bSlipPull=psusp->bContact = 0;
-		}
-		return 0;
-	}
-};
-
-
-struct CWheeledVehicleEntitySerializer : CRigidEntitySerializer {
-	CSuspSerializer *pSuspSerializer;
-
-	CWheeledVehicleEntitySerializer(CPhysicalEntityPartSerializer *peps, CPhysicalJointSerializerRead *pjsr, CPhysicalJointSerializerWrite *pjsw, CRigidBodySerializer *rbs, 
-		CConstraintSerializer *cs, CSuspSerializer *ss) : CRigidEntitySerializer(peps,pjsr,pjsw,rbs,cs),pSuspSerializer(ss) 
-	{
-		CWheeledVehicleEntity trg(0);
-		DECLARE_MEMBER("EnginePower", ft_float, m_enginePower)
-		DECLARE_MEMBER("maxSteer", ft_float, m_maxSteer)
-		DECLARE_MEMBER("EngineMaxw", ft_float, m_engineMaxw)
-		DECLARE_MEMBER("EngineMinw", ft_float, m_engineMinw)
-		DECLARE_MEMBER("EngineIdlew", ft_float, m_engineIdlew)
-		DECLARE_MEMBER("EngineShiftUpw", ft_float, m_engineShiftUpw)
-		DECLARE_MEMBER("EngineShiftDownw", ft_float, m_engineShiftDownw)
-		DECLARE_MEMBER("GearDirSwitchw", ft_float, m_gearDirSwitchw)
-		DECLARE_MEMBER("EngineStartw", ft_float, m_engineStartw)
-		DECLARE_MEMBER("AxleFriction", ft_float, m_axleFriction)
-		DECLARE_MEMBER("BrakeTorque", ft_float, m_brakeTorque)
-		DECLARE_MEMBER("ClutchSpeed", ft_float, m_clutchSpeed)
-		DECLARE_MEMBER("maxBrakingFriction", ft_float, m_maxBrakingFriction)
-		DECLARE_MEMBER("fDynFriction", ft_float, m_kDynFriction)
-		DECLARE_MEMBER("SlipThreshold", ft_float, m_slipThreshold)
-		DECLARE_MEMBER("kStabilizer", ft_float, m_kStabilizer)
-		DECLARE_MEMBER("ackermanOffset", ft_float, m_ackermanOffset)
-		DECLARE_MEMBER("numGears", ft_int, m_nGears)
-		DECLARE_PROC("Gears", &CWheeledVehicleEntitySerializer::SerializeGears)
-		//DECLARE_MEMBER("kSteerToTrack", ft_float, m_kSteerToTrack)
-		DECLARE_MEMBER("nHullParts", ft_int, m_nHullParts)
-		//DECLARE_MEMBER("IntegrationType", ft_int, m_iIntegrationType)
-		DECLARE_MEMBER("EminRigid", ft_float, m_EminRigid)
-		DECLARE_MEMBER("EminVehicle", ft_float, m_EminVehicle)
-		DECLARE_MEMBER("maxStepVehicle", ft_float, m_maxAllowedStepVehicle)
-		DECLARE_MEMBER("maxStepRigid", ft_float, m_maxAllowedStepRigid)
-		DECLARE_MEMBER("DampingVehicle", ft_float, m_dampingVehicle)
-		DECLARE_PROC("Wheel", &CWheeledVehicleEntitySerializer::SerializeWheel)
-	}
-
-	int SerializeGears(parse_context &ctx, char *str) {
-		CWheeledVehicleEntity *pent = (CWheeledVehicleEntity*)ctx.pobj;
-		int i;
-		for(i=0;i<pent->m_nGears;i++) if (ctx.bSaving) 
-			str += sprintf(str,"%.8g ",pent->m_gears[i]);
-		else {
-			for(;*str && isspace(*str);str++);
-			pent->m_gears[i] = atof(str);
-			for(;*str && !isspace(*str);str++);
-		}
-		return 0;
-	}
-
-	int SerializeWheel(parse_context &ctx, char *str) {
-		CWheeledVehicleEntity *pent = (CWheeledVehicleEntity*)ctx.pobj;
-		int i;
-		if (ctx.bSaving) for(i=0;i<pent->m_nParts-pent->m_nHullParts;i++) {
-			fprintf(ctx.f,"%.*sWheel %d\n", ctx.iStackPos+1,g_strTabs, i);
-			ctx.PushState();
-			ctx.pobj = pent->m_susp+i;
-			(ctx.pSerializer = pSuspSerializer)->Serialize(ctx);
-		} else {
-			i = atol(str);
-			ctx.PushState();
-			if (i>=pent->m_suspAlloc) {
-				ReallocateList(pent->m_susp, pent->m_suspAlloc, i+4&~3, true);
-				pent->m_suspAlloc = i+4 & ~3;
-				for(int j=pent->m_nHullParts; j<pent->m_nParts; j++) 
-					pent->m_parts[j].pNewCoords = (coord_block_BBox*)&pent->m_susp[j-pent->m_nHullParts].pos;
-			}
-			ctx.pobj = pent->m_susp+i;
-			pent->m_parts[i+pent->m_nHullParts].pNewCoords = (coord_block_BBox*)&pent->m_susp[i].pos;
-			pent->m_susp[i].pos = pent->m_parts[i+pent->m_nHullParts].pos;
-			pent->m_susp[i].q = pent->m_parts[i+pent->m_nHullParts].q;
-			pent->m_susp[i].scale = pent->m_parts[i+pent->m_nHullParts].scale;
-			pent->m_susp[i].Tscale = 1.0f;
-			pent->m_susp[i].kLatFriction = 1.0f;
-			(ctx.pSerializer = pSuspSerializer)->Serialize(ctx);
-		}
-		return ctx.bSaving;
-	}
-};
-
-
 struct CJointSerializer : CPhysSerializer {
 	CRigidBodySerializer *pRigidBodySerializer;
 
@@ -2201,7 +2073,6 @@ struct CPhysicalWorldSerializer : CPhysSerializer {
 	CEntityGridSerializer *pEntityGridSerializer;
 	CPhysicalEntitySerializer *pStaticEntitySerializer;
 	CRigidEntitySerializer *pRigidEntitySerializer;
-	CWheeledVehicleEntitySerializer *pWheeledVehicleEntitySerializer;
 	CArticulatedEntitySerializer *pArticulatedEntitySerializer;
 	CLivingEntitySerializer *pLivingEntitySerializer;
 	CWalkingRigidEntitySerializer *pWalkingRigidEntitySerializer;
@@ -2211,9 +2082,9 @@ struct CPhysicalWorldSerializer : CPhysSerializer {
 	int flaggedOnly;
 
 	CPhysicalWorldSerializer(CPhysVarsSerializer *pvs, CEntityGridSerializer *egs, CPhysicalEntitySerializer *pes, CRigidEntitySerializer *res,	CWalkingRigidEntitySerializer *wres,
-		CWheeledVehicleEntitySerializer *wves, CArticulatedEntitySerializer *aes, CLivingEntitySerializer *les, CRopeEntitySerializer *rpes, CSoftEntitySerializer *spes, CAreaSerializer *as, int flagged=0) : 
+		CArticulatedEntitySerializer *aes, CLivingEntitySerializer *les, CRopeEntitySerializer *rpes, CSoftEntitySerializer *spes, CAreaSerializer *as, int flagged=0) : 
 		pPhysVarsSerializer(pvs),pEntityGridSerializer(egs),pStaticEntitySerializer(pes),pRigidEntitySerializer(res),pWalkingRigidEntitySerializer(wres),
-		pWheeledVehicleEntitySerializer(wves),pArticulatedEntitySerializer(aes),pLivingEntitySerializer(les),pRopeEntitySerializer(rpes),pSoftEntitySerializer(spes),pAreaSerializer(as), flaggedOnly(flagged)
+		pArticulatedEntitySerializer(aes),pLivingEntitySerializer(les),pRopeEntitySerializer(rpes),pSoftEntitySerializer(spes),pAreaSerializer(as), flaggedOnly(flagged)
 	{
 		CPhysicalWorld trg(0);
 		DECLARE_PROC("PhysicsVars", &CPhysicalWorldSerializer::SerializeVars)
@@ -2290,7 +2161,6 @@ struct CPhysicalWorldSerializer : CPhysSerializer {
 					CPhysSerializer *pSerializer = pStaticEntitySerializer;
 					switch (pent->GetType()) {
 						case PE_RIGID: pSerializer = pRigidEntitySerializer; name = "Rigid Body"; break;
-						case PE_WHEELEDVEHICLE: pSerializer = pWheeledVehicleEntitySerializer; name = "Wheeled Vehicle"; break;
 						case PE_ARTICULATED: pSerializer = pArticulatedEntitySerializer; name = "Articulated"; break;
 						case PE_LIVING: pSerializer = pLivingEntitySerializer; name = "Living"; break;
 						case PE_WALKINGRIGID: pSerializer = pWalkingRigidEntitySerializer; name = "WalkingRigid"; break;
@@ -2325,7 +2195,6 @@ struct CPhysicalWorldSerializer : CPhysSerializer {
 				case PE_RIGID : pent = CreateEnt<CRigidEntity>(pWorld,name); ctx.pSerializer = pRigidEntitySerializer; break;
 				case PE_LIVING: pent = CreateEnt<CLivingEntity>(pWorld,name); ctx.pSerializer = pLivingEntitySerializer; break;
 				case PE_WALKINGRIGID: pent = CreateEnt<CWalkingRigidEntity>(pWorld,name); ctx.pSerializer = pWalkingRigidEntitySerializer; break;
-				case PE_WHEELEDVEHICLE: pent = CreateEnt<CWheeledVehicleEntity>(pWorld,name); ctx.pSerializer = pWheeledVehicleEntitySerializer; break;
 				case PE_PARTICLE: pent = CreateEnt<CParticleEntity>(pWorld,name); break;
 				case PE_ARTICULATED: pent = CreateEnt<CArticulatedEntity>(pWorld,name); ctx.pSerializer = pArticulatedEntitySerializer; break;
 				case PE_ROPE: pent = CreateEnt<CRopeEntity>(pWorld,name); ctx.pSerializer = pRopeEntitySerializer; break;
@@ -2427,8 +2296,6 @@ void SerializeWorld(CPhysicalWorld *pWorld, const char *fname,int bSave)
 	CRigidBodySerializer rbs;
 	CConstraintSerializer cs;
 	CRigidEntitySerializer res(&peps,&jsr,&jsw,&rbs,&cs);
-	CSuspSerializer ss;
-	CWheeledVehicleEntitySerializer wves(&peps,&jsr,&jsw,&rbs,&cs,&ss);
 	CAEPartInfoSerializer aepis;
 	CJointSerializer js(&rbs);
 	CArticulatedEntitySerializer aes(&peps,&jsr,&jsw,&rbs,&cs,&js,&aepis);
@@ -2449,7 +2316,7 @@ void SerializeWorld(CPhysicalWorld *pWorld, const char *fname,int bSave)
 	CSphereSerializer sps;
 	CPhysGeometrySerializer pgs(&ms,&hfs,&bs,&cls,&sps);
 	CAreaSerializer as(&pgs);
-	CPhysicalWorldSerializer pws(&pvs,&egs,&pes,&res,&wres,&wves,&aes,&les,&rpes,&spes,&as,bSave & ~1);
+	CPhysicalWorldSerializer pws(&pvs,&egs,&pes,&res,&wres,&aes,&les,&rpes,&spes,&as,bSave & ~1);
 
 	char str[128];
 	parse_context ctx;
@@ -2577,11 +2444,6 @@ void PostLoadEntityArtic(CArticulatedEntity *pent, CLoaderSizer& sizer) {
 		pent->m_joints[i].fs = (featherstone_data*)_align16(pent->m_joints[i].fsbuf);
 	if (pent->m_pSrc) pent->m_pSrc->AddRef();
 }
-void PostLoadEntityVehicle(CWheeledVehicleEntity *pent, CLoaderSizer& sizer) {
-	PostLoadEntityRigid(pent,sizer);
-	for(int i=pent->m_nHullParts;i<pent->m_nParts;i++)
-		pent->m_parts[i].pNewCoords = (coord_block_BBox*)&pent->m_susp[i-pent->m_nHullParts];
-}
 void PostLoadEntityLiving(CLivingEntity *pent, CLoaderSizer& sizer) {
 	pent->m_parts[0].pPhysGeom=pent->m_parts[0].pPhysGeomProxy = &pent->m_CylinderGeomPhys;
 	pent->m_pContacts = nullptr;
@@ -2594,7 +2456,6 @@ struct InitPostLoadTable {
 		for(int i=0;i<=PE_WALKINGRIGID;i++) g_postLoad[i] = PostLoadEntity;
 		g_postLoad[PE_RIGID]=g_postLoad[PE_WALKINGRIGID] = (void(*)(CPhysicalEntity*,CLoaderSizer&))PostLoadEntityRigid;
 		g_postLoad[PE_ARTICULATED] = (void(*)(CPhysicalEntity*,CLoaderSizer&))PostLoadEntityArtic;
-		g_postLoad[PE_WHEELEDVEHICLE] = (void(*)(CPhysicalEntity*,CLoaderSizer&))PostLoadEntityVehicle;
 		g_postLoad[PE_LIVING] = (void(*)(CPhysicalEntity*,CLoaderSizer&))PostLoadEntityLiving;
 	}
 };
@@ -2608,7 +2469,7 @@ bool SerializeWorldBin(CPhysicalWorld *pWorld, const char *fname,int bSave)
 	if (FILE *f = fopen(fname,bSave ? "wb":"rb")) {
 		int i,j;
 		CPhysicalWorld &w = *pWorld;
-		int version = sizeof(CRigidEntity)+sizeof(CArticulatedEntity)+sizeof(CWheeledVehicleEntity)+sizeof(CRopeEntity)+sizeof(CSoftEntity)+sizeof(CParticleEntity)+sizeof(CLivingEntity)+
+		int version = sizeof(CRigidEntity)+sizeof(CArticulatedEntity)+sizeof(CRopeEntity)+sizeof(CSoftEntity)+sizeof(CParticleEntity)+sizeof(CLivingEntity)+
 									sizeof(CPhysArea)+sizeof(pe_gridthunk)+sizeof(CWaterMan)+MAX_PHYS_THREADS*17;
 
 		if (bSave) {

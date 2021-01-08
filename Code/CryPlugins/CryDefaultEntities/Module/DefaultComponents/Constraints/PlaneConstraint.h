@@ -93,7 +93,7 @@ namespace Cry
 				if (IPhysicalEntity* pConstraintOwner = m_pEntity->GetPhysicalEntity())
 				{
 					// Constraints can only be added to rigid-based entities
-					if (pConstraintOwner->GetType() != PE_RIGID && pConstraintOwner->GetType() != PE_WHEELEDVEHICLE && pConstraintOwner->GetType() != PE_ARTICULATED)
+					if (pConstraintOwner->GetType() != PE_RIGID && pConstraintOwner->GetType() != PE_ARTICULATED)
 					{
 						if (pOtherEntity == WORLD_ENTITY)
 						{
@@ -108,7 +108,7 @@ namespace Cry
 
 #ifndef RELEASE
 						// Validate the same check again
-						if (pConstraintOwner->GetType() != PE_RIGID && pConstraintOwner->GetType() != PE_WHEELEDVEHICLE && pConstraintOwner->GetType() != PE_ARTICULATED)
+						if (pConstraintOwner->GetType() != PE_RIGID && pConstraintOwner->GetType() != PE_ARTICULATED)
 						{
 							CryWarning(VALIDATOR_MODULE_GAME, VALIDATOR_WARNING, "Tried to add plane constraint to non-rigid or vehicle entities!");
 							return;

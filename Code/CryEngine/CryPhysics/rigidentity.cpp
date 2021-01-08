@@ -2194,9 +2194,8 @@ void CRigidEntity::OnContactResolved(entity_contact *pContact, int iop, int iGro
 void CRigidEntity::BreakableConstraintsUpdated()
 {
 	int i;
-	if (GetType()!=PE_WHEELEDVEHICLE)
-		for(i=0;i<m_nParts;i++) if (!m_parts[i].pLattice && !m_pStructure)
-			m_parts[i].flags &= ~geom_monitor_contacts;
+	for(i=0;i<m_nParts;i++) if (!m_parts[i].pLattice && !m_pStructure)
+		m_parts[i].flags &= ~geom_monitor_contacts;
 	for(i=0;i<NMASKBITS && getmask(i)<=m_constraintMask;i++) if (m_constraintMask & getmask(i) && m_pConstraintInfos[i].limit>0)
 		m_parts[m_pConstraints[i].ipart[0]].flags |= geom_monitor_contacts;
 }

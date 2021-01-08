@@ -62,7 +62,6 @@ void CStatObj::Init()
 	m_fRadiusVert = 0;
 	m_pParentObject = 0;
 	m_pClonedSourceObject = 0;
-	m_bVehicleOnlyPhysics = 0;
 	m_bBreakableByGame = 0;
 	m_idmatBreakable = -1;
 
@@ -795,7 +794,6 @@ IStatObj* CStatObj::Clone(bool bCloneGeometry, bool bCloneChildren, bool bMeshes
 	pNewObj->m_bDefaultObject = m_bDefaultObject;
 	pNewObj->m_bOpenEdgesTested = m_bOpenEdgesTested;
 	pNewObj->m_bSubObject = false; // [anton] since parent is not copied anyway
-	pNewObj->m_bVehicleOnlyPhysics = m_bVehicleOnlyPhysics;
 	pNewObj->m_idmatBreakable = m_idmatBreakable;
 	pNewObj->m_bBreakableByGame = m_bBreakableByGame;
 	pNewObj->m_bHasDeformationMorphs = m_bHasDeformationMorphs;

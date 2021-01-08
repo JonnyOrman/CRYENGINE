@@ -1228,7 +1228,7 @@ void CActionGame::UpdateFadeEntities(float dt)
 							// Turn off some collisions
 							// NB: by leaving pe_params_part.ipart undefined, all the geom flags will changed
 							pe_params_part pp;
-							pp.flagsAND = ~(geom_colltype_ray | geom_colltype_vehicle | geom_colltype_player);
+							pp.flagsAND = ~(geom_colltype_ray | geom_colltype_player);
 							pent->SetParams(&pp);
 							state->bCollisions = 0;
 						}
@@ -2579,29 +2579,6 @@ ForceObjUpdate:
 	}
 }
 
-namespace
-{
-ILINE bool CheckCarParamBreakable(const EventPhysCollision* pCEvent)
-{
-	if (pCEvent->pEntity[0])
-	{
-		if (pCEvent->pEntity[0]->GetType() == PE_LIVING)
-			return true;
-		if (pCEvent->pEntity[0]->GetType() == PE_WHEELEDVEHICLE)
-		{
-			pe_status_wheel sw;
-			if ((sw.partid = pCEvent->partid[0]) >= 0 && pCEvent->pEntity[0]->GetStatus(&sw))
-			{
-				pe_params_car pcar;
-				if (pCEvent->pEntity[0]->GetParams(&pcar) && pcar.nWheels <= 4)
-					return true;
-			}
-		}
-	}
-	return false;
-}
-}
-
 void CActionGame::OnCollisionLogged_Breakable(const EventPhys* pEvent)
 {
 	CRY_PROFILE_FUNCTION(PROFILE_ACTION);
@@ -2633,7 +2610,7 @@ void CActionGame::OnCollisionLogged_Breakable(const EventPhys* pEvent)
 		         (pCEvent->iForeignData[1] == PHYS_FOREIGN_ID_ENTITY || pCEvent->iForeignData[1] == PHYS_FOREIGN_ID_STATIC) &&
 		         Get()->AllowProceduralBreaking(ePBT_Normal) && pMat->GetBreakability() == 2 &&
 		         pCEvent->idmat[0] != pCEvent->idmat[1] && pCEvent->idmat[0] != -2 && (energy = pMat->GetBreakEnergy()) > 0 &&
-		         !CheckCarParamBreakable(pCEvent) &&
+		         
 		         (hitenergy = max(fabs_tpl(vloc0.x) + fabs_tpl(vloc0.y) + fabs_tpl(vloc0.z),
 		                          vloc0.len2()) * mass0) >= energy &&
 		         (!(pMat->GetHitpoints()) ||
@@ -2678,7 +2655,7 @@ void CActionGame::OnCollisionLogged_Breakable(const EventPhys* pEvent)
 					//	bBreak = false;
 
 					// Tree breakage throttling
-					if ((pCEvent->pEntity[0] && pCEvent->pEntity[0]->GetType() != PE_WHEELEDVEHICLE) &&
+					if ((pCEvent->pEntity[0]) &&
 					    (s_this->m_throttling.m_brokenTreeCounter > g_breakageTreeMax))
 					{
 						ThrottleLogAlways("THROTTLING: DeformPhysicalEntity denied");
@@ -2697,7 +2674,7 @@ void CActionGame::OnCollisionLogged_Breakable(const EventPhys* pEvent)
 						else if (pCEvent->idmat[0] < 0 && sp.pGeom->GetVolume() * cube(sp.scale) < 0.5f || mass0 >= 1500.0f)
 							energy = max(energy, min(energy * 4, 1.5f)); //, flags=2; // for explosions
 						if (mass0 >= 1500.0f)
-							flags |= (geom_colltype_vehicle | geom_colltype6) << 16;
+							flags |= (geom_colltype6) << 16;
 
 						SBreakEvent& be = s_this->RegisterBreakEvent(pCEvent, energy);
 						s_this->m_throttling.m_brokenTreeCounter += g_breakageTreeInc;

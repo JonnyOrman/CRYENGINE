@@ -265,7 +265,7 @@ void CEntityPhysics::OnChildEntityAttached(EntityId childEntityId)
 		if (i < 0 &&
 		    (pChildProxy = pChild->GetPhysicalProxy()) && pChildProxy->m_pPhysicalEntity && pChildProxy->m_pPhysicalEntity->GetType() <= PE_RIGID &&
 		    pAdam && (pAdamProxy = pAdam->GetPhysicalProxy()) && pAdamProxy->m_pPhysicalEntity &&
-		    (i = pAdamProxy->m_pPhysicalEntity->GetType()) <= PE_WHEELEDVEHICLE && i != PE_STATIC)
+		    (i = pAdamProxy->m_pPhysicalEntity->GetType()) <= PE_RIGID && i != PE_STATIC)
 		{
 			// Move pChild (and all of its children) to pAdam
 			int idmap[EntityPhysicsUtils::PARTID_MAX_ATTACHMENTS + 1];
@@ -578,7 +578,7 @@ void CEntityPhysics::OnEntityXForm(EntityTransformationFlagsMask transformReason
 		AABB bbox;
 		bbox.Reset();
 		if ((pAdam = GetAdam(GetEntity(), mtxLoc)) != GetEntity() &&
-		    pAdam->GetPhysicalProxy()->m_pPhysicalEntity && pAdam->GetPhysicalProxy()->m_pPhysicalEntity->GetType() <= PE_WHEELEDVEHICLE)
+		    pAdam->GetPhysicalProxy()->m_pPhysicalEntity && pAdam->GetPhysicalProxy()->m_pPhysicalEntity->GetType() <= PE_RIGID)
 		{
 			for (sp.ipart = 0; pAdam->GetPhysicalProxy()->m_pPhysicalEntity->GetStatus(&sp); sp.ipart++)
 			{
@@ -845,9 +845,6 @@ void CEntityPhysics::Physicalize(SEntityPhysicalizeParams& params)
 	case PE_SOFT:
 		PhysicalizeSoft(params);
 		break;
-	case PE_WHEELEDVEHICLE:
-		CreatePhysicalEntity(params);
-		break;
 	case PE_ROPE:
 		if (params.nSlot >= 0)
 			PhysicalizeCharacter(params);
@@ -992,12 +989,7 @@ void CEntityPhysics::CreatePhysicalEntity(SEntityPhysicalizeParams& params)
 		pf.flagsOR = params.nFlagsOR;
 		m_pPhysicalEntity->SetParams(&pf);
 	}
-
-	if (params.pCar)
-	{
-		m_pPhysicalEntity->SetParams(params.pCar);
-	}
-
+	
 	if (params.type == PE_ARTICULATED)
 	{
 		pe_params_articulated_body pab;
@@ -2014,7 +2006,7 @@ void CEntityPhysics::OnPhysicsPostStep(EventPhysPostStep* pEvent)
 
 	if (physType != PE_RIGID) // In Rigid body sub-parts are not controlled by physics.
 	{
-		if (!GetEntity()->HasInternalFlag(CEntity::EInternalFlag::PhysicsSyncCharacter) && (physType == PE_ARTICULATED || physType == PE_WHEELEDVEHICLE))
+		if (!GetEntity()->HasInternalFlag(CEntity::EInternalFlag::PhysicsSyncCharacter) && (physType == PE_ARTICULATED))
 		{
 			// Use all slots.
 			ppos.flags = status_local;

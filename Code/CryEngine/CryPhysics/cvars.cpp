@@ -256,7 +256,7 @@ namespace PhysicsCVars
 			"Sets the id of the entity that will trigger debug break if awoken");
 
 		pVars->flagsColliderDebris = geom_colltype_debris;
-		pVars->flagsANDDebris = ~(geom_colltype_vehicle | geom_colltype6);
+		pVars->flagsANDDebris = ~(geom_colltype6);
 		pVars->ticksPerSecond = gEnv->pTimer->GetTicksPerSecond();
 
 		if (gEnv->IsEditor())

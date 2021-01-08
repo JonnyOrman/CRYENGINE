@@ -82,8 +82,6 @@ public:
 		g_szParams[pe_player_dimensions::type_id] = sizeof(pe_player_dimensions);
 		g_szParams[pe_player_dynamics::type_id] = sizeof(pe_player_dynamics);
 		g_szParams[pe_params_particle::type_id] = sizeof(pe_params_particle);
-		g_szParams[pe_params_car::type_id] = sizeof(pe_params_car);
-		g_szParams[pe_params_wheel::type_id] = sizeof(pe_params_wheel);
 		g_szParams[pe_params_rope::type_id] = sizeof(pe_params_rope);
 		g_szParams[pe_params_softbody::type_id] = sizeof(pe_params_softbody);
 		g_szParams[pe_tetrlattice_params::type_id] = sizeof(pe_tetrlattice_params);
@@ -106,7 +104,6 @@ public:
 		g_szAction[pe_action_remove_all_parts::type_id] = sizeof(pe_action_remove_all_parts);
 		g_szAction[pe_action_set_velocity::type_id] = sizeof(pe_action_set_velocity);
 		g_szAction[pe_action_move::type_id] = sizeof(pe_action_move);
-		g_szAction[pe_action_drive::type_id] = sizeof(pe_action_drive);
 		g_szAction[pe_action_attach_points::type_id] = sizeof(pe_action_attach_points);
 		g_szAction[pe_action_target_vtx::type_id] = sizeof(pe_action_target_vtx);
 		g_szAction[pe_action_reset_part_mtx::type_id] = sizeof(pe_action_reset_part_mtx);
@@ -118,7 +115,6 @@ public:
 
 		g_szGeomParams[pe_geomparams::type_id] = sizeof(pe_geomparams);
 		g_szGeomParams[pe_articgeomparams::type_id] = sizeof(pe_articgeomparams);
-		g_szGeomParams[pe_cargeomparams::type_id] = sizeof(pe_cargeomparams);
 
 		memset(g_subrefParams,0,sizeof(g_subrefParams));
 		memset(g_subrefAction,0,sizeof(g_subrefAction));
@@ -145,11 +141,7 @@ public:
 		g_subrefBuf[7].set((int)((INT_PTR)&pj.pMtx0-(INT_PTR)&pj), 1,0, sizeof(Matrix33), g_subrefBuf+8);
 		g_subrefBuf[8].set((int)((INT_PTR)&pj.pSelfCollidingParts-(INT_PTR)&pj), 
 			0,(int)((INT_PTR)&pj.nSelfCollidingParts-(INT_PTR)&pj), sizeof(int), 0);
-
-		pe_params_car pc;
-		g_subrefParams[pe_params_car::type_id] = g_subrefBuf+9;
-		g_subrefBuf[9].set((int)((INT_PTR)&pc.gearRatios-(INT_PTR)&pc), 0,(int)((INT_PTR)&pc.nGears-(INT_PTR)&pc), sizeof(float), 0);
-
+		
 		pe_params_rope pr;
 		g_subrefParams[pe_params_rope::type_id] = g_subrefBuf+10;
 		g_subrefBuf[10].set((int)((INT_PTR)&pr.pPoints-(INT_PTR)&pr), 1,(int)((INT_PTR)&pr.nSegments-(INT_PTR)&pr), sizeof(Vec3), g_subrefBuf+11);
@@ -166,7 +158,7 @@ public:
 
 		pe_geomparams gp;
 		g_subrefGeomParams[pe_geomparams::type_id] = g_subrefGeomParams[pe_articgeomparams::type_id] =
-			g_subrefGeomParams[pe_cargeomparams::type_id] = g_subrefBuf+15;
+			 g_subrefBuf+15;
 		g_subrefBuf[15].set((int)((INT_PTR)&gp.pMtx3x4-(INT_PTR)&gp), 1,0, sizeof(Matrix34), g_subrefBuf+16);
 		g_subrefBuf[16].set((int)((INT_PTR)&gp.pMtx3x3-(INT_PTR)&gp), 1,0, sizeof(Matrix33), g_subrefBuf+17);
 		g_subrefBuf[17].set((int)((INT_PTR)&gp.pMatMapping-(INT_PTR)&gp), 0,(int)((INT_PTR)&gp.nMats-(INT_PTR)&gp), sizeof(int), 0);

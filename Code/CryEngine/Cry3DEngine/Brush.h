@@ -116,8 +116,7 @@ public:
 
 	CDeformableNode*      m_pDeform = nullptr;
 	IFoliage*             m_pFoliage = nullptr;
-
-	uint32 m_bVehicleOnlyPhysics : 1;
+	
 	uint32 m_bDrawLast : 1;
 	uint32 m_bNoPhysicalize : 1;
 

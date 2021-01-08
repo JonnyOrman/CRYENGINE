@@ -401,7 +401,6 @@ void CSurfaceTypeManager::LoadSurfaceTypes()
 		// Particles can do a ray world intersection based on priority
 		int important = sf_important;
 		bool bNoCollide = false;
-		bool vehicle_only_collisions = false;
 		bool nBreakable2d = 0;
 		bool can_shatter = false;
 
@@ -444,7 +443,6 @@ void CSurfaceTypeManager::LoadSurfaceTypes()
 			physNode->getAttr("hole_size_explosion", physParams.hole_size_explosion = 0.0f);
 			physNode->getAttr("breakable_2d", nBreakable2d);
 			physNode->getAttr("hit_points_secondary", physParams.hit_points_secondary = nBreakable2d ? 1.0f : physParams.hit_points);
-			physNode->getAttr("vehicle_only_collisions", vehicle_only_collisions);
 			physNode->getAttr("can_shatter", can_shatter);
 			physNode->getAttr("sound_obstruction", physParams.sound_obstruction);
 			physNode->getAttr("important", important);
@@ -468,7 +466,7 @@ void CSurfaceTypeManager::LoadSurfaceTypes()
 							physParams.collType |= 1 << num;
 				}
 				const char* collNames[] = { "default", "all", "player", "vehicle", "explosion", "ray", "float", "water" };
-				const int collVals[] = { geom_colltype0, geom_collides, geom_colltype_player, geom_colltype_vehicle, geom_colltype_explosion, geom_colltype_ray, geom_floats, geom_floats };
+				const int collVals[] = { geom_colltype0, geom_collides, geom_colltype_player, geom_colltype_explosion, geom_colltype_ray, geom_floats, geom_floats };
 				for (int j = 0; j < CRY_ARRAY_COUNT(collVals); j++)
 					if (const char* name = strstr(collTypeStr.c_str(), collNames[j]))
 						if (name > collTypeStr.c_str() && (name[-1] == '-' || name[-1] == '~'))
@@ -499,8 +497,6 @@ void CSurfaceTypeManager::LoadSurfaceTypes()
 
 			if (bNoCollide)
 				pSurfaceType->m_nFlags |= SURFACE_TYPE_NO_COLLIDE;
-			if (vehicle_only_collisions)
-				pSurfaceType->m_nFlags |= SURFACE_TYPE_VEHICLE_ONLY_COLLISION;
 			if (can_shatter)
 				pSurfaceType->m_nFlags |= SURFACE_TYPE_CAN_SHATTER;
 

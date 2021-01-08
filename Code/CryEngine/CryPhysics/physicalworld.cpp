@@ -22,7 +22,6 @@
 #include "walkingrigidentity.h"
 #include "particleentity.h"
 #include "livingentity.h"
-#include "wheeledvehicleentity.h"
 #include "articulatedentity.h"
 #include "ropeentity.h"
 #include "softentity.h"
@@ -115,7 +114,7 @@ void MarkAsPhysWorkerThread(int *pidx) {
 int GetEntityProfileType(CPhysicalEntity *pent)
 {
 	int i = pent->GetType();
-	if (iszero(i-PE_RIGID)|iszero(i-PE_ARTICULATED)|iszero(i-PE_WHEELEDVEHICLE) && pent->GetMassInv()==0.0f)
+	if (iszero(i-PE_RIGID)|iszero(i-PE_ARTICULATED) && pent->GetMassInv()==0.0f)
 		return 10;
 	if (i==PE_ROPE && pent->m_pOuterEntity)
 		return 7+iszero(pent->m_pOuterEntity->GetType()-PE_ARTICULATED);
@@ -1219,7 +1218,6 @@ IPhysicalEntity* CPhysicalWorld::CreatePhysicalEntity(pe_type type, float lifeTi
 		case PE_STATIC: res = CPhysicalEntity::Create<CPhysicalEntity>(this, pHeap); break;
 		case PE_RIGID : res = CPhysicalEntity::Create<CRigidEntity>(this, pHeap); break;
 		case PE_LIVING: res = CPhysicalEntity::Create<CLivingEntity>(this, pHeap); break;
-		case PE_WHEELEDVEHICLE: res = CPhysicalEntity::Create<CWheeledVehicleEntity>(this, pHeap); break;
 		case PE_WALKINGRIGID: res = CPhysicalEntity::Create<CWalkingRigidEntity>(this, pHeap); break;
 		case PE_PARTICLE: res = CPhysicalEntity::Create<CParticleEntity>(this, pHeap); break;
 		case PE_ARTICULATED: res = CPhysicalEntity::Create<CArticulatedEntity>(this, pHeap); break;
@@ -1328,7 +1326,7 @@ IPhysicalEntity *CPhysicalWorld::CreatePhysicalPlaceholder(pe_type type, pe_para
 	res->m_bProcessed = 0;
 	switch (type) {
 		case PE_STATIC: res->m_iSimClass = 0; break;
-		case PE_RIGID: case PE_WHEELEDVEHICLE: res->m_iSimClass = 1; break;
+		case PE_RIGID: res->m_iSimClass = 1; break;
 		case PE_LIVING: res->m_iSimClass = 3; break;
 		case PE_PARTICLE: case PE_ROPE: case PE_ARTICULATED: case PE_SOFT: res->m_iSimClass = 4;
 	}
@@ -5211,13 +5209,12 @@ int CPhysicalEntity::SetStateFromTypedSnapshot(TSerialize ser, int iSnapshotType
 {
 	static CPhysicalEntity g_entStatic(0);
 	static CRigidEntity g_entRigid(0);
-	static CWheeledVehicleEntity g_entWheeled(0);
 	static CLivingEntity g_entLiving(0);
 	static CParticleEntity g_entParticle(0);
 	static CArticulatedEntity g_entArticulated(0);
 	static CRopeEntity g_entRope(0);
 	static CSoftEntity g_entSoft(0);
-	static CPhysicalEntity *g_pTypedEnts[] = { &g_entStatic,&g_entStatic,&g_entRigid,&g_entWheeled,
+	static CPhysicalEntity *g_pTypedEnts[] = { &g_entStatic,&g_entStatic,&g_entRigid,
 		&g_entLiving,&g_entParticle,&g_entArticulated,&g_entRope,&g_entSoft };
 
 	if (GetType()==iSnapshotType)
@@ -5230,13 +5227,12 @@ void CPhysicalWorld::SerializeGarbageTypedSnapshot( TSerialize ser, int iSnapsho
 {
 	static CPhysicalEntity g_entStatic(0);
 	static CRigidEntity g_entRigid(0);
-	static CWheeledVehicleEntity g_entWheeled(0);
 	static CLivingEntity g_entLiving(0);
 	static CParticleEntity g_entParticle(0);
 	static CArticulatedEntity g_entArticulated(0);
 	static CRopeEntity g_entRope(0);
 	static CSoftEntity g_entSoft(0);
-	static CPhysicalEntity *g_pTypedEnts[] = { &g_entStatic,&g_entStatic,&g_entRigid,&g_entWheeled,
+	static CPhysicalEntity *g_pTypedEnts[] = { &g_entStatic,&g_entStatic,&g_entRigid,
 		&g_entLiving,&g_entParticle,&g_entArticulated,&g_entRope,&g_entSoft };
 
 	g_pTypedEnts[min((int)(CRY_ARRAY_COUNT(g_pTypedEnts)),max(0,iSnapshotType))]->

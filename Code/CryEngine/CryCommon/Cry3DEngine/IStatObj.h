@@ -313,10 +313,7 @@ struct IStatObj : IMeshObj, IStreamable
 
 	//! Retrieve flags set on the static object.
 	virtual uint GetFlags() const = 0;
-
-	//! Retrieves the internal flag m_nVehicleOnlyPhysics.
-	virtual unsigned int GetVehicleOnlyPhysics() = 0;
-
+	
 	//! Retrieves the internal flag m_nIdMaterialBreakable.
 	virtual int GetIDMatBreakable() = 0;
 

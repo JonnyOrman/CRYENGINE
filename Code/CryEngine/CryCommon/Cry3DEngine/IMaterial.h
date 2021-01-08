@@ -27,7 +27,6 @@ struct SShaderParam;
 
 //! Special names for materials.
 #define MTL_SPECIAL_NAME_COLLISION_PROXY         "collision_proxy"
-#define MTL_SPECIAL_NAME_COLLISION_PROXY_VEHICLE "nomaterial_vehicle"
 #define MTL_SPECIAL_NAME_RAYCAST_PROXY           "raycast_proxy"
 
 enum

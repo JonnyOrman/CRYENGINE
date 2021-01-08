@@ -245,7 +245,6 @@ public:
 	unsigned int m_bDefaultObject : 1;
 	unsigned int m_bOpenEdgesTested : 1;
 	unsigned int m_bSubObject : 1;          // This is sub object.
-	unsigned int m_bVehicleOnlyPhysics : 1; // Object can be used for collisions with vehicles only
 	unsigned int m_bBreakableByGame : 1;    // material is marked as breakable by game
 	unsigned int m_bSharesChildren : 1;     // means its subobjects belong to another parent statobj
 	unsigned int m_bHasDeformationMorphs : 1;
@@ -354,8 +353,7 @@ public:
 
 	virtual void             SetFlags(uint nFlags) final   { m_nFlags = nFlags; IncrementModificationId(); }
 	virtual uint             GetFlags() const final        { return m_nFlags; }
-
-	virtual unsigned int     GetVehicleOnlyPhysics() final { return m_bVehicleOnlyPhysics; }
+	
 	virtual int              GetIDMatBreakable() final     { return m_idmatBreakable; }
 	virtual unsigned int     GetBreakableByGame() final    { return m_bBreakableByGame; }
 

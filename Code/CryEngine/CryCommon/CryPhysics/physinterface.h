@@ -88,8 +88,6 @@ enum EPE_Status
 {
 	ePE_status_pos                 = 1,
 	ePE_status_living              = 2,
-	ePE_status_vehicle             = 4,
-	ePE_status_wheel               = 5,
 	ePE_status_joint               = 6,
 	ePE_status_awake               = 7,
 	ePE_status_dynamics            = 8,
@@ -99,7 +97,6 @@ enum EPE_Status
 	ePE_status_nparts              = 12,
 	ePE_status_contains_point      = 13,
 	ePE_status_rope                = 14,
-	ePE_status_vehicle_abilities   = 15,
 	ePE_status_placeholder         = 16,
 	ePE_status_softvtx             = 17,
 	ePE_status_sensors             = 18,
@@ -117,7 +114,7 @@ enum EPE_Status
 };
 
 //! CStatoscope::AddPhysEntity must be updated when changing this enum.
-enum pe_type { PE_NONE = 0, PE_STATIC = 1, PE_RIGID = 2, PE_WHEELEDVEHICLE = 3, PE_LIVING = 4, PE_PARTICLE = 5, PE_ARTICULATED = 6, PE_ROPE = 7, PE_SOFT = 8, PE_AREA = 9, PE_GRID = 10, PE_WALKINGRIGID = 11 };
+enum pe_type { PE_NONE = 0, PE_STATIC = 1, PE_RIGID = 2, PE_LIVING = 4, PE_PARTICLE = 5, PE_ARTICULATED = 6, PE_ROPE = 7, PE_SOFT = 8, PE_AREA = 9, PE_GRID = 10, PE_WALKINGRIGID = 11 };
 enum sim_class { SC_STATIC = 0, SC_SLEEPING_RIGID = 1, SC_ACTIVE_RIGID = 2, SC_LIVING = 3, SC_INDEPENDENT = 4, SC_TRIGGER = 6, SC_DELETED = 7 };
 struct IGeometry;
 struct IPhysicalEntity;
@@ -664,11 +661,7 @@ enum phentity_flags
 
 	//! PE_ARTICULATED-specific flags
 	aef_recorded_physics = 0x02, //!< specifies a an entity that contains pre-baked physics simulation
-
-	//! PE_WHEELEDVEHICLE-specific flags
-	wwef_fake_inner_wheels = 0x08, //!< exclude wheels between the first and the last one from the solver
-	                               //! (only wheels with non-0 suspension are considered)
-
+	
 	//! general flags
 	pef_parts_traceable           = 0x10,                                                      //!< each entity part will be registered separately in the entity grid
 	pef_disabled                  = 0x20,                                                      //!< entity will not be simulated
@@ -1001,86 +994,6 @@ struct pe_params_particle : pe_params
 	VALIDATOR_NORM(heading)
 	VALIDATOR_NORM(q0)
 	VALIDATORS_END
-};
-
-////////// vehicle entity params
-
-struct pe_params_car : pe_params
-{
-	enum entype { type_id = ePE_params_car };
-	pe_params_car()
-	{
-		type = type_id;
-		MARK_UNUSED engineMaxRPM, iIntegrationType, axleFriction, enginePower, maxSteer, maxTimeStep, minEnergy, damping, brakeTorque;
-		MARK_UNUSED engineMinRPM, engineShiftUpRPM, engineShiftDownRPM, engineIdleRPM, engineStartRPM, clutchSpeed, nGears, gearRatios, kStabilizer;
-		MARK_UNUSED slipThreshold, gearDirSwitchRPM, kDynFriction, minBrakingFriction, maxBrakingFriction, steerTrackNeutralTurn, maxGear, minGear, pullTilt;
-		MARK_UNUSED maxTilt, bKeepTractionWhenTilted, wheelMassScale;
-	}
-
-	float  axleFriction;       //!< friction torque at axes divided by mass of vehicle
-	float  enginePower;        //!< power of engine (about 10,000 - 100,000)
-	float  maxSteer;           //!< maximum steering angle
-	float  engineMaxRPM;       //!< engine torque decreases to 0 after reaching this rotation speed
-	float  brakeTorque;        //!< torque applied when breaking using the engine
-	int    iIntegrationType;   //!< for suspensions; 0-explicit Euler, 1-implicit Euler
-	float  maxTimeStep;        //!< maximum time step when vehicle has only wheel contacts
-	float  minEnergy;          //!< minimum awake energy when vehicle has only wheel contacts
-	float  damping;            //!< damping when vehicle has only wheel contacts
-	float  minBrakingFriction; //!< limits the the tire friction when handbraked
-	float  maxBrakingFriction; //!< limits the the tire friction when handbraked
-	float  kStabilizer;        //!< stabilizer force, as a multiplier for kStiffness of respective suspensions
-	int    nWheels;            //!< the number of wheels
-	float  engineMinRPM;       //!< disengages the clutch when falling behind this limit, if braking with the engine
-	float  engineShiftUpRPM;   //!< RPM threshold for for automatic gear switching
-	float  engineShiftDownRPM;
-	float  engineIdleRPM;  //!< RPM for idle state
-	float  engineStartRPM; //!< sets this RPM when activating the engine
-	float  clutchSpeed;    //!< clutch engagement/disengagement speed
-	int    nGears;
-	float* gearRatios;              //!< assumes 0-backward gear, 1-neutral, 2 and above - forward
-	int    maxGear, minGear;        //!< additional gear index clamping
-	float  slipThreshold;           //!< lateral speed threshold for switching a wheel to a 'slipping' mode
-	float  gearDirSwitchRPM;        //!< RPM threshold for switching back and forward gears
-	float  kDynFriction;            //!< friction modifier for sliping wheels
-	float  steerTrackNeutralTurn;   //!< for tracked vehicles, steering angle that causes equal but opposite forces on tracks
-	float  pullTilt;                //!< for tracked vehicles, tilt angle of pulling force towards ground
-	float  maxTilt;                 //!< maximum wheel contact normal tilt (left or right) after which it acts as a locked part of the hull
-	int    bKeepTractionWhenTilted; //!< keeps wheel traction in tilted mode
-	float  wheelMassScale;          //!< scales wheels' masses for inertia computations (default 0)
-};
-
-struct pe_params_wheel : pe_params
-{
-	enum entype { type_id = ePE_params_wheel };
-	pe_params_wheel()
-	{
-		type = type_id;
-		iWheel = 0;
-		MARK_UNUSED bDriving, iAxle, suspLenMax, suspLenInitial, minFriction, maxFriction, surface_idx, bCanBrake, bBlocked,
-		            bRayCast, kStiffness, kDamping, kLatFriction, Tscale, w, bCanSteer, kStiffnessWeight;
-	}
-
-	int   iWheel;
-	int   bDriving;
-	int   iAxle;          //!< wheels on the same axle align their coordinates (if only slightly misaligned)
-	                      //!< and apply stabilizer force (if set); axle<0 means the wheel does not affect the physics
-	int   bCanBrake;      //!< handbrake applies
-	int   bBlocked;       //!< locks the wheel (acts like a forced handbrake)
-	int   bCanSteer;      //!< can this wheel steer, 0 or 1
-	float suspLenMax;     //!< full suspension length (relaxed)
-	float suspLenInitial; //!< length in the initial state (used for automatic computations)
-	float minFriction;    //!< surface friction is cropped to this min-max range
-	float maxFriction;
-	int   surface_idx;
-	int   bRayCast;         //!< uses raycasts instead of cylinders
-	float kStiffness;       //!< if 0, will be computed based on mass distribution, lenMax, and lenInitial
-	float kStiffnessWeight; //!< When autocalculating stiffness use this weight for this wheel. Note weights for wheels in front of the centre of mass do not influence the weights of wheels behind the centre of mass
-	                        //!< By default all weights are 1.0 and the sum doesn't have to add up to 1.0!
-	                        //!< Also a <=0 weight will leave the wheel out of the autocalculation. It will be get a stiffness of weight*mass*gravity/defaultLength/numWheels. weight=-1 is a good starting point for these wheels
-	float kDamping;         //!< absolute value if >=0, otherwise -(fraction of 0-oscillation damping)
-	float kLatFriction;     //!< lateral friction scale (doesn't apply when on handbrake)
-	float Tscale;           //!< optional driving torque scale
-	float w;                //!< rotational velocity; it's computed automatically, but can be overriden if needed
 };
 
 ////////// walking rigid entity params
@@ -1522,23 +1435,6 @@ struct pe_action_move : pe_action
 	VALIDATORS_END
 };
 
-////////// vehicle entity actions
-
-struct pe_action_drive : pe_action
-{
-	enum entype { type_id = ePE_action_drive };
-	pe_action_drive() { type = type_id; MARK_UNUSED pedal, dpedal, steer, dsteer, bHandBrake, clutch, iGear; ackermanOffset = 0.f; }
-
-	float pedal;          //!< engine pedal absolute value; active pedal always awakes the entity
-	float dpedal;         //!< engine pedal delta
-	float steer;          //!< steering angle absolute value
-	float ackermanOffset; //!< apply ackerman steering, 0.0 -> normal driving front wheels steer, back fixed. 1.0 -> front fixed, back steer. 0.5 -> both front and back steer
-	float dsteer;         //!< steering angle delta
-	float clutch;         //!< forces clutch; 0..1
-	int   bHandBrake;     //!< removing handbrake will automatically awaken the vehicle if it's sleeping
-	int   iGear;          //!< 0-back; 1-neutral; 2+-forward
-};
-
 ////////// rope entity actions
 
 struct pe_action_target_vtx : pe_action
@@ -1849,60 +1745,6 @@ struct pe_status_check_stance : pe_status
 	int         bUseCapsule;
 };
 
-////////// vehicle entity statuses
-
-struct pe_status_vehicle : pe_status
-{
-	enum entype { type_id = ePE_status_vehicle };
-	pe_status_vehicle() { type = type_id; }
-
-	float steer;      //!< current steering angle
-	float pedal;      //!< current engine pedal
-	int   bHandBrake; //!< nonzero if handbrake is on
-	float footbrake;  //!< nonzero if footbrake is pressed (range 0..1)
-	Vec3  vel;
-	int   bWheelContact; //!< nonzero if at least one wheel touches ground
-	int   iCurGear;
-	float engineRPM;
-	float clutch;
-	float drivingTorque;
-	int   nActiveColliders; //!< number of non-static contacting entities
-};
-
-struct pe_status_wheel : pe_status
-{
-	enum entype { type_id = ePE_status_wheel };
-	pe_status_wheel() { type = type_id; iWheel = 0; MARK_UNUSED partid; }
-	int              iWheel;
-	int              partid;
-
-	int              bContact;    //!< nonzero if wheel touches ground
-	Vec3             ptContact;   //!< point where wheel touches ground
-	Vec3             normContact; //!< contact normal
-	float            w;           //!< rotation speed
-	int              bSlip;
-	Vec3             velSlip; //!< slip velocity
-	int              contactSurfaceIdx;
-	float            friction;    //!< current friction applied
-	float            suspLen;     //!< current suspension spring length
-	float            suspLenFull; //!< relaxed suspension spring length
-	float            suspLen0;    //!< initial suspension spring length
-	float            r;           //!< wheel radius
-	float            torque;      //!< driving torque
-	float            steer;       //!< current steering angle
-	IPhysicalEntity* pCollider;
-};
-
-struct pe_status_vehicle_abilities : pe_status
-{
-	enum entype { type_id = ePE_status_vehicle_abilities };
-	pe_status_vehicle_abilities() { type = type_id; MARK_UNUSED steer; }
-
-	float steer;       //!< should be set to requested steering angle
-	Vec3  rotPivot;    //!< returns turning circle center
-	float maxVelocity; //!< calculates maximum velocity of forward movement along a plane (steer is ignored)
-};
-
 ////////// articulated entity statuses
 
 struct pe_status_joint : pe_status
@@ -2026,7 +1868,7 @@ enum geom_flags
 	geom_ignore_BBox            = 0x20000000,//!< don't include the part in entity world BBox computation
 	//! mnemonic group names
 	geom_colltype_player        = geom_colltype1, geom_colltype_explosion = geom_colltype2,
-	geom_colltype_vehicle       = geom_colltype3, geom_colltype_foliage = geom_colltype4, geom_colltype_debris = geom_colltype5,
+	geom_colltype_foliage = geom_colltype4, geom_colltype_debris = geom_colltype5,
 	geom_colltype_foliage_proxy = geom_colltype13, geom_colltype_obstruct = geom_colltype14,
 	geom_colltype_solid         = 0x0FFF & ~geom_colltype_explosion, geom_collides = 0xFFFF
 };
@@ -2105,48 +1947,6 @@ struct pe_articgeomparams : pe_geomparams
 		if (!is_unused(src.minContactDist)) minContactDist = src.minContactDist; else MARK_UNUSED minContactDist;
 	}
 	int idbody; //!< id of the subbody this geometry is attached to, the 1st add geometry specifies frame CS of this subbody
-};
-
-////////// vehicle entity geometries
-
-const int NMAXWHEELS = 30;
-struct pe_cargeomparams : pe_geomparams
-{
-	enum entype { type_id = ePE_cargeomparams };
-	pe_cargeomparams() : pe_geomparams() { type = type_id; MARK_UNUSED bDriving, minFriction, maxFriction, bRayCast, kLatFriction; bCanBrake = 1; bCanSteer = 1; kStiffnessWeight = 1.f; }
-	pe_cargeomparams(pe_geomparams& src)
-	{
-		type = type_id;
-		density = src.density;
-		mass = src.mass;
-		pos = src.pos;
-		q = src.q;
-		surface_idx = src.surface_idx;
-		idmatBreakable = src.idmatBreakable;
-		pLattice = src.pLattice;
-		pMatMapping = src.pMatMapping;
-		nMats = src.nMats;
-		pMtx3x4 = src.pMtx3x4;
-		pMtx3x3 = src.pMtx3x3;
-		flags = src.flags;
-		flagsCollider = src.flagsCollider;
-		MARK_UNUSED bDriving, minFriction, maxFriction, bRayCast;
-		bCanBrake = 1, bCanSteer = 1;
-		kStiffnessWeight = 1.f;
-	}
-	int   bDriving;                 //!< whether wheel is driving, -1 - geometry os not a wheel
-	int   iAxle;                    //!< wheel axle, currently not used
-	int   bCanBrake;                //!< whether the wheel is locked during handbrakes
-	int   bRayCast;                 //!< whether the wheel use simple raycasting instead of geometry sweep check
-	int   bCanSteer;                //!< wheel the wheel can steer
-	Vec3  pivot;                    //!< upper suspension point in vehicle CS
-	float lenMax;                   //!< relaxed suspension length
-	float lenInitial;               //!< current suspension length (assumed to be length in rest state)
-	float kStiffness;               //!< suspension stiffness, if 0 - calculate from lenMax, lenInitial, and vehicle mass and geometry
-	float kStiffnessWeight;         //!< When autocalculating stiffness use this weight for this wheel. Note weights for wheels in front of the centre of mass do not influence the weights of wheels behind the centre of mass
-	float kDamping;                 //!< suspension damping, if <0 - calculate as -kdamping*(approximate zero oscillations damping)
-	float minFriction, maxFriction; //!< additional friction limits for tire friction
-	float kLatFriction;             //!< coefficient for lateral friction
 };
 
 ///////////////// tetrahedra lattice params ////////////////////////

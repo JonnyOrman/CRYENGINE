@@ -79,73 +79,43 @@ int       CPhysCallbacks::OnFoliageTouched(const EventPhys* pEvent)
 		primitives::box bbox;
 		OBB obb;
 		Vec3 sz = pbb.BBox[1] - pbb.BBox[0];
-		int nWheels = 0, nParts = pOverlap->pEntity[0]->GetStatus(&snp);
-		if (pOverlap->pEntity[0]->GetType() == PE_WHEELEDVEHICLE)
-		{
-			pe_params_car pc;
-			pOverlap->pEntity[0]->GetParams(&pc);
-			nWheels = pc.nWheels;
-		}
 
 		pOverlap->pEntity[0]->GetStatus(&sp);
-		for (pp.ipart = 0; pp.ipart < nParts - nWheels && pOverlap->pEntity[0]->GetParams(&pp); pp.ipart++, MARK_UNUSED pp.partid)
-			if (pp.flagsOR & (geom_colltype0 | geom_colltype1 | geom_colltype2 | geom_colltype3))
-			{
-				pp.pPhysGeomProxy->pGeom->GetBBox(&bbox);
-				obb.SetOBB(Matrix33(sp.q * pp.q) * bbox.Basis.T(), bbox.size * pp.scale, Vec3(ZERO));
-				if (Overlap::AABB_OBB(AABB(pbb.BBox[0], pbb.BBox[1]), sp.q * (pp.q * bbox.center * pp.scale + pp.pos) + sp.pos, obb))
-					goto foundbox;
-			}
 		return 1;
-foundbox:
-
-		int i;
-		pe_params_foreign_data pfd;
-		C3DEngine* pEngine = (C3DEngine*)gEnv->p3DEngine;
-		pOverlap->pEntity[0]->GetParams(&pfd);
-		if ((i = (pfd.iForeignFlags >> 8 & 255) - 1) < 0)
-		{
-			if ((i = pEngine->m_arrEntsInFoliage.size()) < 255)
-			{
-				SEntInFoliage eif;
-				eif.id = gEnv->pPhysicalWorld->GetPhysicalEntityId(pOverlap->pEntity[0]);
-				eif.timeIdle = 0;
-				pEngine->m_arrEntsInFoliage.push_back(eif);
-				MARK_UNUSED pfd.pForeignData, pfd.iForeignData, pfd.iForeignFlags;
-				pfd.iForeignFlagsOR = (i + 1) << 8;
-				pOverlap->pEntity[0]->SetParams(&pfd, 1);
-			}
-		}
-		else if (i < (int)pEngine->m_arrEntsInFoliage.size())
-			pEngine->m_arrEntsInFoliage[i].timeIdle = 0;
-
-		IRenderNode* pVeg = GetRenderNodeFromPhys(pOverlap->pForeignData[1], pOverlap->iForeignData[1]);
-		if (!pVeg)
-			return 1;
-		const CCamera& cam = gEnv->pSystem->GetViewCamera();
-		int cullDist = GetCVars()->e_CullVegActivation;
-		int iSource = 0;
-
-		if (!cullDist || static_cast<unsigned>(pVeg->GetDrawFrame()) + 10 > gEnv->nMainFrameID &&
-		    (cam.GetPosition() - pVeg->GetPos()).len2() * sqr(cam.GetFov()) < sqr(cullDist * 1.04f))
-			if (pVeg->GetPhysics() == pOverlap->pEntity[1] && !pVeg->PhysicalizeFoliage(true, iSource) && nWheels > 0 && sz.x * sz.y < 0.5f)
-				for (pp.ipart = nParts - 1; pp.ipart >= nParts - nWheels && pOverlap->pEntity[0]->GetParams(&pp); pp.ipart--, MARK_UNUSED pp.partid)
-					if (pp.pPhysGeomProxy->pGeom->PointInsideStatus(
-					      (((pbb.BBox[1] + pbb.BBox[0]) * 0.5f - sp.pos) * sp.q - pp.pos) * pp.q * (pp.scale == 1.0f ? 1.0f : 1.0f / pp.scale)))
-					{
-						// break the vegetation object
-						CStatObj* pStatObj = (CStatObj*)pVeg->GetEntityStatObj();
-						if (pStatObj)
-						{
-							IParticleEffect* pDisappearEffect = pStatObj->GetSurfaceBreakageEffect(SURFACE_BREAKAGE_TYPE("destroy"));
-							if (pDisappearEffect)
-								pDisappearEffect->Spawn(true, IParticleEffect::ParticleLoc(pVeg->GetBBox().GetCenter(), Vec3(0, 0, 1), (sz.x + sz.y + sz.z) * 0.3f));
-						}
-						pVeg->Dephysicalize();
-						pEngine->UnRegisterEntityAsJob(pVeg);
-						break;
-					}
 	}
+//foundbox:
+//
+//		int i;
+//		pe_params_foreign_data pfd;
+//		C3DEngine* pEngine = (C3DEngine*)gEnv->p3DEngine;
+//		pOverlap->pEntity[0]->GetParams(&pfd);
+//		if ((i = (pfd.iForeignFlags >> 8 & 255) - 1) < 0)
+//		{
+//			if ((i = pEngine->m_arrEntsInFoliage.size()) < 255)
+//			{
+//				SEntInFoliage eif;
+//				eif.id = gEnv->pPhysicalWorld->GetPhysicalEntityId(pOverlap->pEntity[0]);
+//				eif.timeIdle = 0;
+//				pEngine->m_arrEntsInFoliage.push_back(eif);
+//				MARK_UNUSED pfd.pForeignData, pfd.iForeignData, pfd.iForeignFlags;
+//				pfd.iForeignFlagsOR = (i + 1) << 8;
+//				pOverlap->pEntity[0]->SetParams(&pfd, 1);
+//			}
+//		}
+//		else if (i < (int)pEngine->m_arrEntsInFoliage.size())
+//			pEngine->m_arrEntsInFoliage[i].timeIdle = 0;
+//
+//		IRenderNode* pVeg = GetRenderNodeFromPhys(pOverlap->pForeignData[1], pOverlap->iForeignData[1]);
+//		if (!pVeg)
+//			return 1;
+//		const CCamera& cam = gEnv->pSystem->GetViewCamera();
+//		int cullDist = GetCVars()->e_CullVegActivation;
+//		int iSource = 0;
+//
+//		/*if (!cullDist || static_cast<unsigned>(pVeg->GetDrawFrame()) + 10 > gEnv->nMainFrameID &&
+//		    (cam.GetPosition() - pVeg->GetPos()).len2() * sqr(cam.GetFov()) < sqr(cullDist * 1.04f))
+//			if (pVeg->GetPhysics() == pOverlap->pEntity[1] && !pVeg->PhysicalizeFoliage(true, iSource) && sz.x * sz.y < 0.5f)*/
+	//}
 	return 1;
 }
 

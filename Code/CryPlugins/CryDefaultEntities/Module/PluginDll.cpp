@@ -50,8 +50,6 @@
 #include "DefaultComponents/Physics/AreaComponent.h"
 #include "DefaultComponents/Physics/WaterVolumeComponent.h"
 #include "DefaultComponents/Physics/ThrusterComponent.h"
-#include "DefaultComponents/Physics/Vehicles/VehicleComponent.h"
-#include "DefaultComponents/Physics/Vehicles/WheelComponent.h"
 #include "DefaultComponents/Physics/VirtualReality/VirtualRealityInteractionComponent.h"
 #include "DefaultComponents/Utilities/ChildEntityComponent.h"
 #include "DefaultComponents/Cameras/CameraManager.h"
@@ -274,14 +272,6 @@ void CPlugin_CryDefaultEntities::RegisterComponents(Schematyc::IEnvRegistrar& re
 		{
 			Schematyc::CEnvRegistrationScope componentScope = scope.Register(SCHEMATYC_MAKE_ENV_COMPONENT(Cry::DefaultComponents::CThrusterComponent));
 			Cry::DefaultComponents::CThrusterComponent::Register(componentScope);
-		}
-		{
-			Schematyc::CEnvRegistrationScope componentScope = scope.Register(SCHEMATYC_MAKE_ENV_COMPONENT(Cry::DefaultComponents::CVehiclePhysicsComponent));
-			Cry::DefaultComponents::CVehiclePhysicsComponent::Register(componentScope);
-		}
-		{
-			Schematyc::CEnvRegistrationScope componentScope = scope.Register(SCHEMATYC_MAKE_ENV_COMPONENT(Cry::DefaultComponents::CWheelComponent));
-			Cry::DefaultComponents::CWheelComponent::Register(componentScope);
 		}
 		{
 			Schematyc::CEnvRegistrationScope componentScope = scope.Register(SCHEMATYC_MAKE_ENV_COMPONENT(Cry::DefaultComponents::VirtualReality::CInteractionComponent));

@@ -261,8 +261,6 @@ void CStatObj::AssignPhysGeom(int nGeomType, phys_geometry* pPhysGeom, int bAppe
 
 		if (nGeomType == PHYS_GEOM_TYPE_DEFAULT)
 		{
-			ISurfaceTypeManager* pSurfaceTypeManager = Get3DEngine()->GetMaterialManager()->GetSurfaceTypeManager();
-			ISurfaceType* pMat;
 			float bounciness, friction;
 			unsigned int flags = 0;
 
@@ -270,18 +268,12 @@ void CStatObj::AssignPhysGeom(int nGeomType, phys_geometry* pPhysGeom, int bAppe
 			{
 				GetPhysicalWorld()->GetSurfaceParameters(surfaceTypesId[i], bounciness, friction, flags);
 				flagsPhys[i] = flags >> sf_matbreakable_bit;
-				if ((pMat = pSurfaceTypeManager->GetSurfaceType(surfaceTypesId[i])) &&
-				    (pMat->GetFlags() & SURFACE_TYPE_VEHICLE_ONLY_COLLISION))
-				{
-					flagsPhys[i] |= (int)1 << 16;
-				}
 				if (flags & sf_manually_breakable)
 					flagsPhys[i] |= (int)1 << 17;
 			}
 
 			mesh_data* pmd;
 			m_idmatBreakable = -1;
-			m_bVehicleOnlyPhysics = 0;
 			m_bBreakableByGame = 0;
 			assert(pPhysGeom->pGeom);
 			PREFAST_ASSUME(pPhysGeom->pGeom);
@@ -293,7 +285,6 @@ void CStatObj::AssignPhysGeom(int nGeomType, phys_geometry* pPhysGeom, int bAppe
 					assert(j >= 0 && j < numIds);
 					PREFAST_ASSUME(j >= 0 && j < numIds);
 					m_idmatBreakable = max(m_idmatBreakable, (flagsPhys[j] & 0xFFFF) - 1);
-					m_bVehicleOnlyPhysics |= flagsPhys[j] >> 16 & 1;
 					m_bBreakableByGame |= flagsPhys[j] >> 17;
 				}
 			else if (pPhysGeom->surface_idx >= 0)
@@ -301,7 +292,6 @@ void CStatObj::AssignPhysGeom(int nGeomType, phys_geometry* pPhysGeom, int bAppe
 				j = pPhysGeom->surface_idx & - isneg(pPhysGeom->surface_idx - numIds);
 				assert(j >= 0 && j < numIds);
 				PREFAST_ASSUME(j >= 0 && j < numIds);
-				m_bVehicleOnlyPhysics = flagsPhys[j] >> 16;
 				m_bBreakableByGame |= flagsPhys[j] >> 17;
 			}
 		}
@@ -2114,20 +2104,13 @@ int CStatObj::PhysicalizeSubobjects(IPhysicalEntity* pent, const Matrix34* pMtx,
 			if (GetCVars()->e_ObjQuality != CONFIG_LOW_SPEC)
 			{
 				partpos.idmatBreakable = ((CStatObj*)pSubObj->pStatObj)->m_idmatBreakable;
-				if (((CStatObj*)pSubObj->pStatObj)->m_bVehicleOnlyPhysics)
-					partpos.flags = geom_colltype6;
-				else
-				{
-					partpos.flags = (geom_colltype_solid & ~(geom_colltype_player & - bHasPlayerOnlyGeoms)) | geom_colltype_ray | geom_floats | geom_colltype_explosion;
-					if (bHasPlayerOnlyGeoms && strcmp(pSubObj->name, "colltype_player") == 0)
-						partpos.flags = geom_colltype_player;
-				}
+				partpos.flags = (geom_colltype_solid & ~(geom_colltype_player & - bHasPlayerOnlyGeoms)) | geom_colltype_ray | geom_floats | geom_colltype_explosion;
+				if (bHasPlayerOnlyGeoms && strcmp(pSubObj->name, "colltype_player") == 0)
+					partpos.flags = geom_colltype_player;
 			}
 			else
 			{
 				partpos.idmatBreakable = -1;
-				if (((CStatObj*)pSubObj->pStatObj)->m_bVehicleOnlyPhysics)
-					partpos.flags = geom_colltype6;
 			}
 			if (!strncmp(pSubObj->name, "skeleton_", 9))
 			{

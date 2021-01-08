@@ -7,7 +7,6 @@ enum ESurfaceTypeFlags : uint32
 {
 	SURFACE_TYPE_NO_PHYSICALIZE         = BIT32(1), //!< This surface should not be physicalized.
 	SURFACE_TYPE_NO_COLLIDE             = BIT32(2), //!< Should only be set for vegetation canopy mats.
-	SURFACE_TYPE_VEHICLE_ONLY_COLLISION = BIT32(3),
 	SURFACE_TYPE_CAN_SHATTER            = BIT32(4), //!< This surface type can shatter.
 	SURFACE_TYPE_BULLET_PIERCEABLE      = BIT32(5), //!< This surface is pierceable by bullets (used by MFX system to spawn front/back FX).
 };

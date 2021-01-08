@@ -212,7 +212,7 @@ void CMatInfo::SetName(const char* sName)
 		}
 	}
 
-	if (strstr(sName, MTL_SPECIAL_NAME_COLLISION_PROXY) != 0 || strstr(sName, MTL_SPECIAL_NAME_COLLISION_PROXY_VEHICLE) != 0)
+	if (strstr(sName, MTL_SPECIAL_NAME_COLLISION_PROXY) != 0)
 	{
 		m_Flags |= MTL_FLAG_COLLISION_PROXY;
 	}

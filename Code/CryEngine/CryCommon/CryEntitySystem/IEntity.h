@@ -271,7 +271,7 @@ struct SEntityPhysicalizeParams
 	//////////////////////////////////////////////////////////////////////////
 	SEntityPhysicalizeParams() : type(0), nSlot(-1), density(-1), mass(-1), nFlagsAND(UINT_MAX), nFlagsOR(0), nLod(0),
 		pAttachToEntity(NULL), nAttachToPart(-1), fStiffnessScale(0), bCopyJointVelocities(false),
-		pParticle(NULL), pBuoyancy(NULL), pPlayerDimensions(NULL), pPlayerDynamics(NULL), pCar(NULL), pAreaDef(NULL), szPropsOverride(0) {}
+		pParticle(NULL), pBuoyancy(NULL), pPlayerDimensions(NULL), pPlayerDynamics(NULL), pAreaDef(NULL), szPropsOverride(0) {}
 	//////////////////////////////////////////////////////////////////////////
 
 	//! Physicalization type must be one of pe_type enums.
@@ -310,7 +310,6 @@ struct SEntityPhysicalizeParams
 	struct pe_params_buoyancy*   pBuoyancy;
 	struct pe_player_dimensions* pPlayerDimensions;
 	struct pe_player_dynamics*   pPlayerDynamics;
-	struct pe_params_car*        pCar;
 
 	//! This parameters are only used when type == PE_AREA.
 	struct AreaDefinition
