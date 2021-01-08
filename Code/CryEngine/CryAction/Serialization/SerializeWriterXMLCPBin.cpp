@@ -136,18 +136,3 @@ const char* CSerializeWriterXMLCPBin::GetStackInfo() const
 	}
 	return str.c_str();
 }
-
-//////////////////////////////////////////////////////////////////////////
-const char* CSerializeWriterXMLCPBin::GetLuaStackInfo() const
-{
-	static string str;
-	str.assign("");
-	for (int i = 0; i < (int)m_luaSaveStack.size(); i++)
-	{
-		const char* name = m_luaSaveStack[i];
-		str += name;
-		if (i != m_luaSaveStack.size() - 1)
-			str += ".";
-	}
-	return str.c_str();
-}

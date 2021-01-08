@@ -295,7 +295,6 @@ def copy_engine_binaries(engine_path, export_path, rel_dir, include_symbols):
                 'ShaderCacheGen*',
                 'icu*',
                 'python27*',
-                'LuaCompiler*',
                 'Editor**',
                 'PySide2*',
                 'shiboken*',

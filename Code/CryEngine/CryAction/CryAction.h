@@ -39,7 +39,6 @@ class CViewSystem;
 class CGameplayRecorder;
 class CPersistantDebug;
 class CPlayerProfileManager;
-class CGameplayAnalyst;
 class CTimeOfDayScheduler;
 class CNetworkCVars;
 class CCryActionCVars;
@@ -352,9 +351,7 @@ private:
 	static void LegacyUnbanPlayerCmd(IConsoleCmdArgs* args);
 	static void OpenURLCmd(IConsoleCmdArgs* args);
 	static void TestResetCmd(IConsoleCmdArgs* args);
-
-	static void DumpAnalysisStatsCmd(IConsoleCmdArgs* args);
-
+	
 #if !defined(_RELEASE)
 	static void ConnectRepeatedlyCmd(IConsoleCmdArgs* args);
 #endif
@@ -447,7 +444,6 @@ private:
 	IEffectSystem*                m_pEffectSystem;
 	CGameSerialize*               m_pGameSerialize;
 	CallbackTimer*                m_pCallbackTimer;
-	CGameplayAnalyst*             m_pGameplayAnalyst;
 	CForceFeedBackSystem*         m_pForceFeedBackSystem;
 	//	INetQueryListener *m_pLanQueryListener;
 	ILanQueryListener*            m_pLanQueryListener;

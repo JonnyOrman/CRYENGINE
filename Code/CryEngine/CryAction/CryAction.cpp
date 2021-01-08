@@ -52,7 +52,6 @@
 #include "GameObjects/GameObjectSystem.h"
 #include "ViewSystem/ViewSystem.h"
 #include "GameplayRecorder/GameplayRecorder.h"
-#include "Analyst.h"
 #include "BreakableGlassSystem.h"
 
 #include "ForceFeedbackSystem/ForceFeedbackSystem.h"
@@ -235,7 +234,6 @@ CCryAction::CCryAction(SSystemInitParams& initParams)
 	m_pActionMapManager(0),
 	m_pViewSystem(0),
 	m_pGameplayRecorder(0),
-	m_pGameplayAnalyst(0),
 	m_pGameRulesSystem(0),
 	m_pGameObjectSystem(0),
 	m_pAnimationGraphCvars(0),
@@ -1366,12 +1364,6 @@ void CCryAction::OpenURLCmd(IConsoleCmdArgs* args)
 		GetCryAction()->ShowPageInBrowser(args->GetArg(1));
 }
 
-void CCryAction::DumpAnalysisStatsCmd(IConsoleCmdArgs* args)
-{
-	if (CCryAction::GetCryAction()->m_pGameplayAnalyst)
-		CCryAction::GetCryAction()->m_pGameplayAnalyst->DumpToTXT();
-}
-
 #if !defined(_RELEASE)
 void CCryAction::ConnectRepeatedlyCmd(IConsoleCmdArgs* args)
 {
@@ -1783,10 +1775,7 @@ bool CCryAction::Initialize(SSystemInitParams& startupParams)
 	m_pGameRulesSystem = new CGameRulesSystem(m_pSystem, this);
 
 	m_pSharedParamsManager = new CSharedParamsManager;
-
-	if (m_pCryActionCVars->g_gameplayAnalyst)
-		m_pGameplayAnalyst = new CGameplayAnalyst();
-
+	
 	InlineInitializationProcessing("CCryAction::Init CGameplayAnalyst");
 	m_pGameObjectSystem = new CGameObjectSystem();
 	if (!m_pGameObjectSystem->Init())
@@ -2048,9 +2037,6 @@ bool CCryAction::CompleteInit()
 
 	EndGameContext();
 
-	if (m_pGameplayAnalyst)
-		m_pGameplayRecorder->RegisterListener(m_pGameplayAnalyst);
-
 	// ---------------------------
 
 	m_pMaterialEffects = new CMaterialEffects();
@@ -2135,25 +2121,6 @@ bool CCryAction::CompleteInit()
 //------------------------------------------------------------------------
 void CCryAction::InitScriptBinds()
 {
-	/*CRY_PROFILE_FUNCTION(PROFILE_LOADING_ONLY);
-
-	m_pScriptNet = new CScriptBind_Network(m_pSystem, this);
-	m_pScriptA = new CScriptBind_Action(this);
-	if (CCryActionCVars::Get().g_legacyItemSystem)
-	{
-		m_pScriptIS = new CScriptBind_ItemSystem(m_pSystem, m_pItemSystem, this);
-	}
-	m_pScriptAS = new CScriptBind_ActorSystem(m_pSystem, this);
-	m_pScriptAMM = new CScriptBind_ActionMapManager(m_pSystem, m_pActionMapManager);
-
-	m_pScriptVS = new CScriptBind_VehicleSystem(m_pSystem, m_pVehicleSystem);
-	m_pScriptBindVehicle = new CScriptBind_Vehicle(m_pSystem, this);
-	m_pScriptBindVehicleSeat = new CScriptBind_VehicleSeat(m_pSystem, this);
-
-	if (CCryActionCVars::Get().g_legacyItemSystem)
-	{
-		m_pScriptInventory = new CScriptBind_Inventory(m_pSystem, this);
-	}*/
 }
 
 //------------------------------------------------------------------------
@@ -2198,10 +2165,7 @@ void CCryAction::ShutDown()
 	if (s_http_server)
 		s_http_server->Stop();
 	s_http_server = NULL;
-
-	if (m_pGameplayAnalyst)
-		m_pGameplayRecorder->UnregisterListener(m_pGameplayAnalyst);
-
+	
 	if (gEnv)
 	{
 		EndGameContext();
@@ -2228,7 +2192,6 @@ void CCryAction::ShutDown()
 	SAFE_RELEASE(m_pLevelSystem);
 	SAFE_RELEASE(m_pViewSystem);
 	SAFE_RELEASE(m_pGameplayRecorder);
-	SAFE_RELEASE(m_pGameplayAnalyst);
 	SAFE_RELEASE(m_pGameRulesSystem);
 	SAFE_RELEASE(m_pSharedParamsManager);
 	SAFE_DELETE(m_pMaterialEffects);
@@ -3471,8 +3434,6 @@ void CCryAction::InitCommands()
 	REGISTER_COMMAND("ban_status", BanStatusCmd, 0, "Shows currently banned players.");
 	REGISTER_COMMAND("ban_remove", UnbanPlayerCmd, 0, "Removes player from ban list.");
 
-	REGISTER_COMMAND("dump_stats", DumpAnalysisStatsCmd, 0, "Dumps some player statistics");
-
 #if !defined(_RELEASE)
 	REGISTER_COMMAND("connect_repeatedly", ConnectRepeatedlyCmd, VF_RESTRICTEDMODE, "Start a client and attempt to connect repeatedly to a server");
 #endif
@@ -4506,7 +4467,6 @@ void CCryAction::GetMemoryUsage(ICrySizer* s) const
 	CHILD_STATISTICS(m_pTimeDemoRecorder);
 	CHILD_STATISTICS(m_pGameQueryListener);
 	CHILD_STATISTICS(m_pGameplayRecorder);
-	CHILD_STATISTICS(m_pGameplayAnalyst);
 	CHILD_STATISTICS(m_pTimeOfDayScheduler);
 	s->Add(*m_pMaterialEffectsCVars);
 	s->AddObject(*m_pGFListeners);

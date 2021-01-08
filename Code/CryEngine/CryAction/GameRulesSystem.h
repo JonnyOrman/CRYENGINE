@@ -49,7 +49,7 @@ public:
 	void Release() { delete this; };
 
 	// IGameRulesSystem
-	virtual bool        RegisterGameRules(const char* rulesName, const char* extensionName, bool bUseScript) override;
+	virtual bool        RegisterGameRules(const char* rulesName, const char* extensionName) override;
 	virtual bool        CreateGameRules(const char* rulesName) override;
 	virtual bool        DestroyGameRules() override;
 

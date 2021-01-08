@@ -81,9 +81,7 @@ public:
 
 protected:
 	bool SwitchState(const ECustomActionState newState,
-	                 const ECustomActionEvent event,
-	                 const char* szNodeToCall,
-	                 const char* szLuaFuncToCall);
+	                 const ECustomActionEvent event);
 
 	void NotifyListeners(ECustomActionEvent event, ICustomAction& customAction)
 	{

@@ -3663,12 +3663,7 @@ bool CEntitySystem::ShouldSerializedEntity(IEntity* pEntity)
 	//entity flag
 	if (pEntity->GetFlags() & ENTITY_FLAG_NO_SAVE)
 		return false;
-
-	//lua flag
-	if (CVar::es_SaveLoadUseLUANoSaveFlag != 0)
-	{
-	}
-
+	
 	// layer settings
 	int iSerMode = CVar::es_LayerSaveLoadSerialization;
 	if (iSerMode == 0)

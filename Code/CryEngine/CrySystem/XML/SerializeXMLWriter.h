@@ -108,7 +108,6 @@ private:
 
 	// Used for printing currebnt stack info for warnings.
 	const char* GetStackInfo() const;
-	const char* GetLuaStackInfo() const;
 
 	//////////////////////////////////////////////////////////////////////////
 	// Check For Defaults.

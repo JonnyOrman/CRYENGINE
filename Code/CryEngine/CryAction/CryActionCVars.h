@@ -33,10 +33,7 @@ public:
 #endif
 
 	int   aiFlowNodeAlertnessCheck;
-
-	int g_gameplayAnalyst;
-	int g_multiplayerEnableVehicles;
-
+	
 	// Cooperative Animation System
 	int co_coopAnimDebug;
 	int co_usenewcoopanimsystem;

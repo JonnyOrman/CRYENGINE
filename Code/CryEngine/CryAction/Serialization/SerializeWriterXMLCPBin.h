@@ -105,7 +105,6 @@ private:
 
 	// Used for printing current stack info for warnings.
 	const char* GetStackInfo() const;
-	const char* GetLuaStackInfo() const;
 
 	bool        IsEntity(EntityId& entityId);
 

@@ -123,7 +123,6 @@ void CEntityClass::SetClassDesc(const IEntityClassRegistry::SEntityClassDesc& cl
 	m_guid = classDesc.guid;
 	m_schematycRuntimeClassGuid = classDesc.schematycRuntimeClassGuid;
 	m_onSpawnCallback = classDesc.onSpawnCallback;
-	m_sScriptFile = classDesc.sScriptFile;
 	m_pfnUserProxyCreate = classDesc.pUserProxyCreateFunc;
 	m_pUserProxyUserData = classDesc.pUserProxyData;
 	m_pScriptFileHandler = classDesc.pScriptFileHandler;
@@ -139,11 +138,6 @@ void CEntityClass::SetName(const char* sName)
 void CEntityClass::SetGUID(const CryGUID& guid)
 {
 	m_guid = guid;
-}
-
-void CEntityClass::SetScriptFile(const char* sScriptFile)
-{
-	m_sScriptFile = sScriptFile;
 }
 
 void CEntityClass::SetUserProxyCreateFunc(UserProxyCreateFunc pFunc, void* pUserData /*=NULL */)

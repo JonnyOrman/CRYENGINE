@@ -55,14 +55,6 @@ void CGameObjectSystem::RegisterFactories(IGameFramework* pFrameWork)
 	REGISTER_FACTORY(pFrameWork, "Interactor", CInteractor, false);*/
 
 	CCryFile file;
-	if (file.Open("Scripts/Entities/Environment/WaterVolume.lua", "r"))
-	{
-		file.Close();
-		REGISTER_GAME_OBJECT_EXTENSION(pFrameWork, "WaterVolume", GameVolume_Water, "Scripts/Entities/Environment/WaterVolume.lua");
-
-		HIDE_FROM_EDITOR("WaterVolume");
-		REGISTER_EDITOR_VOLUME_CLASS(pFrameWork, "WaterVolume");
-	}
 
 	IEntityClassRegistry::SEntityClassDesc clsDesc;
 	clsDesc.sName = "MannequinEntity";
@@ -84,11 +76,4 @@ void CGameObjectSystem::RegisterFactories(IGameFramework* pFrameWork)
 	};
 	clsDesc.pUserProxyCreateFunc = &CObjectCreator::Create;
 	gEnv->pEntitySystem->GetClassRegistry()->RegisterStdClass(clsDesc);
-
-	// Special case since entity container is Hunt specific, skip entity registration if no script is available
-	if (file.Open("Scripts/Entities/Containers/EntityContainerObject.lua", "r"))
-	{
-		file.Close();
-		REGISTER_GAME_OBJECT_EXTENSION(pFrameWork, "EntityContainerObject", EntityContainerObject, "Scripts/Entities/Containers/EntityContainerObject.lua");
-	}
 }

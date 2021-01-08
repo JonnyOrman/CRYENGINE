@@ -26,7 +26,6 @@ void CBreakReplicator::RegisterClasses()
 		once = false;
 		IEntityClassRegistry::SEntityClassDesc serializerClass;
 		serializerClass.sName = "BreakRepGameObject";
-		serializerClass.sScriptFile = "";
 		serializerClass.flags = ECLF_INVISIBLE;
 	}
 }

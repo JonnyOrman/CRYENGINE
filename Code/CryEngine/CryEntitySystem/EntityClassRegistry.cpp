@@ -354,9 +354,7 @@ void CEntityClassRegistry::LoadClassDescription(const XmlNodeRef& root, bool bOn
 		const char* sName = root->getAttr("Name");
 		if (*sName == 0)
 			return; // Empty name.
-
-		const char* sScript = root->getAttr("Script");
-
+		
 		IEntityClass* pClass = FindClass(sName);
 		if (!pClass)
 		{
@@ -364,7 +362,6 @@ void CEntityClassRegistry::LoadClassDescription(const XmlNodeRef& root, bool bOn
 			SEntityClassDesc cd;
 			cd.flags = 0;
 			cd.sName = sName;
-			cd.sScriptFile = sScript;
 
 			bool bInvisible = false;
 			if (root->getAttr("Invisible", bInvisible))

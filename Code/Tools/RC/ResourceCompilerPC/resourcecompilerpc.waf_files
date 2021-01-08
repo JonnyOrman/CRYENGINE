@@ -121,11 +121,6 @@
 			"../../CryCommonTools/Metadata/Metadata.cpp",
 			"../../CryCommonTools/Metadata/Metadata.h"
 		],
-		"LuaCompiler":
-		[
-			"LuaCompiler.cpp",
-			"LuaCompiler.h"
-		],
 		"FbxCompiler":
 		[
 			"FBX/CryFbxScene.cpp",

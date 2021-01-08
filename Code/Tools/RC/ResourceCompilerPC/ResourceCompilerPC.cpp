@@ -12,7 +12,6 @@
 #include "CGA/AnimationCompiler.h"
 #include "FBX/FbxConverter.h"
 #include "Metadata/MetadataCompiler.h"
-#include "LuaCompiler.h"
 #include "../../CryXML/ICryXML.h"
 
 #include <CryCore/Platform/CryLibrary.h>
@@ -75,8 +74,6 @@ void __stdcall RegisterConverters(IResourceCompiler* const pRC)
 	pRC->RegisterConverter("StatCGFCompiler", new CStatCGFCompiler());
 
 	pRC->RegisterConverter("ChunkCompiler", new CChunkCompiler());
-
-	pRC->RegisterConverter("LuaCompiler", new LuaCompiler());
 
 #ifdef TOOLS_ENABLE_FBX_SDK
 	pRC->RegisterConverter("FbxConverter", new CFbxConverter());

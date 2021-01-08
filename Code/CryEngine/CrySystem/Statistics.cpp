@@ -653,8 +653,7 @@ struct SCryEngineStats
 
 	uint32                            nTotalAllocatedMemory = 0;
 	uint32                            nSummary_CodeAndStaticSize = 0; // Total size of all code plus static data
-
-	uint32                            nSummaryScriptSize = 0;
+	
 	uint32                            nSummaryCharactersSize = 0;
 	uint32                            nSummaryMeshCount = 0;
 	uint32                            nSummaryMeshSize = 0;
@@ -2153,30 +2152,7 @@ void CStatsToExcelExporter::ExportSummary(SCryEngineStats& stats)
 	AddCell("Textures streaming throughput(KB/s)", CELL_BOLD);
 	AddCell((uint32)((stats.nSummary_TexturesStreamingThroughput) / 1024));
 	AddRow();
-
-	//AddRow();
-	//m_CurrRow->setAttr( "ss:StyleID","s25" );
-	//AddCell( "Resource Type (MB)" );
-	//AddCell( "Count" );
-	//AddCell( "Total Size" );
-	//AddCell( "System Memory" );
-	//AddCell( "Video Memory" );
-	//AddCell( "Engine Textures" );
-	//AddCell( "User Textures" );
-	//if(stats.nSummary_TexturesStreamingThroughput > 0)
-	//	AddCell( "Textures streaming throughput(KB/s)" );
-
-	//AddRow();
-	//AddCell( "Textures",CELL_BOLD );
-	//AddCell( stats.textures.size() );
-	//AddCell( (stats.nSummary_TextureSize)/(1024*1024) );
-	//AddCell( (stats.nSummary_TextureSize)/(1024*1024) );
-	//AddCell( (stats.nSummary_TextureSize)/(1024*1024) );
-	//AddCell( (stats.nSummary_EngineTextureSize)/(1024*1024) );
-	//AddCell( (stats.nSummary_UserTextureSize)/(1024*1024) );
-	//if(stats.nSummary_TexturesStreamingThroughput > 0)
-	//	AddCell( (stats.nSummary_TexturesStreamingThroughput) / 1024 );
-
+	
 	AddRow();
 	m_CurrRow->setAttr("ss:StyleID", "s25");
 	AddCell("Meshes");
@@ -2196,11 +2172,7 @@ void CStatsToExcelExporter::ExportSummary(SCryEngineStats& stats)
 	AddRow();
 	m_CurrRow->setAttr("ss:StyleID", "s25");
 	AddRow();
-
-	AddRow();
-	AddCell("Lua Memory Usage (MB)");
-	AddCell(stats.nSummaryScriptSize / (1024 * 1024));
-
+	
 	AddRow();
 	AddCell("Game Memory Usage (MB)");
 	AddCell(stats.nTotalAllocatedMemory / (1024 * 1024));
@@ -3789,10 +3761,7 @@ void CStatsToExcelExporter::ExportMemInfo(SCryEngineStats& stats)
 	AddCell_SumOfRows(nRows);
 
 	AddRow();
-
-	AddRow();
-	AddCell("Lua Memory Usage (KB)", CELL_BOLD);
-	AddCell(stats.nSummaryScriptSize / (1024));
+	
 	AddRow();
 	AddCell("Total Num Allocs", CELL_BOLD);
 	AddCell(stats.memInfo.totalNumAllocsInModules);

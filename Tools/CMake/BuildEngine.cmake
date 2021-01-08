@@ -483,7 +483,6 @@ if (OPTION_ENGINE)
 		add_subdirectory ("Code/Libs/curl")
 	endif ()
 	add_subdirectory ("Code/Libs/freetype")
-	add_subdirectory ("Code/Libs/lua")
 
     if (OPTION_UNIT_TEST)
 	    set(TEST_MODULES "" CACHE INTERNAL "List of test modules being built" FORCE)	

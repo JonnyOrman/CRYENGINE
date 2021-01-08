@@ -14,31 +14,31 @@
 //------------------------------------------------------------------------------------------------------------------------
 bool CCustomAction::StartAction()
 {
-	return SwitchState(CAS_Started, CAE_Started, "CustomAction:Start", "OnCustomActionStart");
+	return SwitchState(CAS_Started, CAE_Started);
 }
 
 //------------------------------------------------------------------------------------------------------------------------
 bool CCustomAction::SucceedAction()
 {
-	return SwitchState(CAS_Succeeded, CAE_Succeeded, "CustomAction:Succeed", "OnCustomActionSucceed");
+	return SwitchState(CAS_Succeeded, CAE_Succeeded);
 }
 
 //------------------------------------------------------------------------------------------------------------------------
 bool CCustomAction::SucceedWaitAction()
 {
-	return SwitchState(CAS_SucceededWait, CAE_SucceededWait, "CustomAction:SucceedWait", "OnCustomActionSucceedWait");
+	return SwitchState(CAS_SucceededWait, CAE_SucceededWait);
 }
 
 //------------------------------------------------------------------------------------------------------------------------
 bool CCustomAction::SucceedWaitCompleteAction()
 {
-	return SwitchState(CAS_SucceededWaitComplete, CAE_SucceededWaitComplete, "CustomAction:SucceedWaitComplete", "OnCustomActionSucceedWaitComplete");
+	return SwitchState(CAS_SucceededWaitComplete, CAE_SucceededWaitComplete);
 }
 
 //------------------------------------------------------------------------------------------------------------------------
 bool CCustomAction::EndActionSuccess()
 {
-	bool bSwitched = SwitchState(CAS_Ended, CAE_EndedSuccess, NULL, "OnCustomActionEndSuccess"); // NULL since not firing up another custom action node
+	bool bSwitched = SwitchState(CAS_Ended, CAE_EndedSuccess); // NULL since not firing up another custom action node
 	if (bSwitched)
 	{
 		m_listeners.Clear();
@@ -51,7 +51,7 @@ bool CCustomAction::EndActionSuccess()
 //------------------------------------------------------------------------------------------------------------------------
 bool CCustomAction::EndActionFailure()
 {
-	bool bSwitched = SwitchState(CAS_Ended, CAE_EndedFailure, NULL, "OnCustomActionEndFailure"); // NULL since not firing up another custom action node
+	bool bSwitched = SwitchState(CAS_Ended, CAE_EndedFailure); // NULL since not firing up another custom action node
 	if (bSwitched)
 	{
 		m_listeners.Clear();
@@ -64,13 +64,7 @@ bool CCustomAction::EndActionFailure()
 void CCustomAction::TerminateAction()
 {
 	m_currentState = CAS_Ended;
-
-	/*IFlowGraph* pFlowGraph = GetFlowGraph();
-	if (pFlowGraph)
-	{
-		pFlowGraph->SetCustomAction(0);
-	}*/
-
+	
 	m_pObjectEntity = NULL;
 
 	this->NotifyListeners(CAE_Terminated, *this);
@@ -83,7 +77,7 @@ bool CCustomAction::AbortAction()
 {
 	if (m_currentState == CAS_Started) // Can only abort when starting, not in succeeded state
 	{
-		return SwitchState(CAS_Aborted, CAE_Aborted, "CustomAction:Abort", "OnCustomActionAbort");
+		return SwitchState(CAS_Aborted, CAE_Aborted);
 	}
 
 	return false;
@@ -126,9 +120,7 @@ void CCustomAction::Serialize(TSerialize ser)
 
 //------------------------------------------------------------------------------------------------------------------------
 bool CCustomAction::SwitchState(const ECustomActionState newState,
-                                const ECustomActionEvent event,
-                                const char* szNodeToCall,
-                                const char* szLuaFuncToCall)
+                                const ECustomActionEvent event)
 {
 	if (m_currentState == newState)
 		return false;

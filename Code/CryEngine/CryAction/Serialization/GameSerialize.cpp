@@ -915,9 +915,7 @@ ELoadGameResult CGameSerialize::LoadGame(CCryAction* pCryAction, const char* met
 		GameWarning("Errors during Game Loading");
 	}
 	checkpoint.Check("EntityPostSerialize");
-
-	checkpoint.Check("Lua GC Cycle");
-
+	
 	Clean();
 	checkpoint.Check("PostClean");
 

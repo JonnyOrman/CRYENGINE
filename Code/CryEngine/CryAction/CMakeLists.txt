@@ -57,9 +57,6 @@ add_sources("CryAction_game_objects_uber.cpp"
 	SOURCE_GROUP "GameplayRecorder"
 		"GameplayRecorder/GameplayRecorder.cpp"
 		"GameplayRecorder/GameplayRecorder.h"
-	SOURCE_GROUP "GameplayRecorder\\\\Gameplay Analyst"
-		"Analyst.cpp"
-		"Analyst.h"
 )
 
 add_sources("CryAction_main_uber_0.cpp"

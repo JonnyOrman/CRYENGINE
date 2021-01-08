@@ -571,7 +571,6 @@ void CConsoleHelpGen::CreateMainPages()
 		{"OSM_", "Overload Scene Manager"},
 		{"PROFILE_", "Profiling"},
 		{"STAP_", "Screen-space Torso Aim Pose"},
-		{"LUA_", "Lua"             "\n"  "scripting system"},
 		{"SV_", "Server"},
 		{"MFX_", "Material Effects"},
 		{"M_", "Multi threading"},

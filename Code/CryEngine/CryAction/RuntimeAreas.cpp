@@ -11,7 +11,6 @@ CRuntimeAreaManager::CRuntimeAreaManager()
 
 	IEntityClassRegistry::SEntityClassDesc runtimeObjectDesc;
 	runtimeObjectDesc.sName = "RuntimeAreaObject";
-	runtimeObjectDesc.sScriptFile = "";
 
 	FillAudioControls();
 }

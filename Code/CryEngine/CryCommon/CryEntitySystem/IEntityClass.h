@@ -158,11 +158,7 @@ struct IEntityClass
 
 	//! Set entity class flags.
 	virtual void SetFlags(uint32 nFlags) = 0;
-
-	//! Returns the Lua script file name.
-	//! \return Lua Script filename, return empty string if entity does not use script.
-	virtual const char* GetScriptFile() const = 0;
-
+	
 	virtual IEntityEventHandler*      GetEventHandler() const = 0;
 	virtual IEntityScriptFileHandler* GetScriptFileHandler() const = 0;
 
@@ -213,7 +209,6 @@ struct IEntityClassRegistry
 		SEntityClassDesc()
 			: flags(0)
 			, sName("")
-			, sScriptFile("")
 			, editorClassInfo()
 			, pUserProxyCreateFunc(nullptr)
 			, pUserProxyData(nullptr)
@@ -226,7 +221,6 @@ struct IEntityClassRegistry
 		CryGUID                           guid;
 		int                               flags;
 		string                            sName;
-		string                            sScriptFile;
 
 		SEditorClassInfo                  editorClassInfo;
 

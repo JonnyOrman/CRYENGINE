@@ -169,9 +169,6 @@ They are normally called through the :command:`find_package` command.
    /module/FindLibXml2
    /module/FindLibXslt
    /module/FindLTTngUST
-   /module/FindLua50
-   /module/FindLua51
-   /module/FindLua
    /module/FindMatlab
    /module/FindMFC
    /module/FindMotif

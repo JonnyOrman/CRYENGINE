@@ -32,11 +32,7 @@ CCryActionCVars::CCryActionCVars()
 	// 0 is the preferred value, 1 is for Crysis compatibility
 	int defaultAiFlowNodeAlertnessCheck = 1;
 	REGISTER_CVAR2("ai_FlowNodeAlertnessCheck", &aiFlowNodeAlertnessCheck, defaultAiFlowNodeAlertnessCheck, VF_INVISIBLE, "Enable the alertness check in AI flownodes");
-
-	//Gameplay Analyst
-	REGISTER_CVAR2("g_gameplayAnalyst", &g_gameplayAnalyst, 0, VF_REQUIRE_APP_RESTART, "Enable/Disable Gameplay Analyst");
-	REGISTER_CVAR2("g_multiplayerEnableVehicles", &g_multiplayerEnableVehicles, 1, 0, "Enable vehicles in multiplayer");
-
+	
 	// Cooperative Animation System
 	REGISTER_CVAR(co_coopAnimDebug, 0, 0, "Enable Cooperative Animation debug output");
 	REGISTER_CVAR(co_usenewcoopanimsystem, 1, VF_CHEAT, "Uses the new cooperative animation system which works without the animation graph");

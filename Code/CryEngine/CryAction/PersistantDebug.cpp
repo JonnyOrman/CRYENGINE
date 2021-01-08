@@ -221,7 +221,6 @@ bool CPersistantDebug::Init()
 	m_pETHideReadability = REGISTER_INT("cl_ETHideReadability", 0, VF_DUMPTODISK, "Hide AI readability tags");
 	m_pETHideAIDebug = REGISTER_INT("cl_ETHideAIDebug", 0, VF_DUMPTODISK, "Hide AI debug tags");
 	m_pETHideFlowgraph = REGISTER_INT("cl_ETHideFlowgraph", 0, VF_DUMPTODISK, "Hide tags created by flowgraph");
-	m_pETHideScriptBind = REGISTER_INT("cl_ETHideScriptBind", 0, VF_DUMPTODISK, "Hide tags created by Lua script");
 	m_pETFontSizeMultiplier = REGISTER_FLOAT("cl_ETFontSizeMultiplier", 1.0f, VF_DUMPTODISK, "Global font size multiplier");
 	m_pETMaxDisplayDistance = REGISTER_FLOAT("cl_ETMaxDisplayDistance", -2.0f, VF_DUMPTODISK, "Max display distance");
 	m_pETColorOverrideEnable = REGISTER_INT("cl_ETColorOverrideEnable", 0, VF_DUMPTODISK, "Global color override");

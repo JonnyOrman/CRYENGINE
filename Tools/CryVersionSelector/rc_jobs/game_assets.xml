@@ -135,17 +135,6 @@
 		<Job Input="*.skin" Refresh="1" StripNonMesh="1" />
 	</CharactersJob>
 
-	<!-- Compile lua script template -->
-	<LuaJob>
-		<If TargetHasEditor="1">
-			<Properties CopyOnly="1" /> <!-- If we have editor, don't compile lua script -->
-		</If>
-		<If Platform="tegra">
-			<Properties CopyOnly="1" /> <!-- Tegra runs 32-bit binaries on a 64-bit arch, but the lua compiler outputs binaries in the format of the arch. on which it is run -->
-		</If>
-		<Job Input="*.lua" />
-	</LuaJob>
-
 	<!-- Copy in subfolder template -->
 	<CopySubfolderJob>
 		<Properties SourceRoot="${SourceRoot}/${Subfolder}" />
@@ -182,7 +171,6 @@
 		<Run Job="AlembicJob" />
 		<Run Job="TexturesJob" />
 		<Run Job="XmlJob" />
-		<Run Job="LuaJob" />
 		<Run Job="CharactersJob" />
 
 		<!-- Grab all valid files and copy them to the temp location. Some files already got copied by the previous jobs. -->

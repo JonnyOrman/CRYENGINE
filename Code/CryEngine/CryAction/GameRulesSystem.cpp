@@ -38,17 +38,10 @@ CGameRulesSystem::~CGameRulesSystem()
 }
 
 //------------------------------------------------------------------------
-bool CGameRulesSystem::RegisterGameRules(const char* rulesName, const char* extensionName, bool bUseScript)
+bool CGameRulesSystem::RegisterGameRules(const char* rulesName, const char* extensionName)
 {
 	IEntityClassRegistry::SEntityClassDesc ruleClass;
-
-	char scriptName[1024];
-	if (bUseScript)
-	{
-		cry_sprintf(scriptName, "Scripts/GameRules/%s.lua", rulesName);
-		ruleClass.sScriptFile = scriptName;
-	}
-
+	
 	ruleClass.sName = rulesName;
 	ruleClass.pUserProxyCreateFunc = CreateGameObject;
 	ruleClass.pUserProxyData = this;

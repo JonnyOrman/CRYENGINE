@@ -13,7 +13,6 @@
 CEntityArchetype::CEntityArchetype(IEntityClass* pClass)
 {
 	assert(pClass);
-	assert(pClass->GetScriptFile());
 	m_pClass = pClass;
 }
 

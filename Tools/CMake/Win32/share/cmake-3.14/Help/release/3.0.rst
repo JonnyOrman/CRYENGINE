@@ -217,9 +217,6 @@ Modules
 * A new :module:`FindBacktrace` module has been added to support
   :command:`find_package(Backtrace)` calls.
 
-* A new :module:`FindLua` module has been added to support
-  :command:`find_package(Lua)` calls.
-
 * The :module:`FindBoost` module learned a new ``Boost_NAMESPACE``
   option to change the ``boost`` prefix on library names.
 

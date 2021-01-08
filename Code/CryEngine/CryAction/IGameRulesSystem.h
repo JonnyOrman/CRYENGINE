@@ -756,7 +756,7 @@ struct IGameRulesSystem
 	//   bUseScript - Whether or not to load and use a Lua script
 	// Returns
 	//   The value true will be returned if the GameRules could have been registered.
-	virtual bool RegisterGameRules(const char* pRulesName, const char* pExtensionName, bool bUseScript = true) = 0;
+	virtual bool RegisterGameRules(const char* pRulesName, const char* pExtensionName) = 0;
 
 	// Summary
 	//   Creates a new instance for a GameRules

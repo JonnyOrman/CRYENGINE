@@ -26,7 +26,6 @@ public:
 
 	virtual const char*               GetName() const override          { return m_sName.c_str(); }
 	virtual CryGUID                   GetGUID() const final             { return m_guid; }
-	virtual const char*               GetScriptFile() const override    { return m_sScriptFile.c_str(); }
 
 	virtual bool                      LoadScript(bool bForceReload) override;
 	virtual UserProxyCreateFunc       GetUserProxyCreateFunc() const override { return m_pfnUserProxyCreate; }
@@ -63,7 +62,6 @@ public:
 	void                             GetMemoryUsage(ICrySizer* pSizer) const override
 	{
 		pSizer->AddObject(m_sName);
-		pSizer->AddObject(m_sScriptFile);
 		pSizer->AddObject(m_pEventHandler);
 		pSizer->AddObject(m_pScriptFileHandler);
 	}
@@ -71,7 +69,6 @@ private:
 	uint32                                   m_nFlags;
 	string                                   m_sName;
 	CryGUID                                  m_guid;
-	string                                   m_sScriptFile;
 
 	UserProxyCreateFunc                      m_pfnUserProxyCreate;
 	void*                                    m_pUserProxyUserData;
