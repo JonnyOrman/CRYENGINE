@@ -235,7 +235,6 @@ CPhysicalWorld::CPhysicalWorld(ILog *pLog) : m_nWorkerThreads(0)
 	m_vars.bLogStructureChanges = 1;
 	m_vars.bPlayersCanBreak = 0;
 	m_vars.bMultithreaded = 0;
-	m_vars.breakImpulseScale = 1.0f;
 	m_vars.jointGravityStep = 1.0f;
 	m_vars.jointDmgAccum = 2.0f;
 	m_vars.jointDmgAccumThresh = 0.2f;
@@ -273,7 +272,6 @@ CPhysicalWorld::CPhysicalWorld(ILog *pLog) : m_nWorkerThreads(0)
 #else
 	0;
 #endif
-	m_vars.breakageMinAxisInertia = 0.01f;
 	m_vars.idEntBreakOnAwake = -1000;
 
 	memset(m_grpProfileData, 0, sizeof(m_grpProfileData));
@@ -3659,7 +3657,7 @@ pexpl->explDir = m_lastExplDir;	}
 						  bboxPart.size  =(pents[nents]->m_parts[i].BBox[1]-pents[nents]->m_parts[i].BBox[0])*0.5f,
 						  box_sphere_overlap_check(&bboxPart,&sphExpl))))
 				{
-					bBreak = (m_vars.breakImpulseScale || pents[nents]->m_flags & pef_override_impulse_scale || pexpl->forceDeformEntities)
+					bBreak = (/*m_vars.breakImpulseScale || */pents[nents]->m_flags & pef_override_impulse_scale || pexpl->forceDeformEntities)
 						&& iTypes & 1<<pents[nents]->m_iSimClass &&
 						pexpl->holeSize>0 && pents[nents]->m_parts[i].idmatBreakable>=0 && !(pents[nents]->m_parts[i].flags & geom_manually_breakable);
 					if (pexpl->nOccRes<=0 && !bBreak)

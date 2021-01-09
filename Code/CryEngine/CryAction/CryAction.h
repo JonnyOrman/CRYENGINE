@@ -12,7 +12,6 @@
 struct IFlowSystem;
 struct IGameTokenSystem;
 struct IEffectSystem;
-struct IBreakableGlassSystem;
 struct IForceFeedbackSystem;
 struct IGameVolumes;
 
@@ -22,7 +21,6 @@ class CFlowSystem;
 class CDevMode;
 class CTimeDemoRecorder;
 class CGameQueryListener;
-class CScriptRMI;
 class CGameSerialize;
 class CMaterialEffects;
 class CMaterialEffectsCVars;
@@ -109,7 +107,6 @@ public:
 	virtual IMannequin&                   GetMannequinInterface();
 	virtual ILevelSystem*                 GetILevelSystem();
 	virtual IActorSystem*                 GetIActorSystem();
-	virtual IBreakReplicator*             GetIBreakReplicator();
 	virtual IActionMapManager*            GetIActionMapManager();
 	virtual IViewSystem*                  GetIViewSystem();
 	virtual IGameplayRecorder*            GetIGameplayRecorder();
@@ -117,7 +114,6 @@ public:
 	virtual IGameObjectSystem*            GetIGameObjectSystem();
 	virtual IEffectSystem*                GetIEffectSystem();
 	virtual IMaterialEffects*             GetIMaterialEffects();
-	virtual IBreakableGlassSystem*        GetIBreakableGlassSystem();
 	virtual IPlayerProfileManager*        GetIPlayerProfileManager();
 	virtual ICooperativeAnimationManager* GetICooperativeAnimationManager();
 	virtual ICheckpointSystem*            GetICheckpointSystem();
@@ -134,15 +130,8 @@ public:
 	virtual bool                          StartedGameContext() const;
 	virtual bool                          StartingGameContext() const;
 	virtual bool                          BlockingSpawnPlayer();
-
-	virtual void                          ResetBrokenGameObjects();
-	virtual void                          CloneBrokenObjectsAndRevertToStateAtTime(int32 iFirstBreakEventIndex, uint16* pBreakEventIndices, int32& iNumBreakEvents, IRenderNode** outClonedNodes, int32& iNumClonedNodes, SRenderNodeCloneLookup& renderNodeLookup);
-	virtual void                          ApplySingleProceduralBreakFromEventIndex(uint16 uBreakEventIndex, const SRenderNodeCloneLookup& renderNodeLookup);
-	virtual void                          UnhideBrokenObjectsByIndex(uint16* ObjectIndicies, int32 iNumObjectIndices);
-
+	
 	void                                  Serialize(TSerialize ser); // defined in ActionGame.cpp
-	virtual void                          FlushBreakableObjects();   // defined in ActionGame.cpp
-	void                                  ClearBreakHistory();
 
 	IGameToEditorInterface*               GetIGameToEditor() { return m_pGameToEditor; }
 	virtual void                          InitEditor(IGameToEditorInterface* pGameToEditor);
@@ -247,11 +236,7 @@ public:
 	CGameContext*               GetGameContext();
 	CPersistantDebug*           GetPersistantDebug()       { return m_pPersistantDebug; }
 	virtual IPersistantDebug*   GetIPersistantDebug();
-
-	virtual void                AddBreakEventListener(IBreakEventListener* pListener);
-	virtual void                RemoveBreakEventListener(IBreakEventListener* pListener);
-
-	void                        OnBreakEvent(uint16 uBreakEventIndex);
+	
 	void                        OnPartRemoveEvent(int32 iPartRemoveEventIndex);
 
 	virtual void                RegisterListener(IGameFrameworkListener* pGameFrameworkListener, const char* name, EFRAMEWORKLISTENERPRIORITY eFrameworkListenerPriority);
@@ -309,9 +294,7 @@ public:
 
 private:
 	bool Initialize(SSystemInitParams& initParams);
-
-	void InitScriptBinds();
-
+	
 	bool InitGame(SSystemInitParams& startupParams);
 	bool ShutdownGame();
 
@@ -438,7 +421,6 @@ private:
 	CAnimationGraphCVars*         m_pAnimationGraphCvars;
 	IMannequin*                   m_pMannequin;
 	CMaterialEffects*             m_pMaterialEffects;
-	IBreakableGlassSystem*        m_pBreakableGlassSystem;
 	CPlayerProfileManager*        m_pPlayerProfileManager;
 
 	IEffectSystem*                m_pEffectSystem;
@@ -542,7 +524,6 @@ private:
 
 	typedef std::vector<SGameFrameworkListener> TGameFrameworkListeners;
 	TGameFrameworkListeners* m_pGFListeners;
-	IBreakEventListener*     m_pBreakEventListener;
 	std::vector<bool>        m_validListeners;
 
 	int                      m_VoiceRecordingEnabled;

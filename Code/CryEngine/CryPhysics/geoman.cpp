@@ -466,13 +466,3 @@ IGeometry *CGeomManager::GetCrackGeom(const Vec3 *pt,int idmat, geom_world_data 
 
 	return pMesh;
 }
-
-
-IBreakableGrid2d *CGeomManager::GenerateBreakableGrid(Vec2 *ptsrc,int npt, const Vec2i &nCells, int bStaticBorder, int seed)
-{	
-	CBreakableGrid2d *pGrid = new CBreakableGrid2d;
-	pGrid->Generate(ptsrc,npt,nCells,bStaticBorder,seed);
-	return pGrid;
-}
-
-

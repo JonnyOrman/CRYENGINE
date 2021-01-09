@@ -436,7 +436,6 @@ bool CCheckpointSystem::LoadGame(const char* fileName)
 
 	//make sure the scripts are clean
 	//CXP : this caused a crash after some reloads, which hints to problems in the gamerules script
-	//gEnv->pScriptSystem->ForceGarbageCollection();
 
 	return true;
 }
@@ -511,9 +510,7 @@ void CCheckpointSystem::ResetEngine()
 
 	//reset engine similar to editor when leaving game mode
 	//broken geometry and dynamics
-	CCryAction::GetCryAction()->FlushBreakableObjects();
 	DeleteDynamicEntities();
-	CCryAction::GetCryAction()->ResetBrokenGameObjects();
 
 	//this should just reset the velocity of all moving things, but instead vehicle doors fall off ...
 	//CXP : add this back in after CXP, Anton has to fix it

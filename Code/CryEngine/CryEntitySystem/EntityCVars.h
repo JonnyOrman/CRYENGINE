@@ -48,7 +48,6 @@ struct CVar
 	static int         es_debugDrawEntityIDs;
 
 	static int         es_LayerSaveLoadSerialization;
-	static int         es_SaveLoadUseLUANoSaveFlag;
 	static int         es_LayerDebugInfo;
 
 	static int         es_profileComponentUpdates;

@@ -27,7 +27,6 @@
 #include "ILevelSystem.h"
 #include "IPlayerProfiles.h"
 #include "VoiceController.h"
-#include "BreakReplicator.h"
 #include "CVarListProcessor.h"
 #include "NetworkCVars.h"
 #include "CryActionCVars.h"
@@ -224,8 +223,8 @@ void CGameContext::SetContextInfo(unsigned flags, uint16 port, const char* conne
 	m_port = port;
 	m_connectionString = connectionString;
 
-	if (!(flags & eGSF_LocalOnly))
-		m_pBreakReplicator.reset(new CBreakReplicator(this));
+	/*if (!(flags & eGSF_LocalOnly))
+		m_pBreakReplicator.reset(new CBreakReplicator(this));*/
 
 #ifndef OLD_VOICE_SYSTEM_DEPRECATED
 	if (!gEnv->IsDedicated())
@@ -658,8 +657,8 @@ bool CGameContext::InitChannelEstablishmentTasks(IContextEstablisher* pEst, INet
 
 void CGameContext::ResetMap(bool isServer)
 {
-	if (m_pBreakReplicator.get())
-		m_pBreakReplicator->Reset();
+	/*if (m_pBreakReplicator.get())
+		m_pBreakReplicator->Reset();*/
 
 	if (!isServer && HasContextFlag(eGSF_Server))
 		return;
@@ -959,8 +958,8 @@ bool CGameContext::OnBeforeSpawn(SEntitySpawnParams& params)
 
 void CGameContext::OnSpawn(IEntity* pEntity, SEntitySpawnParams& params)
 {
-	if (HasContextFlag(eGSF_ImmersiveMultiplayer) && m_pBreakReplicator.get())
-		m_pBreakReplicator->OnSpawn(pEntity, params);
+	/*if (HasContextFlag(eGSF_ImmersiveMultiplayer) && m_pBreakReplicator.get())
+		m_pBreakReplicator->OnSpawn(pEntity, params);*/
 
 	if (IGameRules* pGameRules = GetGameRules())
 		pGameRules->OnEntitySpawn(pEntity);
@@ -1039,8 +1038,8 @@ bool CGameContext::OnRemove(IEntity* pEntity)
 		}
 	}
 
-	if (m_pBreakReplicator.get())
-		m_pBreakReplicator->OnRemove(pEntity);
+	/*if (m_pBreakReplicator.get())
+		m_pBreakReplicator->OnRemove(pEntity);*/
 
 	bool ok = true;
 
@@ -1076,8 +1075,8 @@ void CGameContext::OnReused(IEntity* pEntity, SEntitySpawnParams& params)
 		m_pNetContext->SafelyUnbind(pEntity->GetId());
 	}
 
-	if (m_pBreakReplicator.get())
-		m_pBreakReplicator->OnReuse(pEntity, params);
+	/*if (m_pBreakReplicator.get())
+		m_pBreakReplicator->OnReuse(pEntity, params);*/
 
 	if (pEntity->GetProxy(ENTITY_PROXY_SCRIPT))
 	{
@@ -1501,20 +1500,20 @@ IGameRules* CGameContext::GetGameRules()
 
 void CGameContext::OnStartNetworkFrame()
 {
-	if (m_pBreakReplicator.get())
-		m_pBreakReplicator->OnStartFrame();
+	/*if (m_pBreakReplicator.get())
+		m_pBreakReplicator->OnStartFrame();*/
 }
 
 void CGameContext::OnEndNetworkFrame()
 {
-	if (m_pBreakReplicator.get())
-		m_pBreakReplicator->OnEndFrame();
+	/*if (m_pBreakReplicator.get())
+		m_pBreakReplicator->OnEndFrame();*/
 }
 
 void CGameContext::OnBrokeSomething(const SBreakEvent& be, EventPhysMono* pMono, bool isPlane)
 {
-	if (m_pBreakReplicator.get())
-		m_pBreakReplicator->OnBrokeSomething(be, pMono, isPlane);
+	/*if (m_pBreakReplicator.get())
+		m_pBreakReplicator->OnBrokeSomething(be, pMono, isPlane);*/
 }
 
 void CGameContext::ReconfigureGame(INetChannel* pNetChannel)
@@ -1559,8 +1558,8 @@ void CGameContext::GetMemoryUsage(ICrySizer* s) const
 		m_pVoiceController->GetMemoryStatistics(s);
 #endif
 	m_classRegistry.GetMemoryStatistics(s);
-	if (m_pBreakReplicator.get())
-		m_pBreakReplicator->GetMemoryStatistics(s);
+	/*if (m_pBreakReplicator.get())
+		m_pBreakReplicator->GetMemoryStatistics(s);*/
 	s->AddObject(m_levelName);
 	s->AddObject(m_gameRules);
 	s->AddObject(m_connectionString);
@@ -1805,11 +1804,11 @@ SParsedConnectionInfo CGameContext::ParseConnectionInfo(const string& sconst)
 
 void CGameContext::DefineContextProtocols(IProtocolBuilder* pBuilder, bool server)
 {
-	if (m_pBreakReplicator.get())
+	/*if (m_pBreakReplicator.get())
 	{
 		m_pBreakReplicator->m_bDefineProtocolMode_server = server;
 		m_pBreakReplicator->DefineProtocol(pBuilder);
-	}
+	}*/
 
 	CCryAction* cca = CCryAction::GetCryAction();
 	if (cca->GetNetMessageDispatcher())
@@ -1819,25 +1818,6 @@ void CGameContext::DefineContextProtocols(IProtocolBuilder* pBuilder, bool serve
 	{
 		pFrameStepController->DefineProtocols(pBuilder);
 	}
-}
-
-void CGameContext::PlaybackBreakage(int breakId, INetBreakagePlaybackPtr pBreakage)
-{
-	if (m_pBreakReplicator.get())
-		m_pBreakReplicator->PlaybackBreakage(breakId, pBreakage);
-}
-
-void* CGameContext::ReceiveSimpleBreakage(TSerialize ser)
-{
-	if (m_pBreakReplicator.get())
-		return m_pBreakReplicator->ReceiveSimpleBreakage(ser);
-	return NULL;
-}
-
-void CGameContext::PlaybackSimpleBreakage(void* userData, INetBreakageSimplePlaybackPtr pBreakage)
-{
-	if (m_pBreakReplicator.get())
-		m_pBreakReplicator->PlaybackSimpleBreakage(userData, pBreakage);
 }
 
 bool CGameContext::SetImmersive(bool immersive)

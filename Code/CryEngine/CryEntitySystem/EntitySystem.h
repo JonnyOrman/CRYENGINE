@@ -26,7 +26,6 @@ struct IPhysicalEntity;
 struct SEntityLayerGarbage;
 
 class CAreaManager;
-class CBreakableManager;
 class CCharacterBoneAttachmentManager;
 class CEntity;
 class CEntityArchetypeManager;
@@ -271,10 +270,7 @@ public:
 
 	// Access to area manager.
 	IAreaManager* GetAreaManager() const final { return (IAreaManager*)(m_pAreaManager); }
-
-	// Access to breakable manager.
-	virtual IBreakableManager*       GetBreakableManager() const final         { return m_pBreakableManager; }
-
+	
 	CEntityLoadManager*              GetEntityLoadManager() const              { return m_pEntityLoadManager; }
 
 	CGeomCacheAttachmentManager*     GetGeomCacheAttachmentManager() const     { return m_pGeomCacheAttachmentManager; }
@@ -389,8 +385,7 @@ private:
 	typedef std::unordered_map<EntityGUID, EntityId> EntityGuidMap;
 	EntityGuidMap                    m_guidMap;
 	EntityGuidMap                    m_genIdMap;
-
-	IBreakableManager*               m_pBreakableManager;
+	
 	CEntityArchetypeManager*         m_pEntityArchetypeManager;
 	CGeomCacheAttachmentManager*     m_pGeomCacheAttachmentManager;
 	CCharacterBoneAttachmentManager* m_pCharacterBoneAttachmentManager;

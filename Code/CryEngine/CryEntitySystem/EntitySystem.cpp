@@ -9,7 +9,6 @@
 #include "PhysicsEventListener.h"
 #include "AreaManager.h"
 #include "AreaProxy.h"
-#include "BreakableManager.h"
 #include "EntityArchetype.h"
 #include "PartitionGrid.h"
 #include "ProximityTriggerSystem.h"
@@ -19,7 +18,6 @@
 #include "EntityLayer.h"
 #include "EntityLoadManager.h"
 #include <CrySystem/Profilers/IStatoscope.h>
-#include <CryEntitySystem/IBreakableManager.h>
 #include "GeomCacheAttachmentManager.h"
 #include "CharacterBoneAttachmentManager.h"
 #include <CryCore/TypeInfo_impl.h>  // CRY_ARRAY_COUNT
@@ -160,7 +158,6 @@ CEntitySystem::CEntitySystem(ISystem* pSystem)
 	m_nStartPause.SetSeconds(-1.0f);
 
 	m_pAreaManager = new CAreaManager();
-	m_pBreakableManager = new CBreakableManager();
 	m_pEntityArchetypeManager = new CEntityArchetypeManager;
 
 	m_pEntityLoadManager = new CEntityLoadManager();
@@ -212,7 +209,6 @@ CEntitySystem::~CEntitySystem()
 
 	SAFE_DELETE(m_pProximityTriggerSystem);
 	SAFE_DELETE(m_pPartitionGrid);
-	SAFE_DELETE(m_pBreakableManager);
 
 	SAFE_DELETE(g_Alloc_EntitySlot);
 	//ShutDown();
@@ -367,10 +363,7 @@ void CEntitySystem::Reset()
 
 	stl::free_container(m_deletedEntities);
 	m_guidMap.clear();
-
-	// Delete broken objects after deleting entities
-	GetBreakableManager()->ResetBrokenObjects();
-
+	
 	ResetAreas();
 
 	m_entityArray.Reset();

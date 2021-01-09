@@ -700,12 +700,6 @@ void CMaterialEffects::Update(float frameTime)
 #endif
 }
 
-//void CMaterialEffects::NotifyFGHudEffectEnd(IFlowGraphPtr pFG)
-//{
-//	if (m_pMaterialFGManager)
-//		m_pMaterialFGManager->EndFGEffect(pFG);
-//}
-
 void CMaterialEffects::Reset(bool bCleanup)
 {
 	// make sure all pre load data has been propperly released to not have any
@@ -717,10 +711,7 @@ void CMaterialEffects::Reset(bool bCleanup)
 			m_effectContainers[id]->ReleasePreLoadAssets();
 		}
 	}
-
-	/*if (m_pMaterialFGManager)
-		m_pMaterialFGManager->Reset(bCleanup);*/
-
+	
 	if (bCleanup)
 	{
 		stl::free_container(m_mfxLibraries);

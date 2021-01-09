@@ -255,43 +255,7 @@ void CEntityContainerMgr::Reset()
 
 bool CEntityContainerMgr::RunModule(EntityId containerId, const char* moduleName)
 {
-	/*IFlowGraphModule* pModule = gEnv->pFlowSystem->GetIModuleManager()->GetModule(moduleName);
-	if (!pModule)
-	{*/
-		return false;
-	//}
-
-	//std::vector<EntityId> idsToRemove;
-
-	//const CEntityContainer* pContainer = GetContainerConst(containerId);
-	//if (pContainer && !pContainer->IsEmpty())
-	//{
-	//	const CEntityContainer::TEntitiesInContainer& entities = pContainer->GetEntities();
-	//	for (CEntityContainer::TSentityInfoParam entityInfo : entities)
-	//	{
-	//		IEntity* pEntity = gEnv->pEntitySystem->GetEntity(entityInfo.id);
-	//		if (pEntity)
-	//		{
-	//			pModule->CallDefaultInstanceForEntity(pEntity);
-	//		}
-	//		else
-	//		{
-	//			// gather entity ids from entities that no longer exist
-	//			idsToRemove.push_back(entityInfo.id);
-	//		}
-	//	}
-	//}
-
-	//// remove entities that no longer exist
-	//if (!idsToRemove.empty())
-	//{
-	//	for (size_t i = 0, numItems = idsToRemove.size(); i < numItems; ++i)
-	//	{
-	//		RemoveEntity(containerId, idsToRemove[i]);
-	//	}
-	//}
-
-	//return true;
+	return false;
 }
 
 

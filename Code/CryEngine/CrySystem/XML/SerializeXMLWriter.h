@@ -47,7 +47,6 @@ private:
 	CTimeValue                 m_curTime;
 
 	std::vector<XmlNodeRef>    m_nodeStack;
-	std::vector<const char*>   m_luaSaveStack;
 	//////////////////////////////////////////////////////////////////////////
 
 	ILINE const XmlNodeRef& CurNode()

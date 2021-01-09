@@ -339,12 +339,6 @@ void CCustomActionManager::Update()
 
 		if (action.GetCurrentState() == CAS_Ended)
 		{
-			// Remove the pointer to this action in the flow graph
-			//IFlowGraph* pFlowGraph = action.GetFlowGraph();
-			//if (pFlowGraph && pFlowGraph->GetCustomAction() != NULL)   // Might be null if terminated
-			//	pFlowGraph->SetCustomAction(NULL);
-
-			// Remove in the actual list
 			m_activeActions.remove(action);
 		}
 	}
@@ -363,7 +357,6 @@ ICustomAction* CCustomActionManager::AddActiveCustomAction(IEntity* pObject, con
 		return NULL;
 
 	// Instance custom actions don't need to have a custom action graph
-	//IFlowGraphPtr pFlowGraph = NULL;
 	if (szCustomActionGraphName != NULL && szCustomActionGraphName[0] != 0)
 	{
 		ICustomAction* pCustomActionFromLibrary = GetCustomActionFromLibrary(szCustomActionGraphName);
@@ -372,16 +365,6 @@ ICustomAction* CCustomActionManager::AddActiveCustomAction(IEntity* pObject, con
 			CryWarning(VALIDATOR_MODULE_GAME, VALIDATOR_WARNING, "CCustomActionManager::AddActiveCustomAction: Failed find action: %s in library", szCustomActionGraphName);
 			return NULL;
 		}
-		// Create a clone of the flow graph
-
-		/*if (IFlowGraph* pLibraryActionFlowGraph = pCustomActionFromLibrary->GetFlowGraph())
-			pFlowGraph = pLibraryActionFlowGraph->Clone();*/
-
-		/*if (!pFlowGraph)
-		{
-			CryWarning(VALIDATOR_MODULE_GAME, VALIDATOR_WARNING, "CCustomActionManager::AddActiveCustomAction: No flow graph in action: %s in library", szCustomActionGraphName);
-			return NULL;
-		}*/
 	}
 
 	// create active action and add it to the list

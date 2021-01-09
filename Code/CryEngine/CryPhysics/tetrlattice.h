@@ -118,44 +118,4 @@ public:
 	static int g_nFacesAlloc,g_nTetsAlloc;
 };
 
-
-class CBreakableGrid2d : public IBreakableGrid2d {
-public:
-	CBreakableGrid2d() { m_pt=0; m_pTris=0; m_pCellDiv=0; m_nTris=0; m_nTris0=1<<31; m_pCellQueue=new int[m_szCellQueue=32]; }
-	~CBreakableGrid2d() { 
-		if (m_pt) delete[] m_pt; 
-		if (m_pTris) delete[] m_pTris;
-		if (m_pCellDiv) delete[] m_pCellDiv;
-		if (m_pCellQueue) delete[] m_pCellQueue;
-	}
-	void Generate(Vec2 *ptsrc,int npt, const Vec2i &nCells, int bStaticBorder, int seed=-1);
-
-	virtual int *BreakIntoChunks(const Vec2 &pt, float r, Vec2 *&ptout, int maxPatchTris,float jointhresh,int seed=-1, 
-		float filterAng=0.0f,float ry=0.0f);
-	virtual grid *GetGridData() { return &m_coord; }
-	virtual bool IsEmpty() { return m_nTris==0; }
-	virtual void Release() { delete this; }
-	virtual float GetFracture() { return (float)(m_nTris0-m_nTris)/(float)m_nTris0; }
-
-	void MarkCellInterior(int i);
-	int get_neighb(int iTri,int iEdge);
-	void get_edge_ends(int iTri,int iEdge, int &iend0,int &iend1);
-	int CropSpikes(int imin,int imax, int *queue,int szQueue, int flags,int flagsNew, float thresh);
-
-	virtual void GetMemoryStatistics(ICrySizer *pSizer) const {
-		SIZER_COMPONENT_NAME(pSizer, "brekable2d grid");
-		if (m_pt) pSizer->AddObject(m_pt, m_coord.size.x*m_coord.size.y*(sizeof(m_pt[0])+sizeof(m_pTris[0])*2+sizeof(m_pCellDiv[0])));
-		if (m_pCellQueue) pSizer->AddObject(m_pCellQueue, m_szCellQueue);
-	}
-
-	enum tritypes { TRI_AVAILABLE=1<<29, TRI_FIXED=1<<27, TRI_EMPTY=1<<26, TRI_STABLE=1<<25, TRI_PROCESSED=1<<24 };
-	primitives::grid m_coord;
-	Vec2 *m_pt;
-	int *m_pTris;
-	char *m_pCellDiv;
-	int m_nTris,m_nTris0;
-	int *m_pCellQueue; 
-	int m_szCellQueue;
-};
-
 #endif

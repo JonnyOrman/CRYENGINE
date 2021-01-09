@@ -29,8 +29,6 @@ class CEntity;
 class ICrySizer;
 
 struct EventPhysRemoveEntityParts;
-struct IBreakableManager;
-struct IBreakEventListener;
 struct IEntity;
 struct IEntitySystem;
 struct IPhysicalEntity;
@@ -500,10 +498,7 @@ struct IEntitySystem
 
 	//! Gets a pointer to access to area manager.
 	virtual IAreaManager* GetAreaManager() const = 0;
-
-	//! \return The breakable manager interface.
-	virtual IBreakableManager* GetBreakableManager() const = 0;
-
+	
 	//////////////////////////////////////////////////////////////////////////
 	//! Entity archetypes.
 	virtual IEntityArchetype*                 LoadEntityArchetype(XmlNodeRef oArchetype) = 0;

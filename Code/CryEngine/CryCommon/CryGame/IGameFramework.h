@@ -325,13 +325,13 @@ struct SRenderNodeCloneLookup
 	int           iNumPairs;
 };
 
-struct IBreakReplicator
-{
-	// <interfuscator:shuffle>
-	virtual ~IBreakReplicator(){}
-	virtual const EventPhysRemoveEntityParts* GetRemovePartEvents(int& iNumEvents) = 0;
-	// </interfuscator:shuffle>
-};
+//struct IBreakReplicator
+//{
+//	// <interfuscator:shuffle>
+//	virtual ~IBreakReplicator(){}
+//	virtual const EventPhysRemoveEntityParts* GetRemovePartEvents(int& iNumEvents) = 0;
+//	// </interfuscator:shuffle>
+//};
 
 //! Persistent debug exposes functionality for drawing debug geometry over a specific period of time, without having to continuously re-render manually each frame.
 //! This can be extremely useful to debug gameplay logic.
@@ -552,16 +552,6 @@ struct IGameFrameworkListener
 	virtual void OnForceLoadingWithFlash()                            {}
 };
 
-struct IBreakEventListener
-{
-	virtual ~IBreakEventListener(){}
-	virtual void OnBreakEvent(uint16 uBreakEventIndex) = 0;
-	virtual void OnPartRemoveEvent(int32 iPartRemoveEventIndex) = 0;
-	virtual void OnEntityDrawSlot(IEntity* pEntity, int32 slot, int32 flags) = 0;
-	virtual void OnEntityChangeStatObj(IEntity* pEntity, int32 iBrokenObjectIndex, int32 slot, IStatObj* pOldStatObj, IStatObj* pNewStatObj) = 0;
-	virtual void OnSetSubObjHideMask(IEntity* pEntity, int nSlot, hidemask nSubObjHideMask) = 0;
-};
-
 // Interface for the CryAction engine module
 struct IGameFrameworkEngineModule : public Cry::IDefaultModule
 {
@@ -662,7 +652,7 @@ struct IGameFramework
 
 	//! Returns a pointer to the IBreakReplicator interface.
 	//! \return Pointer to IBreakReplicator interface.
-	virtual IBreakReplicator* GetIBreakReplicator() = 0;
+	//virtual IBreakReplicator* GetIBreakReplicator() = 0;
 
 	//! Returns a pointer to the IActionMapManager interface.
 	//! \return Pointer to IActionMapManager interface.
@@ -747,22 +737,7 @@ struct IGameFramework
 
 	//! For the editor: spawn a player and wait for connection
 	virtual bool BlockingSpawnPlayer() = 0;
-
-	//! Remove broken entity parts
-	virtual void FlushBreakableObjects() = 0;
-
-	//! For the game : fix the broken game objects (to restart the map)
-	virtual void ResetBrokenGameObjects() = 0;
-
-	//! For the kill cam : clone the list of objects specified in the break events indexed
-	virtual void CloneBrokenObjectsAndRevertToStateAtTime(int32 iFirstBreakEventIndex, uint16* pBreakEventIndices, int32& iNumBreakEvents, IRenderNode** outClonedNodes, int32& iNumClonedNodes, SRenderNodeCloneLookup& renderNodeLookup) = 0;
-
-	//! For the kill cam: apply a single break event from an index
-	virtual void ApplySingleProceduralBreakFromEventIndex(uint16 uBreakEventIndex, const SRenderNodeCloneLookup& renderNodeLookup) = 0;
-
-	//! For the game: unhide the broken game objects (at the end of the kill cam)
-	virtual void UnhideBrokenObjectsByIndex(uint16* ObjectIndicies, int32 iNumObjectIndices) = 0;
-
+	
 	//! Let the GameFramework initialize with the editor
 	virtual void InitEditor(IGameToEditorInterface* pGameToEditor) = 0;
 
@@ -882,13 +857,7 @@ struct IGameFramework
 	virtual void              GetAbsLevelPath(char* pPathBuffer, uint32 pathBufferSize) = 0;
 
 	virtual IPersistantDebug* GetIPersistantDebug() = 0;
-
-	//! Adds a listener for break events.
-	virtual void AddBreakEventListener(IBreakEventListener* pListener) = 0;
-
-	//! Removes a listener for break events.
-	virtual void                  RemoveBreakEventListener(IBreakEventListener* pListener) = 0;
-
+	
 	virtual void                  RegisterListener(IGameFrameworkListener* pGameFrameworkListener, const char* name, EFRAMEWORKLISTENERPRIORITY eFrameworkListenerPriority) = 0;
 	virtual void                  UnregisterListener(IGameFrameworkListener* pGameFrameworkListener) = 0;
 
@@ -935,10 +904,7 @@ struct IGameFramework
 	//! To avoid stalls during gameplay and to get a list of all assets needed for the level (bEnforceAll=true).
 	//! \param bEnforceAll true to ensure all possible assets become registered (list should not be too conservative - to support level stripification).
 	virtual void PrefetchLevelAssets(const bool bEnforceAll) = 0;
-
-	//! Inform that an IEntity was spawned from breakage.
-	virtual void OnBreakageSpawnedEntity(IEntity* pEntity, IPhysicalEntity* pPhysEntity, IPhysicalEntity* pSrcPhysEntity) = 0;
-
+	
 	//! Returns true if the supplied game session is a game session.
 	virtual bool IsGameSession(CrySessionHandle sessionHandle) = 0;
 

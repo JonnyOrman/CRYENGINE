@@ -28,7 +28,6 @@ struct IBSPTree3D;
 struct IClipVolume;
 struct IEntity;
 struct IEntityEventListener;
-struct IFlowGraph;
 struct IMaterial;
 struct INetworkSpawnParams;
 struct IPhysicalEntity;
@@ -856,15 +855,6 @@ struct IClipVolumeComponent : public IEntityComponent
 	virtual IClipVolume* GetClipVolume() const = 0;
 	virtual IBSPTree3D*  GetBspTree() const = 0;
 	virtual void         SetProperties(bool bIgnoresOutdoorAO, uint8 viewDistRatio) = 0;
-};
-
-//! Flow Graph component allows entity to host reference to the flow graph.
-struct IEntityFlowGraphComponent : public IEntityComponent
-{
-	CRY_ENTITY_COMPONENT_INTERFACE_GUID(IEntityFlowGraphComponent, "17e5eba7-57e4-4662-a1c2-1f41de946cda"_cry_guid)
-
-	virtual void        SetFlowGraph(IFlowGraph* pFlowGraph) = 0;
-	virtual IFlowGraph* GetFlowGraph() = 0;
 };
 
 //! Substitution component remembers IRenderNode this entity substitutes and unhides it upon deletion

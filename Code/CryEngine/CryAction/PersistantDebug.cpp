@@ -13,8 +13,6 @@ CPersistantDebug::CPersistantDebug()
 	, m_pETHideBehaviour(nullptr)
 	, m_pETHideReadability(nullptr)
 	, m_pETHideAIDebug(nullptr)
-	, m_pETHideFlowgraph(nullptr)
-	, m_pETHideScriptBind(nullptr)
 	, m_pETFontSizeMultiplier(nullptr)
 	, m_pETMaxDisplayDistance(nullptr)
 	, m_pETColorOverrideEnable(nullptr)
@@ -220,7 +218,6 @@ bool CPersistantDebug::Init()
 	m_pETHideBehaviour = REGISTER_INT("cl_ETHideBehaviour", 0, VF_DUMPTODISK, "Hide AI behavior tags");
 	m_pETHideReadability = REGISTER_INT("cl_ETHideReadability", 0, VF_DUMPTODISK, "Hide AI readability tags");
 	m_pETHideAIDebug = REGISTER_INT("cl_ETHideAIDebug", 0, VF_DUMPTODISK, "Hide AI debug tags");
-	m_pETHideFlowgraph = REGISTER_INT("cl_ETHideFlowgraph", 0, VF_DUMPTODISK, "Hide tags created by flowgraph");
 	m_pETFontSizeMultiplier = REGISTER_FLOAT("cl_ETFontSizeMultiplier", 1.0f, VF_DUMPTODISK, "Global font size multiplier");
 	m_pETMaxDisplayDistance = REGISTER_FLOAT("cl_ETMaxDisplayDistance", -2.0f, VF_DUMPTODISK, "Max display distance");
 	m_pETColorOverrideEnable = REGISTER_INT("cl_ETColorOverrideEnable", 0, VF_DUMPTODISK, "Global color override");

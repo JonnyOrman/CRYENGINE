@@ -141,8 +141,6 @@ private:
 	ICVar* m_pETHideBehaviour;
 	ICVar* m_pETHideReadability;
 	ICVar* m_pETHideAIDebug;
-	ICVar* m_pETHideFlowgraph;
-	ICVar* m_pETHideScriptBind;
 	ICVar* m_pETFontSizeMultiplier;
 	ICVar* m_pETMaxDisplayDistance;
 	ICVar* m_pETColorOverrideEnable;

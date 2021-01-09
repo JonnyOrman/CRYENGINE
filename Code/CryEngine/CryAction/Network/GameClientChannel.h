@@ -180,8 +180,6 @@ struct SClientBatchConsoleVariablesParams : public ISerializable
 	}
 };
 
-struct SBreakEvent;
-
 struct STimeOfDayInitParams
 {
 	float tod;

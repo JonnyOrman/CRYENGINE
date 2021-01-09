@@ -104,8 +104,6 @@ string GetEventName(ENetObjectEvent evt)
 		return "SyncWithGame_Start";
 	case eNOE_SyncWithGame_End:
 		return "SyncWithGame_End";
-	case eNOE_GotBreakage:
-		return "GotBreakage";
 	}
 
 	string temp;
@@ -540,11 +538,6 @@ bool CNetContext::RemoteContextHasAuthority(INetChannel* pChannel, EntityId id)
 void CNetContext::SetParentObject(EntityId objId, EntityId parentId)
 {
 	m_pState->SetParentObject(objId, parentId);
-}
-
-void CNetContext::LogBreak(const SNetBreakDescription& breakage)
-{
-	m_pState->LogBreak(breakage);
 }
 
 bool CNetContext::SetSchedulingParams(EntityId objId, uint32 normal, uint32 owned)

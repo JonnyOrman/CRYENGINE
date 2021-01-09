@@ -15,8 +15,6 @@
 #include "NetContext.h"
 #include <CrySystem/ITimer.h>
 #include "Network.h"
-#include "BreakagePlayback.h"
-#include "PerformBreakage.h"
 #include "History/History.h"
 #include "VoiceContext.h"
 #include "SyncedFileSet.h"
@@ -470,12 +468,7 @@ NET_IMPLEMENT_SIMPLE_ATSYNC_MESSAGE(CClientContextView, BeginBreakStream, eNRT_R
 		NetWarning("Illegal break id %d", param.brk);
 		return false;
 	}
-	if (m_pBreakOps[param.brk])
-	{
-		NetWarning("Trying to use a breakage stream for two breaks... illegal [breakid=%d]", param.brk);
-		return false;
-	}
-	m_pBreakOps[param.brk] = new SNetClientBreakDescription();
+	
 	return true;
 }
 
@@ -485,12 +478,6 @@ NET_IMPLEMENT_SIMPLE_ATSYNC_MESSAGE(CClientContextView, DeclareBrokenProduct, eN
 	{
 		NetWarning("Illegal break id %d", param.brk);
 		Parent()->Disconnect(eDC_ContextCorruption, "Illegal break id");
-		return false;
-	}
-	if (!m_pBreakOps[param.brk])
-	{
-		NetWarning("Trying to send break products with no break stream... illegal [breakid=%d, netid=%s]", param.brk, param.id.GetText());
-		Parent()->Disconnect(eDC_ContextCorruption, "Trying to send break products with no break stream");
 		return false;
 	}
 	if (!ContextState())
@@ -503,7 +490,6 @@ NET_IMPLEMENT_SIMPLE_ATSYNC_MESSAGE(CClientContextView, DeclareBrokenProduct, eN
 		Parent()->Disconnect(eDC_ContextCorruption, "Failed allocating object for broken product");
 		return false;
 	}
-	m_pBreakOps[param.brk]->push_back(param.id);
 	return true;
 }
 
@@ -514,53 +500,12 @@ NET_IMPLEMENT_SIMPLE_ATSYNC_MESSAGE(CClientContextView, PerformBreak, eNRT_Relia
 		NetWarning("Illegal break id %d", param.brk);
 		return false;
 	}
-	if (!m_pBreakOps[param.brk])
-	{
-		NetWarning("Trying to send break products with no break stream... illegal [breakid=%d]", param.brk);
-		return false;
-	}
-	if (ContextState())
-	{
-		_smart_ptr<INetBreakagePlayback> pBrk = new CBreakagePlayback(this, m_pBreakOps[param.brk]);
-		ContextState()->GetGameContext()->PlaybackBreakage(param.brk, pBrk);
-	}
-	m_pBreakOps[param.brk] = 0;
 	return true;
 }
 
 NET_IMPLEMENT_ATSYNC_MESSAGE(CClientContextView, PerformSimpleBreak, eNRT_ReliableUnordered, eMPF_BlocksStateChange)
 {
-	if (CNetContextState* pState = ContextState())
-	{
-		if (IGameContext* pGameContext = pState->GetGameContext())
-		{
-			CPerformBreakSimpleClient* pClient = new CPerformBreakSimpleClient(this);
-			pClient->SerialiseNetIds(ser);
-
-			// Call the game side code, which will call the correct version of SerialiseSimpleBreakage()
-			void* userData = pGameContext->ReceiveSimpleBreakage(ser);
-
-			// Need to invoke the playback call from the game thread!
-			INetBreakageSimplePlaybackPtr pBreakSimplePlayback(pClient);
-			TO_GAME(&CClientContextView::GC_PerformSimpleBreak, this, userData, pBreakSimplePlayback);
-		}
-	}
-	else
-	{
-		CryWarning(VALIDATOR_MODULE_NETWORK, VALIDATOR_WARNING, "PerformSimpleBreak FAILED! GameContext was NULL!");
-	}
 	return true;
-}
-
-void CClientContextView::GC_PerformSimpleBreak(void* userData, INetBreakageSimplePlaybackPtr pBreakSimplePlayback)
-{
-	if (CNetContextState* pState = ContextState())
-	{
-		if (IGameContext* pGameContext = pState->GetGameContext())
-		{
-			pGameContext->PlaybackSimpleBreakage(userData, pBreakSimplePlayback);
-		}
-	}
 }
 
 NET_IMPLEMENT_IMMEDIATE_MESSAGE(CClientContextView, FlushMsgs, eNRT_ReliableUnordered, eMPF_BlocksStateChange)

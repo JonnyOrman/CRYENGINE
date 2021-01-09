@@ -29,7 +29,6 @@
 	#include "GameObjects/GameObject.h"
 #endif
 
-class CScriptRMI;
 class CPhysicsSync;
 class CGameServerChannel;
 class CActionGame;
@@ -42,7 +41,7 @@ class CNetDebug;
 #endif
 
 struct SBreakEvent;
-class CBreakReplicator;
+//class CBreakReplicator;
 
 struct SParsedConnectionInfo
 {
@@ -121,9 +120,6 @@ public:
 	virtual CTimeValue          GetPhysicsTime();
 	virtual void                BeginUpdateObjects(CTimeValue physTime, INetChannel* pChannel);
 	virtual void                EndUpdateObjects();
-	virtual void                PlaybackBreakage(int breakId, INetBreakagePlaybackPtr pBreakage);
-	virtual void*               ReceiveSimpleBreakage(TSerialize ser);
-	virtual void                PlaybackSimpleBreakage(void* userData, INetBreakageSimplePlaybackPtr pBreakage);
 	virtual void                CompleteUnbind(EntityId id);
 	// ~IGameContext
 
@@ -305,7 +301,7 @@ private:
 	};
 
 	std::unique_ptr<IContextEstablisher> m_pContextEstablisher;
-	std::unique_ptr<CBreakReplicator>    m_pBreakReplicator;
+	//std::unique_ptr<CBreakReplicator>    m_pBreakReplicator;
 };
 
 class CScopedRemoveObjectUnlock

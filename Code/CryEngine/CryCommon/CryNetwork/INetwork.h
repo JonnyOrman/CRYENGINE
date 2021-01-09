@@ -309,27 +309,6 @@ struct SNetProtocolDef
 	SNetMessageDef* vMessages;
 };
 
-struct INetBreakagePlayback : public CMultiThreadRefCount
-{
-	// <interfuscator:shuffle>
-	virtual void     SpawnedEntity(int idx, EntityId id) = 0;
-	virtual EntityId GetEntityIdForIndex(int idx) = 0;
-	// </interfuscator:shuffle>
-};
-typedef _smart_ptr<INetBreakagePlayback> INetBreakagePlaybackPtr;
-
-//! Experimental, alternative break-system.
-struct INetBreakageSimplePlayback : public CMultiThreadRefCount
-{
-	// <interfuscator:shuffle>
-	virtual void BeginBreakage() = 0;                                  //!< Used to tell the network that breakage replication has started.
-	virtual void FinishedBreakage() = 0;                               //!< Used to tell the network that breakage replication has finished.
-	virtual void BindSpawnedEntity(EntityId id, int spawnIdx) = 0;     //!< Use to net bind the "collected" entities from the break.
-	// </interfuscator:shuffle>
-};
-typedef _smart_ptr<INetBreakageSimplePlayback> INetBreakageSimplePlaybackPtr;
-//! \endcond
-
 struct INetSendableSink
 {
 	// <interfuscator:shuffle>
@@ -337,35 +316,6 @@ struct INetSendableSink
 	virtual void NextRequiresEntityEnabled(EntityId id) = 0;
 	virtual void SendMsg(INetSendable* pSendable) = 0;
 	// </interfuscator:shuffle>
-};
-
-struct IBreakDescriptionInfo : public CMultiThreadRefCount
-{
-	// <interfuscator:shuffle>
-	virtual void GetAffectedRegion(AABB& aabb) = 0;
-	virtual void AddSendables(INetSendableSink* pSink, int32 brkId) = 0;
-
-	//! Experimental, alternative break-system.
-	virtual void SerialiseSimpleBreakage(TSerialize ser) {}
-	// </interfuscator:shuffle>
-};
-typedef _smart_ptr<IBreakDescriptionInfo> IBreakDescriptionInfoPtr;
-
-enum ENetBreakDescFlags
-{
-	eNBF_UseDefaultSend       = 0,
-	eNBF_UseSimpleSend        = 1 << 0,
-	eNBF_SendOnlyOnClientJoin = 1 << 1,
-};
-
-struct SNetBreakDescription
-{
-	SNetBreakDescription() { flags = eNBF_UseDefaultSend; breakageEntity = 0; }
-	IBreakDescriptionInfoPtr pMessagePayload;
-	ENetBreakDescFlags       flags;
-	EntityId*                pEntities;
-	int                      nEntities;
-	EntityId                 breakageEntity;
 };
 
 enum ENetworkServiceInterface
@@ -1084,10 +1034,7 @@ struct INetContext
 	virtual void SetParentObject(EntityId objId, EntityId parentId) = 0;
 
 	virtual void RequestRemoteUpdate(EntityId id, NetworkAspectType aspects) = 0;
-
-	//! Add a break event to the log of breaks for this context
-	virtual void LogBreak(const SNetBreakDescription& des) = 0;
-
+	
 	//! Set scheduling parameters for an object.
 	//! \param normal 4cc game/scripts/network/scheduler.xml.
 	//! \param owned 4cc from game/scripts/network/scheduler.xml.
@@ -1373,11 +1320,7 @@ struct IGameContext
 
 	virtual void       OnEndNetworkFrame() = 0;
 	virtual void       OnStartNetworkFrame() = 0;
-
-	virtual void       PlaybackBreakage(int breakId, INetBreakagePlaybackPtr pBreakage) = 0;
-	virtual void*      ReceiveSimpleBreakage(TSerialize ser)                                           { return NULL; }
-	virtual void       PlaybackSimpleBreakage(void* userData, INetBreakageSimplePlaybackPtr pBreakage) {}
-
+	
 	virtual string     GetConnectionString(CryFixedStringT<HOST_MIGRATION_MAX_PLAYER_NAME_SIZE>* pNameOverride, bool fake) const = 0;
 
 	virtual void       CompleteUnbind(EntityId id) = 0;

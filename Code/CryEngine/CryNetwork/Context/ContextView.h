@@ -393,9 +393,7 @@ private:
 	void         RemoveRMIListener(IRMIListener* pListener);
 
 	void         DebugEvent(SNetObjectID id, ENetObjectDebugEvent evt);
-
-	virtual void GotBreakage(const SNetIntBreakDescription* pDesc);
-
+	
 protected:
 	enum EGetSentAspectsAuthority
 	{

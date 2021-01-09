@@ -76,8 +76,7 @@ public:
 			((IGeometry*)m_pCracks[i].pGeom)->Release();
 		} m_nCracks=m_idCrack=0;
 	}
-
-	virtual IBreakableGrid2d *GenerateBreakableGrid(Vec2 *ptsrc,int npt, const Vec2i &nCells, int bStaticBorder, int seed=-1);
+	
 	virtual void ReleaseGeomsImmediately(bool bReleaseImmediately) { m_bReleaseGeomsImmediately = bReleaseImmediately; }
 
 	phys_geometry *GetFreeGeomSlot();

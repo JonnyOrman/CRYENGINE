@@ -17,7 +17,6 @@ CSerializeWriterXMLCPBin::CSerializeWriterXMLCPBin(const XMLCPB::CNodeLiveWriter
 	m_curTime = gEnv->pTimer->GetFrameStartTime();
 	m_nodeStack.reserve(MAX_NODE_STACK_DEP);
 	m_nodeStack.push_back(nodeRef);
-	m_luaSaveStack.reserve(10);
 }
 
 //////////////////////////////////////////////////////////////////////////

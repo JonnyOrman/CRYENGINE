@@ -4,7 +4,6 @@
 
 #pragma once
 
-struct IFlowGraph;
 struct ICustomAction;
 
 #define CUSTOM_ACTIONS_PATH "Libs/CustomActions"

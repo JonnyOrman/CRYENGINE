@@ -60,7 +60,6 @@ CNetContextState::CNetContextState(CNetContext* pContext, int token, CNetContext
 	MMM_REGION(m_pMMM);
 
 	m_pNetIDs.reset(new TNetIDMap);
-	m_pLoggedBreakage.reset(new TNetIntBreakDescriptionList);
 
 	++g_objcnt.netContextState;
 
@@ -120,7 +119,6 @@ CNetContextState::~CNetContextState()
 	m_vObjectsEx.resize(0);
 
 	m_pNetIDs.reset();
-	m_pLoggedBreakage.reset();
 
 	m_allEstablishers.clear();
 	m_currentEstablishers.clear();
@@ -254,8 +252,6 @@ void CNetContextState::HandleSubscriptionDelta(INetContextListenerPtr pListener,
 		SendBindAspectsTo(pListener);
 	if (TurnedOnBit(eNOE_SetAspectProfile, oldEvents, newEvents))
 		SendSetAspectProfileEventsTo(pListener);
-	if (TurnedOnBit(eNOE_GotBreakage, oldEvents, newEvents))
-		SendBreakageTo(pListener);
 	if (m_bInGame && TurnedOnBit(eNOE_InGame, oldEvents, newEvents))
 	{
 		SNetObjectEvent event;
@@ -344,18 +340,6 @@ void CNetContextState::SendSetAspectProfileEventsTo(INetContextListenerPtr pList
 				}
 			}
 		}
-	}
-}
-
-void CNetContextState::SendBreakageTo(INetContextListenerPtr pListener)
-{
-	ASSERT_GLOBAL_LOCK;
-	SNetObjectEvent event;
-	event.event = eNOE_GotBreakage;
-	for (TNetIntBreakDescriptionList::iterator it = m_pLoggedBreakage->begin(); it != m_pLoggedBreakage->end(); ++it)
-	{
-		event.pBreakage = &*it;
-		SendEventTo(&event, pListener);
 	}
 }
 
@@ -2393,40 +2377,6 @@ NetworkAspectType CNetContextState::UpdateAspectData(SNetObjectID id, NetworkAsp
 	return ctx.GetTakenAspects();
 }
 
-void CNetContextState::LogBreak(const SNetBreakDescription& breakage)
-{
-	SCOPED_GLOBAL_LOCK;
-	MMM_REGION(m_pMMM);
-
-	m_pLoggedBreakage->push_back(SNetIntBreakDescription());
-	SNetIntBreakDescription& des = m_pLoggedBreakage->back();
-
-	des.pMessagePayload = breakage.pMessagePayload;
-	des.flags = breakage.flags;
-	des.breakageEntity = breakage.breakageEntity;
-	if (CNetCVars::Get().breakageSyncEntities)
-	{
-		for (int i = 0; i < breakage.nEntities; i++)
-		{
-			if (gEnv->bServer)
-			{
-				AllocateObject(breakage.pEntities[i], SNetObjectID(), 8, true, eST_Collected, NULL);
-				NetLog("Allocated collected object %s for index %d; entity id = %d", GetNetID(breakage.pEntities[i]).GetText(), i, breakage.pEntities[i]);
-			}
-			des.spawnedObjects.push_back(breakage.pEntities[i]);
-		}
-	}
-
-	if ((breakage.flags & eNBF_SendOnlyOnClientJoin) == 0)
-	{
-		// Send break event immediately
-		SNetObjectEvent event;
-		event.event = eNOE_GotBreakage;
-		event.pBreakage = &des;
-		Broadcast(&event);
-	}
-}
-
 void CNetContextState::NotifyGameOfAspectUpdate(SNetObjectID objID, NetworkAspectID aspectIdx, CNetChannel* pChannel, CTimeValue remoteTime)
 {
 	if (m_pContext)
@@ -2921,12 +2871,7 @@ void CNetContextState::GetMemoryStatistics(ICrySizer* pSizer)
 		SIZER_SUBCOMPONENT_NAME(pSizer, "CNetContext::m_changeBuffer");
 		pSizer->AddContainer(m_changeBuffer);
 	}
-
-	{
-		SIZER_SUBCOMPONENT_NAME(pSizer, "CNetContext::m_loggedBreakage");
-		pSizer->AddContainer(*m_pLoggedBreakage);
-	}
-
+	
 	m_vGameChangedObjects.GetMemoryStatistics(pSizer);
 	pSizer->AddContainer(m_vNetChangeLog);
 

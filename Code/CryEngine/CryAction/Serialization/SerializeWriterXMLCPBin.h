@@ -41,7 +41,6 @@ public:
 private:
 	CTimeValue                              m_curTime;
 	std::vector<XMLCPB::CNodeLiveWriterRef> m_nodeStack;  // TODO: look to get rid of this. it should be useless, because can access all necesary data from the XMLCPBin object
-	std::vector<const char*>                m_luaSaveStack;
 	XMLCPB::CWriterInterface&               m_binWriter;
 
 	void RecursiveAddXmlNodeRef(XMLCPB::CNodeLiveWriterRef BNode, XmlNodeRef xmlNode);

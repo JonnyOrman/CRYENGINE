@@ -57,8 +57,7 @@ enum class EMemStatContextType : uint32
 
 	AudioSystem = 23,
 	EntityArchetype = 24,
-
-	LUA = 25,
+	
 	D3D = 26,
 	ParticleEffect = 27,
 	SoundBuffer = 28,

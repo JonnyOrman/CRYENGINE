@@ -97,7 +97,6 @@ public:
 	virtual void            SetAspectProfile(EntityId id, NetworkAspectType aspectBit, uint8 profile);
 	virtual uint8           GetAspectProfile(EntityId id, NetworkAspectType aspectBit);
 	virtual void            SetParentObject(EntityId objId, EntityId parentId);
-	virtual void            LogBreak(const SNetBreakDescription& breakage);
 	virtual bool            SetSchedulingParams(EntityId objId, uint32 normal, uint32 owned);
 	virtual void            PulseObject(EntityId objId, uint32 pulseType);
 	virtual void            EnableBackgroundPassthrough(bool enable);

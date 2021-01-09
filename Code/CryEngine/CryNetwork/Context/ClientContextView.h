@@ -122,7 +122,6 @@ public:
 	NET_DECLARE_SIMPLE_ATSYNC_MESSAGE(PerformBreak, SOnlyBreakId);
 
 	NET_DECLARE_ATSYNC_MESSAGE(PerformSimpleBreak);
-	void GC_PerformSimpleBreak(void* userData, INetBreakageSimplePlaybackPtr pBreakSimplePlayback);
 
 	NET_DECLARE_IMMEDIATE_MESSAGE(BeginSyncFiles);
 	NET_DECLARE_IMMEDIATE_MESSAGE(BeginSyncFile);
@@ -198,9 +197,7 @@ private:
 	bool                SetAspectProfileMessage(NetworkAspectID aspectIdx, TSerialize ser, uint32, uint32, uint32);
 	void                ContinueEnterState();
 	static void         OnUpdatePredictedSpawn(void* pUsr1, void* pUsr2, ENetSendableStateUpdate);
-
-	SNetClientBreakDescriptionPtr m_pBreakOps[MAX_BREAK_STREAMS];
-
+	
 	virtual uint32 FilterEventMask(uint32 mask, EContextViewState state)
 	{
 		return mask | (ENABLE_DEBUG_KIT * eNOE_SyncWithGame_End);

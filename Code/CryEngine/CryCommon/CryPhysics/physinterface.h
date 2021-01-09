@@ -2403,27 +2403,6 @@ struct ITetrLattice
 	// </interfuscator:shuffle>
 };
 
-struct IBreakableGrid2d
-{
-	// <interfuscator:shuffle>
-	virtual ~IBreakableGrid2d(){}
-	//! BreakIntoChunks: emulates fracture in the grid around pt with dimensions r x ry
-	//! ptout receives a pointer to a vertex array
-	//! return value is an allocated array of indices, 3 per triangle, -1 marks contour end, -2 array end
-	//! maxPatchTris tells to unite broken trianges into patches of up to this size; 0 means broken triangles are discarded
-	//! jointhresh (0..1) affects the way triangles unite into patches
-	//! seed bootsraps the RNG if >=0
-	//! hole edges are filtered to removes corners sharper than filterAng (except those that are formed by several joined triangles)
-	virtual int*              BreakIntoChunks(const Vec2& pt, float r, Vec2*& ptout, int maxPatchTris, float jointhresh, int seed = -1, float filterAng = 0.0f, float ry = 0.0f) = 0;
-	virtual primitives::grid* GetGridData() = 0;
-	virtual bool              IsEmpty() = 0;
-	virtual void              Release() = 0;
-	virtual float             GetFracture() = 0; //!< destroyed percentage so far
-	virtual void              GetMemoryStatistics(ICrySizer* pSizer) const = 0;
-	// </interfuscator:shuffle>
-};
-//! \endcond
-
 struct IGeomManager
 {
 	// <interfuscator:shuffle>
@@ -2464,14 +2443,7 @@ struct IGeomManager
 	//! GetCrackGeom - creates a stretched crack based on the three corner vertices (pt[3])
 	//! pgwd receives it world transformation
 	virtual IGeometry* GetCrackGeom(const Vec3* pt, int idmat, geom_world_data* pgwd) = 0;
-
-	//! GenerateBreakebleGrid - creates a perturbed regular grid of points
-	//! ptsrc's bbox is split into a nCells grid (with an additional border)
-	//! vertices are randomly perturbed up to 0.4 cell size (seed can bootstrap the randomizer)
-	//! ptsrc is "painted" into the grid, snapping the closest grid vertices to ptsrc (but no new ones are created at this stage)
-	//! bStatic is ignored currently
-	virtual IBreakableGrid2d* GenerateBreakableGrid(Vec2* ptsrc, int npt, const Vec2i& nCells, int bStatic = 1, int seed = -1) = 0;
-
+	
 	virtual void              ReleaseGeomsImmediately(bool bReleaseImmediately) = 0;
 	// </interfuscator:shuffle>
 };
@@ -2765,7 +2737,6 @@ struct PhysicsVars : SolverSettings
 	int   bPlayersCanBreak;
 	float lastTimeStep;
 	int   bMultithreaded;
-	float breakImpulseScale;
 	float rtimeGranularity;
 	float massLimitDebris;
 	int   flagsColliderDebris;
@@ -2801,7 +2772,6 @@ struct PhysicsVars : SolverSettings
 
 	int   bEntGridUseOBB;
 	int   nStartupOverloadChecks;
-	float breakageMinAxisInertia; //!< For procedural breaking, each axis must have a minimum inertia compared to the axis with the largest inertia (0.01-1.00)
 
 	int   bForceSyncPhysics;
 	int   idEntBreakOnAwake;

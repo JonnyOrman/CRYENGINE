@@ -41,7 +41,6 @@ enum ENetObjectEvent
 	eNOE_SetAspectProfile           = 0x00040000,
 	eNOE_SyncWithGame_Start         = 0x00080000,
 	eNOE_SyncWithGame_End           = 0x00100000,
-	eNOE_GotBreakage                = 0x00200000,
 	eNOE_ValidatePrediction         = 0x00400000,
 	eNOE_PartialUpdate              = 0x00800000,
 	eNOE_StartedEstablishingContext = 0x01000000,
@@ -95,27 +94,6 @@ struct SNetObjectAspectChange
 	NetworkAspectType forceChange;
 };
 
-struct SNetIntBreakDescription
-{
-	const SNetMessageDef*    pMessage;
-	IBreakDescriptionInfoPtr pMessagePayload;
-	ENetBreakDescFlags       flags;
-	DynArray<EntityId>       spawnedObjects;
-	EntityId                 breakageEntity;
-};
-struct SNetClientBreakDescription : public DynArray<SNetObjectID>, public CMultiThreadRefCount
-{
-	SNetClientBreakDescription()
-	{
-		++g_objcnt.clientBreakDescription;
-	}
-	~SNetClientBreakDescription()
-	{
-		--g_objcnt.clientBreakDescription;
-	}
-};
-typedef _smart_ptr<SNetClientBreakDescription> SNetClientBreakDescriptionPtr;
-
 struct SNetObjectEvent
 {
 	SNetObjectEvent() :
@@ -153,8 +131,6 @@ struct SNetObjectEvent
 		// eNOE_RemoveRMIListener
 		IRMIListener*                  pRMIListener;
 		ENetObjectDebugEvent           dbgEvent;
-		// eNOE_GotBreakage
-		const SNetIntBreakDescription* pBreakage;
 		// eNOE_PredictSpawn, eNOE_ValidatePrediction
 		struct
 		{

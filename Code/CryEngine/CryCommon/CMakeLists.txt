@@ -160,8 +160,6 @@ add_sources("NoUberFile"
 		"CryEntitySystem/IEntitySerialize.h"
 		"CryEntitySystem/EntityDesc.h"
 		"CryEntitySystem/IBitStream.h"
-		"CryEntitySystem/IBreakableManager.h"
-		"CryEntitySystem/IBreakableGlassSystem.h"
 )
 
 # -- crycommon.waf_files --

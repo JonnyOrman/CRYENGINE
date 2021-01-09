@@ -1634,7 +1634,6 @@ bool CSystem::InitMovieSystem(const SSystemInitParams& startupParams)
 bool CSystem::InitFileSystem(const SSystemInitParams& startupParams)
 {
 	CRY_PROFILE_FUNCTION(PROFILE_LOADING_ONLY);
-	MEMSTAT_CONTEXT(EMemStatContextType::LUA, "Init File System");
 
 	if (m_pUserCallback)
 		m_pUserCallback->OnInitProgress("Initializing File System...");
@@ -1792,7 +1791,6 @@ bool CSystem::InitFileSystem(const SSystemInitParams& startupParams)
 
 void CSystem::InitLog(const SSystemInitParams& startupParams)
 {
-	MEMSTAT_CONTEXT(EMemStatContextType::LUA, "Init Log");
 	if (startupParams.pLog == nullptr)
 	{
 		m_env.pLog = new CLog(this);

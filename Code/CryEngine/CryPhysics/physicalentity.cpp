@@ -1211,7 +1211,7 @@ int CPhysicalEntity::Action(pe_action *_action, int bThreadSafe)
 			if (!is_unused(action->point))
 				i = MapHitPointFromParent(i,action->point);
 
-			float scale = 1.0f+(m_pWorld->m_vars.breakImpulseScale-1.0f)*iszero((int)m_flags & pef_override_impulse_scale);
+			float scale = 1.0f+(/*m_pWorld->m_vars.breakImpulseScale*/-1.0f)*iszero((int)m_flags & pef_override_impulse_scale);
 			if (m_pStructure) {
 				int bMarkEntityAsDeforming = 0;
 				Vec3 dL(ZERO),dP=action->impulse*scale;
@@ -2228,7 +2228,7 @@ int CPhysicalEntity::UpdateStructure(float time_interval, pe_explosion *pexpl, i
 				g_parts[i].pent = this;
 			}
 			impTot=0; vmax=-1; Pmax.zero(); Lmax.zero();
-			if (m_pWorld->m_vars.breakImpulseScale || m_flags & pef_override_impulse_scale) {
+			if (/*m_pWorld->m_vars.breakImpulseScale || */m_flags & pef_override_impulse_scale) {
 				for(i=0; i<m_nParts; i++) {
 					P = m_pStructure->pParts[i].Pext*dt*100+m_pStructure->pParts[i].Fext;
 					L = m_pStructure->pParts[i].Lext*dt*100+m_pStructure->pParts[i].Text;
@@ -2466,7 +2466,7 @@ int CPhysicalEntity::UpdateStructure(float time_interval, pe_explosion *pexpl, i
 			pents = 0;
 			nIsles &= ~-m_pStructure->bTestRun;
 
-			if (m_pWorld->m_vars.breakImpulseScale || m_flags & pef_override_impulse_scale || !pexpl || 
+			if (/*m_pWorld->m_vars.breakImpulseScale || */m_flags & pef_override_impulse_scale || !pexpl || 
 					(pexpl && pexpl->forceDeformEntities)) for(i=1;i<nIsles;i++) 
 			{
 				for(j=0,epcep.nTotParts=0;j<m_nParts;j++) 
@@ -2805,7 +2805,7 @@ int CPhysicalEntity::UpdateStructure(float time_interval, pe_explosion *pexpl, i
 						V0 = pgeom0->V;
 						float Imax0 = max(max(pgeom0->Ibody.x,pgeom0->Ibody.y),pgeom0->Ibody.z);
 						pgeom0->pGeom->CalcPhysicalProperties(pgeom0);
-						t = max(max(pgeom0->Ibody.x,pgeom0->Ibody.y),pgeom0->Ibody.z)*m_pWorld->m_vars.breakageMinAxisInertia;
+						t = max(max(pgeom0->Ibody.x,pgeom0->Ibody.y),pgeom0->Ibody.z)/**m_pWorld->m_vars.breakageMinAxisInertia*/;
 						pgeom0->Ibody.x = max(pgeom0->Ibody.x, t); 
 						pgeom0->Ibody.y = max(pgeom0->Ibody.y, t); 
 						pgeom0->Ibody.z = max(pgeom0->Ibody.z, t); 
@@ -3226,7 +3226,7 @@ void CPhysicalEntity::OnContactResolved(entity_contact *pContact, int iop, int i
 			n = svtx.P;
 			pt = svtx.r+svtx.pbody->pos;
 		}
-		float scale = 1.0f+(m_pWorld->m_vars.breakImpulseScale-1.0f)*iszero((int)m_flags & pef_override_impulse_scale);
+		float scale = 1.0f+(/*m_pWorld->m_vars.breakImpulseScale*/-1.0f)*iszero((int)m_flags & pef_override_impulse_scale);
 		if (m_pStructure) {
 			Vec3 dP,r,sz;
 			float Plen2,Llen2;

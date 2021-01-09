@@ -2216,9 +2216,7 @@ void CLevelSystem::UnLoadLevel()
 		{
 			pCoopAnimManager->Reset();
 		}
-
-		pCryAction->ClearBreakHistory();
-
+		
 		// Custom actions (Active + Library) keep a smart ptr to flow graph and need to be cleared before get below to the gEnv->pFlowSystem->Reset(true);
 		ICustomActionManager* pCustomActionManager = pCryAction->GetICustomActionManager();
 		if (pCustomActionManager)

@@ -2,12 +2,10 @@
 
 #include "stdafx.h"
 #include "PhysicsEventListener.h"
-#include <CryEntitySystem/IBreakableManager.h>
 #include "EntitySlot.h"
 #include "Entity.h"
 #include "EntitySystem.h"
 #include "EntityCVars.h"
-#include "BreakableManager.h"
 
 #include "PhysicsProxy.h"
 
@@ -322,42 +320,24 @@ int CPhysicsEventListener::OnPreCreatePhysEntityPart(const EventPhys* pEvent)
 //////////////////////////////////////////////////////////////////////////
 int CPhysicsEventListener::OnUpdateMesh(const EventPhys* pEvent)
 {
-	static_cast<CBreakableManager*>(GetIEntitySystem()->GetBreakableManager())->HandlePhysics_UpdateMeshEvent((EventPhysUpdateMesh*)pEvent);
 	return 1;
 }
 
 //////////////////////////////////////////////////////////////////////////
 int CPhysicsEventListener::OnCreatePhysEntityPart(const EventPhys* pEvent)
 {
-	EventPhysCreateEntityPart* pCreateEvent = (EventPhysCreateEntityPart*)pEvent;
-
-	//////////////////////////////////////////////////////////////////////////
-	// Let Breakable manager handle creation of the new entity part.
-	//////////////////////////////////////////////////////////////////////////
-	CBreakableManager* pBreakMgr = static_cast<CBreakableManager*>(GetIEntitySystem()->GetBreakableManager());
-	pBreakMgr->HandlePhysicsCreateEntityPartEvent(pCreateEvent);
 	return 1;
 }
 
 //////////////////////////////////////////////////////////////////////////
 int CPhysicsEventListener::OnRemovePhysEntityParts(const EventPhys* pEvent)
 {
-	EventPhysRemoveEntityParts* pRemoveEvent = (EventPhysRemoveEntityParts*)pEvent;
-
-	CBreakableManager* pBreakMgr = static_cast<CBreakableManager*>(GetIEntitySystem()->GetBreakableManager());
-	pBreakMgr->HandlePhysicsRemoveSubPartsEvent(pRemoveEvent);
-
 	return 1;
 }
 
 //////////////////////////////////////////////////////////////////////////
 int CPhysicsEventListener::OnRevealPhysEntityPart(const EventPhys* pEvent)
 {
-	EventPhysRevealEntityPart* pRevealEvent = (EventPhysRevealEntityPart*)pEvent;
-
-	CBreakableManager* pBreakMgr = static_cast<CBreakableManager*>(GetIEntitySystem()->GetBreakableManager());
-	pBreakMgr->HandlePhysicsRevealSubPartEvent(pRevealEvent);
-
 	return 1;
 }
 
@@ -503,10 +483,7 @@ int CPhysicsEventListener::OnJointBreak(const EventPhys* pEvent)
 		//IStatObj::SSubObject *pSubObject2 = pStatObj->GetSubObject(pBreakEvent->partid[1]);
 		//if (pSubObject2)
 		//pObj2 = pSubObject2->pStatObj;
-
-		CBreakableManager* pBreakMgr = static_cast<CBreakableManager*>(GetIEntitySystem()->GetBreakableManager());
-		if (pObj1 && FxAllowed())
-			pBreakMgr->CreateSurfaceEffect(pObj1, tm, SURFACE_BREAKAGE_TYPE("joint_break"));
+		
 		//if (pObj2)
 		//pBreakMgr->CreateSurfaceEffect( pObj2,tm,sEffectType );
 	}
@@ -543,21 +520,6 @@ int CPhysicsEventListener::OnJointBreak(const EventPhys* pEvent)
 				pStatObjEnt->SetFlags(pStatObjEnt->GetFlags() | STATIC_OBJECT_GENERATED);
 				if (pCEntity)
 					pCEntity->SetStatObj(pStatObjEnt, ENTITY_SLOT_ACTUAL, false);
-				else if (pRenderNode)
-				{
-					IBreakableManager::SCreateParams createParams;
-					createParams.pSrcStaticRenderNode = pRenderNode;
-					createParams.fScale = nodeTM.GetColumn(0).len();
-					createParams.nSlotIndex = 0;
-					createParams.worldTM = nodeTM;
-					createParams.nMatLayers = pRenderNode->GetMaterialLayers();
-					createParams.nRenderNodeFlags = pRenderNode->GetRndFlags();
-					createParams.pCustomMtl = pRenderNode->GetMaterial();
-					createParams.nEntityFlagsAdd = ENTITY_FLAG_MODIFIED_BY_PHYSICS;
-					createParams.pName = pRenderNode->GetName();
-					static_cast<CBreakableManager*>(GetIEntitySystem()->GetBreakableManager())->CreateObjectAsEntity(
-					  pStatObjEnt, pBreakEvent->pEntity[0], pBreakEvent->pEntity[0], createParams, true);
-				}
 			}
 
 			IStatObj::SSubObject* pSubObj1;

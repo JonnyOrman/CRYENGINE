@@ -771,7 +771,6 @@ ELoadGameResult CGameSerialize::LoadGame(CCryAction* pCryAction, const char* met
 		// delete any left-over entities
 		pEntitySystem->DeletePendingEntities();
 		FlushActivatableGameObjectExtensions();
-		pCryAction->FlushBreakableObjects();
 
 		// Clean all entities that should not be in system before loading entities from savegame.
 		DeleteDynamicEntities(loadEnvironment.m_basicEntityData); //must happen before reserving entities
@@ -1452,10 +1451,7 @@ bool CGameSerialize::LoadEntities(SLoadEnvironment& loadEnv, std::unique_ptr<TSe
 	{
 		FlushActivatableGameObjectExtensions();
 		loadEnv.m_checkpoint.Check("FlushExtensions");
-
-		loadEnv.m_pCryAction->FlushBreakableObjects();
-		loadEnv.m_checkpoint.Check("FlushBreakables");
-
+		
 		// Clean all entities that should not be in system before loading entties from savegame.
 		// delete any left-over entities
 		DeleteDynamicEntities(loadEnv.m_basicEntityData); //must happen before reserving entities

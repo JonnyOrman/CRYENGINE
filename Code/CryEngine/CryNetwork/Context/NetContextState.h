@@ -214,7 +214,6 @@ public:
 	void          SetAspectProfile(EntityId id, NetworkAspectType aspectBit, uint8 profile);
 	uint8         GetAspectProfile(EntityId id, NetworkAspectType aspectBit);
 	void          SetParentObject(EntityId objId, EntityId parentId);
-	void          LogBreak(const SNetBreakDescription& breakage);
 	bool          SetSchedulingParams(EntityId objId, uint32 normal, uint32 owned);
 	void          PulseObject(EntityId objId, uint32 pulseType);
 	void          EnableBackgroundPassthrough(bool enable);
@@ -495,10 +494,7 @@ private:
 
 	// temp store for spawned object id
 	EntityId m_spawnedObjectId;
-
-	typedef std::list<SNetIntBreakDescription, STLMementoAllocator<SNetIntBreakDescription>> TNetIntBreakDescriptionList;
-	std::unique_ptr<TNetIntBreakDescriptionList> m_pLoggedBreakage;
-
+	
 	// called by the view when the object is really destroyed remotely
 	// (so we can wait for all objects before resetting)
 	// returns true if the object was really unbound

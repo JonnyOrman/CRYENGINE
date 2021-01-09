@@ -17,8 +17,6 @@ CSerializeXMLWriterImpl::CSerializeXMLWriterImpl(const XmlNodeRef& nodeRef)
 	//	m_bCheckEntityOnScript = false;
 	assert(!!nodeRef);
 	m_nodeStack.push_back(nodeRef);
-
-	m_luaSaveStack.reserve(10);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -102,7 +100,6 @@ void CSerializeXMLWriterImpl::GetMemoryUsage(ICrySizer* pSizer) const
 {
 	pSizer->Add(*this);
 	pSizer->AddObject(m_nodeStack);
-	pSizer->AddContainer(m_luaSaveStack);
 }
 
 

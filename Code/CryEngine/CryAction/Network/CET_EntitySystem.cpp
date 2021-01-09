@@ -85,7 +85,6 @@ public:
 	{
 		// reset a bunch of subsystems
 		gEnv->p3DEngine->ResetParticlesAndDecals();
-		gEnv->pGameFramework->ResetBrokenGameObjects();
 		gEnv->pPhysicalWorld->ResetDynamicEntities();
 		if (gEnv->pGameFramework->GetIMaterialEffects())
 		{

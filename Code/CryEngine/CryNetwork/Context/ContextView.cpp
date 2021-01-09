@@ -31,26 +31,24 @@
 #include "UpdateMessage.h"
 
 static const unsigned StateMessages =
-  eNOE_SyncWithGame_Start |
-  eNOE_BindObject |
-  eNOE_UnbindObject |
-  eNOE_UnboundObject |
-  eNOE_ObjectAspectChange |
-  eNOE_ReconfiguredObject |
-  eNOE_BindAspects |
-  eNOE_UnbindAspects |
-  eNOE_SetAuthority |
-  eNOE_SetAspectProfile |
-  eNOE_PartialUpdate |
-  eNOE_GotBreakage;
+eNOE_SyncWithGame_Start |
+eNOE_BindObject |
+eNOE_UnbindObject |
+eNOE_UnboundObject |
+eNOE_ObjectAspectChange |
+eNOE_ReconfiguredObject |
+eNOE_BindAspects |
+eNOE_UnbindAspects |
+eNOE_SetAuthority |
+eNOE_SetAspectProfile |
+eNOE_PartialUpdate;
 
 static const unsigned ExcludeIfLocal =
   eNOE_ObjectAspectChange |
   eNOE_ReconfiguredObject |
   eNOE_BindAspects |
   eNOE_UnbindAspects |
-  eNOE_RemoveStaticEntity |
-  eNOE_GotBreakage;
+  eNOE_RemoveStaticEntity;
 
 static const unsigned TopLevelMessages =
   //#if ENABLE_DEBUG_KIT
@@ -736,9 +734,6 @@ void CContextView::OnObjectEvent(CNetContextState* pState, SNetObjectEvent* pEve
 			break;
 		case eNOE_DebugEvent:
 			DebugEvent(pEvent->id, pEvent->dbgEvent);
-			break;
-		case eNOE_GotBreakage:
-			GotBreakage(pEvent->pBreakage);
 			break;
 		case eNOE_SyncWithGame_Start:
 #if ENABLE_DEBUG_KIT
@@ -2041,10 +2036,6 @@ void CContextView::PerformRegularCleanup()
 }
 
 void CContextView::SetAspectProfile(SNetObjectID objectID, NetworkAspectType aspect, uint8 profile)
-{
-}
-
-void CContextView::GotBreakage(const SNetIntBreakDescription* pDesc)
 {
 }
 

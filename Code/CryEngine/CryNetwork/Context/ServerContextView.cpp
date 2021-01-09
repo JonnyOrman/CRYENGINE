@@ -23,10 +23,6 @@
 #include "UpdateMessage.h"
 #include "SyncedFileSet.h"
 
-#include "BreakagePlayback.h"
-#include "PerformBreakage.h"
-
-
 class CServerContextView::CBindObjectMessage : public CUpdateMessage
 {
 public:
@@ -329,90 +325,6 @@ private:
 	string GetName()
 	{
 		return m_pView->GetName();
-	}
-};
-
-class CServerContextView::CPerformBreak : public INetSendable
-{
-public:
-	CPerformBreak(CServerContextView* pView, int id, const SNetIntBreakDescription* pDesc) : INetSendable(eMPF_BlocksStateChange, eNRT_ReliableUnordered), m_id(id), m_pView(pView), m_pDesc(pDesc)
-	{
-	}
-
-#if ENABLE_PACKET_PREDICTION
-	SMessageTag GetMessageTag(INetSender* pSender, IMessageMapper* mapper)
-	{
-		SMessageTag mTag;
-		mTag.messageId = mapper->GetMsgId(CClientContextView::PerformBreak);
-		mTag.varying1 = 0;
-		mTag.varying2 = 0;
-		return mTag;
-	}
-#endif
-
-	EMessageSendResult Send(INetSender* pSender)
-	{
-		pSender->BeginMessage(CClientContextView::PerformBreak);
-		SOnlyBreakId(m_id).SerializeWith(pSender->ser);
-		return eMSR_SentOk;
-	}
-
-	void UpdateState(uint32 nFromSeq, ENetSendableStateUpdate state)
-	{
-		if (state != eNSSU_Requeue)
-		{
-			m_pView->UnlockStateChanges("BREAK");
-
-			for (DynArray<CNetObjectBindLock>::const_iterator itlk = m_locks.begin(); itlk != m_locks.end(); ++itlk)
-			{
-				m_pView->SendablesDependentOnObjectRemove(itlk->GetID(), m_handle);
-			}
-		}
-	}
-
-	void GetPositionInfo(SMessagePositionInfo& pos)
-	{
-		AABB aabb;
-		m_pDesc->pMessagePayload->GetAffectedRegion(aabb);
-		pos.havePosition = true;
-		pos.position = aabb.GetCenter();
-	}
-
-	size_t GetSize()
-	{
-		return sizeof(*this);
-	}
-
-	const char* GetDescription()
-	{
-		return "PerformBreak";
-	}
-
-	void SetHandle(SSendableHandle hdl, const DynArray<EntityId>& alsoEnts)
-	{
-		NET_ASSERT(!m_handle);
-		m_handle = hdl;
-		AddEntities(alsoEnts);
-		AddEntities(m_pDesc->spawnedObjects);
-		for (DynArray<CNetObjectBindLock>::const_iterator itlk = m_locks.begin(); itlk != m_locks.end(); ++itlk)
-			m_pView->m_pSendables->insert(std::make_pair(itlk->GetID(), m_handle));
-	}
-
-private:
-	int                            m_id;
-	const SNetIntBreakDescription* m_pDesc;
-	_smart_ptr<CServerContextView> m_pView;
-	SSendableHandle                m_handle;
-	DynArray<CNetObjectBindLock>   m_locks;
-
-	void AddEntities(const DynArray<EntityId>& ents)
-	{
-		for (DynArray<EntityId>::const_iterator it = ents.begin(); it != ents.end(); ++it)
-		{
-			SNetObjectID objId = m_pView->ContextState()->GetNetID(*it, false);
-			if (objId)
-				m_locks.push_back(m_pView->ContextState()->LockObject(objId, "PBRK"));
-		}
 	}
 };
 
@@ -1124,93 +1036,6 @@ private:
 	std::map<EntityId, SSendableHandle> m_waitHandles;
 	DynArray<EntityId>                  m_entities;
 };
-
-void CServerContextView::GotBreakage(const SNetIntBreakDescription* pDesc)
-{
-	MMM_REGION(m_pMMM);
-
-	if (IsLocal())
-		return;
-
-	const int flags = pDesc->flags;
-
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	if (flags & eNBF_UseSimpleSend)
-	{
-		CPerformBreakSimpleServer::GotBreakage(this, pDesc);
-		return;
-	}
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	BreakSegmentID minSegId, maxSegId;
-	SSendableHandle& hdl = m_breakStreamHandles[0].hdl;
-
-	static const float BREAK_SEGMENT_SIZE = 20.0f;
-
-	AABB affected;
-	pDesc->pMessagePayload->GetAffectedRegion(affected);
-	minSegId = BreakSegmentID(affected.min / BREAK_SEGMENT_SIZE);
-	maxSegId = BreakSegmentID(affected.max / BREAK_SEGMENT_SIZE + BreakSegmentID(1));
-
-	std::vector<SSendableHandle, STLMementoAllocator<SSendableHandle>> waitForInitial;
-	if (hdl)
-		waitForInitial.push_back(hdl);
-	for (int i = minSegId.x; i <= maxSegId.x; i++)
-		for (int j = minSegId.y; j <= maxSegId.y; j++)
-			for (int k = minSegId.z; k <= maxSegId.z; k++)
-				if (SSendableHandle bhdl = (*m_pBreakSegmentStreams)[BreakSegmentID(i, j, k)])
-					waitForInitial.push_back(bhdl);
-	std::sort(waitForInitial.begin(), waitForInitial.end());
-	waitForInitial.resize(std::unique(waitForInitial.begin(), waitForInitial.end()) - waitForInitial.begin());
-
-	if (waitForInitial.size() > 0)
-	{
-		Parent()->NetAddSendable(new CBeginBreakStream(m_breakStreamHandles[0].id), waitForInitial.size(), &waitForInitial[0], &hdl);
-	}
-	else
-	{
-		Parent()->NetAddSendable(new CBeginBreakStream(m_breakStreamHandles[0].id), 0, NULL, &hdl);
-	}
-
-	if (CNetCVars::Get().breakageSyncEntities)
-	{
-		for (int i = 0; i < pDesc->spawnedObjects.size(); i++)
-		{
-			EntityId ent = pDesc->spawnedObjects[i];
-			SNetObjectID id = ContextState()->GetNetID(ent);
-			//const SContextObject * pObj = ContextState()->GetContextObject(id);
-			SContextObjectRef obj = ContextState()->GetContextObject(id);
-			if (id && obj.main && obj.main->spawnType == eST_Collected)
-			{
-				Parent()->NetAddSendable(new CDeclareBrokenProductMessage(id, m_breakStreamHandles[0].id, this), 1, &hdl, &hdl);
-			}
-			else
-			{
-				NetLog("[brk] failed to call CDeclareBrokenProductMessage id=%s, main=%p, spawnType=%d", id.GetText(), obj.main, obj.main ? obj.main->spawnType : -1);
-			}
-		}
-	}
-
-	LockStateChanges("BREAK");
-	CBreakageSendableSink sink(this, &hdl);
-	pDesc->pMessagePayload->AddSendables(&sink, m_breakStreamHandles[0].id);
-
-	_smart_ptr<CPerformBreak> pPB = new CPerformBreak(this, m_breakStreamHandles[0].id, pDesc);
-	Parent()->NetAddSendable(&*pPB, 1, &hdl, &hdl);
-	pPB->SetHandle(hdl, sink.GetEntities());
-
-	// block radius around breakage
-	for (int i = minSegId.x; i <= maxSegId.x; i++)
-		for (int j = minSegId.y; j <= maxSegId.y; j++)
-			for (int k = minSegId.z; k <= maxSegId.z; k++)
-				(*m_pBreakSegmentStreams)[BreakSegmentID(i, j, k)] = hdl;
-
-	// rotate break streams
-	SBreakStreamHandle temp = m_breakStreamHandles[0];
-	for (int i = 1; i < MAX_BREAK_STREAMS; i++)
-		m_breakStreamHandles[i - 1] = m_breakStreamHandles[i];
-	m_breakStreamHandles[MAX_BREAK_STREAMS - 1] = temp;
-}
 
 #if SERVER_FILE_SYNC_MODE
 class CServerContextView::CCET_SyncFiles : public CCET_Base

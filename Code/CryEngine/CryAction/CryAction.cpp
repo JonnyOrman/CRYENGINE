@@ -52,7 +52,6 @@
 #include "GameObjects/GameObjectSystem.h"
 #include "ViewSystem/ViewSystem.h"
 #include "GameplayRecorder/GameplayRecorder.h"
-#include "BreakableGlassSystem.h"
 
 #include "ForceFeedbackSystem/ForceFeedbackSystem.h"
 
@@ -72,7 +71,6 @@
 #include "TimeOfDayScheduler.h"
 #include "CooperativeAnimationManager/CooperativeAnimationManager.h"
 #include "Network/CVarListProcessor.h"
-#include "Network/BreakReplicator.h"
 #include "CheckPoint/CheckPointSystem.h"
 #include "GameSession/GameSessionHandler.h"
 
@@ -239,7 +237,6 @@ CCryAction::CCryAction(SSystemInitParams& initParams)
 	m_pAnimationGraphCvars(0),
 	m_pMannequin(0),
 	m_pMaterialEffects(0),
-	m_pBreakableGlassSystem(0),
 	m_pForceFeedBackSystem(0),
 	m_pPlayerProfileManager(0),
 	m_pEffectSystem(0),
@@ -269,7 +266,6 @@ CCryAction::CCryAction(SSystemInitParams& initParams)
 	m_bAllowSave(true),
 	m_bAllowLoad(true),
 	m_pGFListeners(0),
-	m_pBreakEventListener(NULL),
 	m_nextFrameCommand(0),
 	m_lastSaveLoad(0.0f),
 	m_lastFrameTimeUI(0.0f),
@@ -1748,11 +1744,7 @@ bool CCryAction::Initialize(SSystemInitParams& startupParams)
 
 	m_pDefaultTimeDemoRecorder = stl::make_unique<CTimeDemoRecorder>();
 	SetITimeDemoRecorder(m_pDefaultTimeDemoRecorder.get());
-
-	/*CScriptRMI::RegisterCVars();
-	CGameObject::CreateCVars();
-	m_pScriptRMI = new CScriptRMI();*/
-
+	
 	// initialize subsystems
 	m_pEffectSystem = new CEffectSystem;
 	m_pEffectSystem->Init();
@@ -1836,16 +1828,7 @@ bool CCryAction::Initialize(SSystemInitParams& startupParams)
 	IMovieSystem* movieSys = gEnv->pMovieSystem;
 	if (movieSys != NULL)
 		movieSys->SetUser(m_pViewSystem);
-
-	if (CCryActionCVars::Get().g_legacyItemSystem)
-	{
-		//REGISTER_FACTORY((IGameFramework*)this, "Inventory", CInventory, false);
-	}
-
-	InitScriptBinds();
-
-	// m_pGameRulesSystem = new CGameRulesSystem(m_pSystem, this);
-
+	
 	m_pLocalAllocs = new SLocalAllocs();
 
 #if 0
@@ -2028,9 +2011,7 @@ bool CCryAction::CompleteInit()
 
 	InlineInitializationProcessing("CCryAction::CompleteInit");
 
-	/*REGISTER_FACTORY((IGameFramework*)this, "AnimatedCharacter", CAnimatedCharacter, false);
-	REGISTER_FACTORY((IGameFramework*)this, "LipSync_TransitionQueue", CLipSync_TransitionQueue, false);
-	REGISTER_FACTORY((IGameFramework*)this, "LipSync_FacialInstance", CLipSync_FacialInstance, false);*/
+
 	gs_lipSyncExtensionNamesForExposureToEditor.clear();
 	gs_lipSyncExtensionNamesForExposureToEditor.push_back("LipSync_TransitionQueue");
 	gs_lipSyncExtensionNamesForExposureToEditor.push_back("LipSync_FacialInstance");
@@ -2040,12 +2021,11 @@ bool CCryAction::CompleteInit()
 	// ---------------------------
 
 	m_pMaterialEffects = new CMaterialEffects();
-	//m_pScriptBindMFX = new CScriptBind_MaterialEffects(m_pSystem, m_pMaterialEffects);
 	m_pSystem->SetIMaterialEffects(m_pMaterialEffects);
 
 	InlineInitializationProcessing("CCryAction::CompleteInit MaterialEffects");
 
-	m_pBreakableGlassSystem = new CBreakableGlassSystem();
+	//m_pBreakableGlassSystem = new CBreakableGlassSystem();
 
 	InitForceFeedbackSystem();
 
@@ -2073,7 +2053,7 @@ bool CCryAction::CompleteInit()
 	DumpMemInfo("CryAction::CompleteInit End");
 #endif
 
-	CBreakReplicator::RegisterClasses();
+	//CBreakReplicator::RegisterClasses();
 
 	if (gEnv->pRenderer)
 	{
@@ -2116,11 +2096,6 @@ bool CCryAction::CompleteInit()
 
 	InlineInitializationProcessing("CCryAction::CompleteInit End");
 	return true;
-}
-
-//------------------------------------------------------------------------
-void CCryAction::InitScriptBinds()
-{
 }
 
 //------------------------------------------------------------------------
@@ -2195,7 +2170,6 @@ void CCryAction::ShutDown()
 	SAFE_RELEASE(m_pGameRulesSystem);
 	SAFE_RELEASE(m_pSharedParamsManager);
 	SAFE_DELETE(m_pMaterialEffects);
-	SAFE_DELETE(m_pBreakableGlassSystem);
 	SAFE_RELEASE(m_pActorSystem);
 	SAFE_DELETE(m_pForceFeedBackSystem);
 	SAFE_DELETE(m_pEffectSystem);
@@ -2380,8 +2354,8 @@ bool CCryAction::PostSystemUpdate(bool haveFocus, CEnumFlags<ESystemUpdateFlags>
 		if (m_pMaterialEffects)
 			m_pMaterialEffects->Update(frameTime);
 
-		if (m_pBreakableGlassSystem)
-			m_pBreakableGlassSystem->Update(frameTime);
+		/*if (m_pBreakableGlassSystem)
+			m_pBreakableGlassSystem->Update(frameTime);*/
 
 		if (m_pCooperativeAnimationManager)
 			m_pCooperativeAnimationManager->Update(frameTime);
@@ -2670,59 +2644,6 @@ bool CCryAction::BlockingSpawnPlayer()
 	if (!m_pGame)
 		return false;
 	return m_pGame->BlockingSpawnPlayer();
-}
-
-void CCryAction::ResetBrokenGameObjects()
-{
-	if (m_pGame)
-	{
-		m_pGame->FixBrokenObjects(true);
-		m_pGame->ClearBreakHistory();
-	}
-}
-
-/////////////////////////////////////////
-// CloneBrokenObjectsAndRevertToStateAtTime() is called by the kill cam. It takes a list of indices into
-//		the break events array, which it uses to find the objects that were broken during the kill cam, and
-//		therefore need to be cloned for playback. It clones the broken objects, and hides the originals. It
-//		then reverts the cloned objects to their unbroken state, and re-applies any breaks that occured up
-//		to the start of the kill cam.
-void CCryAction::CloneBrokenObjectsAndRevertToStateAtTime(int32 iFirstBreakEventIndex, uint16* pBreakEventIndices, int32& iNumBreakEvents, IRenderNode** outClonedNodes, int32& iNumClonedNodes, SRenderNodeCloneLookup& renderNodeLookup)
-{
-	if (m_pGame)
-	{
-		//CryLogAlways(">> Cloning objects broken during killcam and reverting to unbroken state");
-		m_pGame->CloneBrokenObjectsByIndex(pBreakEventIndices, iNumBreakEvents, outClonedNodes, iNumClonedNodes, renderNodeLookup);
-
-		//CryLogAlways(">> Hiding original versions of objects broken during killcam");
-		m_pGame->HideBrokenObjectsByIndex(pBreakEventIndices, iNumBreakEvents);
-
-		//CryLogAlways(">> Applying breaks up to start of killcam to cloned objects");
-		m_pGame->ApplyBreaksUntilTimeToObjectList(iFirstBreakEventIndex, renderNodeLookup);
-	}
-}
-
-/////////////////////////////////////////
-// ApplySingleProceduralBreakFromEventIndex() re-applies a single break to a cloned object, for use in the
-//		kill cam during playback
-void CCryAction::ApplySingleProceduralBreakFromEventIndex(uint16 uBreakEventIndex, const SRenderNodeCloneLookup& renderNodeLookup)
-{
-	if (m_pGame)
-	{
-		m_pGame->ApplySingleProceduralBreakFromEventIndex(uBreakEventIndex, renderNodeLookup);
-	}
-}
-
-/////////////////////////////////////////
-// UnhideBrokenObjectsByIndex() is provided a list of indices into the Break Event array, that it uses
-//		to look up and unhide broken objects assocated with the break events. This is used by the kill
-//		cam when it finishes playback
-void CCryAction::UnhideBrokenObjectsByIndex(uint16* pObjectIndicies, int32 iNumObjectIndices)
-{
-	if (m_pGame)
-	{
-		m_pGame->UnhideBrokenObjectsByIndex(pObjectIndicies, iNumObjectIndices);
-	}
 }
 
 bool CCryAction::ChangeGameContext(const SGameContextParams* pGameContextParams)
@@ -3252,11 +3173,6 @@ void CCryAction::OnEditorSetGameMode(int iMode)
 		}
 		m_isEditing = !iMode;
 	}
-	else if (m_pGame)
-	{
-		m_pGame->FixBrokenObjects(true);
-		m_pGame->ClearBreakHistory();
-	}
 
 	// reset any pending camera blending
 	if (m_pViewSystem)
@@ -3706,10 +3622,10 @@ IActorSystem* CCryAction::GetIActorSystem()
 	return m_pActorSystem;
 }
 
-IBreakReplicator* CCryAction::GetIBreakReplicator()
-{
-	return CBreakReplicator::GetIBreakReplicator();
-}
+//IBreakReplicator* CCryAction::GetIBreakReplicator()
+//{
+//	return CBreakReplicator::GetIBreakReplicator();
+//}
 
 ISharedParamsManager* CCryAction::GetISharedParamsManager()
 {
@@ -3749,11 +3665,6 @@ IEffectSystem* CCryAction::GetIEffectSystem()
 IMaterialEffects* CCryAction::GetIMaterialEffects()
 {
 	return m_pMaterialEffects;
-}
-
-IBreakableGlassSystem* CCryAction::GetIBreakableGlassSystem()
-{
-	return m_pBreakableGlassSystem;
 }
 
 IRealtimeRemoteUpdate* CCryAction::GetIRealTimeRemoteUpdate()
@@ -3978,32 +3889,12 @@ void CCryAction::DelegateCmd(IConsoleCmdArgs* args)
 	}
 }
 
-void CCryAction::AddBreakEventListener(IBreakEventListener* pListener)
-{
-	CRY_ASSERT(m_pBreakEventListener == NULL);
-	m_pBreakEventListener = pListener;
-}
-
-void CCryAction::RemoveBreakEventListener(IBreakEventListener* pListener)
-{
-	CRY_ASSERT(m_pBreakEventListener == pListener);
-	m_pBreakEventListener = NULL;
-}
-
-void CCryAction::OnBreakEvent(uint16 uBreakEventIndex)
-{
-	if (m_pBreakEventListener)
-	{
-		m_pBreakEventListener->OnBreakEvent(uBreakEventIndex);
-	}
-}
-
 void CCryAction::OnPartRemoveEvent(int32 iPartRemoveEventIndex)
 {
-	if (m_pBreakEventListener)
+	/*if (m_pBreakEventListener)
 	{
 		m_pBreakEventListener->OnPartRemoveEvent(iPartRemoveEventIndex);
-	}
+	}*/
 }
 
 void CCryAction::RegisterListener(IGameFrameworkListener* pGameFrameworkListener, const char* name, EFRAMEWORKLISTENERPRIORITY eFrameworkListenerPriority)
@@ -4457,7 +4348,6 @@ void CCryAction::GetMemoryUsage(ICrySizer* s) const
 	if (m_pAnimationGraphCvars)
 		s->Add(*m_pAnimationGraphCvars);
 	s->AddObject(m_pMaterialEffects);
-	s->AddObject(m_pBreakableGlassSystem);
 	CHILD_STATISTICS(m_pPlayerProfileManager);
 	CHILD_STATISTICS(m_pEffectSystem);
 	CHILD_STATISTICS(m_pGameSerialize);
@@ -4610,7 +4500,7 @@ IGameSessionHandler* CCryAction::GetIGameSessionHandler()
 
 void CCryAction::OnBreakageSpawnedEntity(IEntity* pEntity, IPhysicalEntity* pPhysEntity, IPhysicalEntity* pSrcPhysEntity)
 {
-	CBreakReplicator* pBreakReplicator = CBreakReplicator::Get();
+	/*CBreakReplicator* pBreakReplicator = CBreakReplicator::Get();
 	if (pBreakReplicator)
 	{
 		pBreakReplicator->OnSpawn(pEntity, pPhysEntity, pSrcPhysEntity);
@@ -4618,7 +4508,7 @@ void CCryAction::OnBreakageSpawnedEntity(IEntity* pEntity, IPhysicalEntity* pPhy
 	if (gEnv->bMultiplayer)
 	{
 		m_pGame->OnBreakageSpawnedEntity(pEntity, pPhysEntity, pSrcPhysEntity);
-	}
+	}*/
 }
 
 //////////////////////////////////////////////////////////////////////////

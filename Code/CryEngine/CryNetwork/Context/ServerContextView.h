@@ -127,7 +127,6 @@ protected:
 private:
 	virtual bool        ShouldInitContext() { return true; }
 	virtual const char* DebugString()       { return "SERVER"; }
-	virtual void        GotBreakage(const SNetIntBreakDescription* pDesc);
 	void                SendUnbindMessage(SNetObjectID netID, bool bFromBind, CNetObjectBindLock lk);
 	void                InitSessionIDs();
 	void                RemoveStaticEntity(EntityId id);
