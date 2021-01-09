@@ -7,7 +7,6 @@
 
 #define VIEWID_NORMAL     0
 #define VIEWID_FOLLOWHEAD 1
-#define VIEWID_VEHICLE    2
 #define VIEWID_RAGDOLL    3
 
 enum EMotionBlurType

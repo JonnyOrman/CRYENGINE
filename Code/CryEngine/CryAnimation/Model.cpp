@@ -762,10 +762,6 @@ void CDefaultSkeleton::CopyAndAdjustSkeletonParams(const CDefaultSkeleton* pCDef
 
 	//adjust recoil
 	m_recoilDesc = pCDefaultSkeletonSrc->m_recoilDesc;
-	if (pCDefaultSkeletonSrc->m_recoilDesc.m_weaponRightJointIndex > 0)
-		m_recoilDesc.m_weaponRightJointIndex = RemapIdx(pCDefaultSkeletonSrc, pCDefaultSkeletonSrc->m_recoilDesc.m_weaponRightJointIndex);
-	if (pCDefaultSkeletonSrc->m_recoilDesc.m_weaponLeftJointIndex > 0)
-		m_recoilDesc.m_weaponLeftJointIndex = RemapIdx(pCDefaultSkeletonSrc, pCDefaultSkeletonSrc->m_recoilDesc.m_weaponLeftJointIndex);
 	uint32 numRecoilJoints = m_recoilDesc.m_joints.size();
 	for (uint32 i = 0; i < numRecoilJoints; i++)
 		m_recoilDesc.m_joints[i].m_nIdx = RemapIdx(pCDefaultSkeletonSrc, pCDefaultSkeletonSrc->m_recoilDesc.m_joints[i].m_nIdx);

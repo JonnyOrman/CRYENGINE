@@ -32,16 +32,9 @@ enum EDataTags4CC
 	eDT_entity    = 'entt',
 	eDT_name      = 'name',
 	eDT_type      = 'type',
-	eDT_health    = 'hlth',
-	eDT_armor     = 'armr',
-	eDT_isgod     = 'igod',
 	eDT_3rdperson = 'p3rd',
 	eDT_item      = 'item',
 	eDT_posi      = 'posi',
-	eDT_weapon    = 'weap',
-	eDT_ammocount = 'ammo',
-	eDT_firemode  = 'fire',
-	eDT_ammotype  = 'ammt',
 	eDT_position  = 'pos0',
 };
 

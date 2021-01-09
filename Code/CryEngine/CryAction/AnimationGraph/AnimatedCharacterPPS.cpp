@@ -925,14 +925,6 @@ void CAnimatedCharacter::RequestPhysicalEntityMovement(const QuatT& wantedEntMov
 				}
 			}
 		}
-
-		// Send expected location to AI so pathfollowing which runs in parallel with physics becomes more accurate
-		{
-			if (IActor* pActor = CCryAction::GetCryAction()->GetIActorSystem()->GetActor(pEntity->GetId()))
-			{
-				pActor->SetExpectedPhysicsPos(m_entLocation.t + m_expectedEntMovement);
-			}
-		}
 	}
 
 	m_hasForcedOverrideRotation = false;

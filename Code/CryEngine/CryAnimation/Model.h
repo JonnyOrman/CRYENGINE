@@ -202,14 +202,10 @@ struct RecoilDesc
 {
 	RecoilDesc()
 	{
-		m_weaponRightJointIndex = -1;
-		m_weaponLeftJointIndex = -1;
 	}
 	DynArray<SRecoilJoints> m_joints;
 	string                  m_ikHandleLeft;
 	string                  m_ikHandleRight;
-	int32                   m_weaponRightJointIndex;
-	int32                   m_weaponLeftJointIndex;
 };
 
 struct PoseBlenderAimDesc

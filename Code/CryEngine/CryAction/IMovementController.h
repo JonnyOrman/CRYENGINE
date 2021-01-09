@@ -72,7 +72,6 @@ struct SActorTargetParams
 	SActorTargetParams() :
 		location(ZERO),
 		direction(FORWARD_DIRECTION),
-		vehicleSeat(0),
 		speed(-1.0f),
 		directionTolerance(0.0f),
 		startArcAngle(0.0f),
@@ -93,8 +92,6 @@ struct SActorTargetParams
 
 	Vec3                      location; // target location
 	Vec3                      direction;
-	string                    vehicleName;
-	int                       vehicleSeat;
 	float                     speed;
 	float                     directionTolerance; // allowed direction tolerance (radians)
 	float                     startArcAngle;      // arc angle used to bend the starting line (radians)
@@ -931,9 +928,6 @@ struct SStanceState
 		entityDirection(FORWARD_DIRECTION),
 		animationBodyDirection(FORWARD_DIRECTION),
 		upDirection(0, 0, 1),
-		weaponPosition(ZERO),
-		aimDirection(FORWARD_DIRECTION),
-		fireDirection(FORWARD_DIRECTION),
 		eyePosition(ZERO),
 		eyeDirection(FORWARD_DIRECTION),
 		lean(0.0f),
@@ -948,9 +942,6 @@ struct SStanceState
 	Vec3  entityDirection;
 	Vec3  animationBodyDirection;
 	Vec3  upDirection;            // Up direction of the character.
-	Vec3  weaponPosition;         // Game logic position of the weapon of the character.
-	Vec3  aimDirection;           // Direction from the weapon position to aim target, used for representation.
-	Vec3  fireDirection;          // Direction from the weapon position to the fire target, used for emitting the bullets.
 	Vec3  eyePosition;            // Game logic position of the eye of the character.
 	Vec3  eyeDirection;           // Direction from the eye position to the lookat or aim-at target.
 	float lean;                   // The amount the character is leaning -1 = left, 1 = right;

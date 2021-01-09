@@ -216,11 +216,7 @@ CActionGame::~CActionGame()
 		gEnv->pNetContext->DeleteContext();
 		gEnv->pNetContext = nullptr;
 	}
-
-	if (m_pGameContext && m_pGameContext->GetFramework()->GetIGameRulesSystem() &&
-	    m_pGameContext->GetFramework()->GetIGameRulesSystem()->GetCurrentGameRules())
-		m_pGameContext->GetFramework()->GetIGameRulesSystem()->GetCurrentGameRules()->RemoveHitListener(this);
-
+	
 	if (m_pEntitySystem)
 		m_pEntitySystem->ResetAreas(); // this is called again in UnloadLevel(). but we need it here to avoid unwanted events generated when the player entity is deleted.
 	SAFE_DELETE(m_pGameContext);
@@ -952,11 +948,7 @@ bool CActionGame::Update()
 	{
 		const float deltaTime = gEnv->pTimer->GetFrameTime();
 		_smart_ptr<CActionGame> pThis(this);
-
-		IGameRulesSystem* pgrs;
-		IGameRules* pgr;
-		if (m_pGameContext && (pgrs = m_pGameContext->GetFramework()->GetIGameRulesSystem()) && (pgr = pgrs->GetCurrentGameRules()))
-			pgr->AddHitListener(this);
+		
 		UpdateImmersiveness();
 
 		CServerTimer::Get()->UpdateOnFrameStart();
@@ -2649,33 +2641,6 @@ void CCryAction::Serialize(TSerialize ser)
 {
 	if (m_pGame)
 		m_pGame->Serialize(ser);
-}
-
-void CActionGame::OnExplosion(const ExplosionInfo& ei)
-{
-	// This code is purely for serialisation, which is not needed in MP
-	if (gEnv->bMultiplayer)
-		return;
-
-	int i, j, nEnts;
-	IPhysicalEntity** pents;
-	pe_status_nparts snp;
-	pe_status_pos sp;
-	pe_params_part pp;
-	//IEntity* pEntity;
-
-	nEnts = m_pPhysicalWorld->GetEntitiesInBox(ei.pos - Vec3(ei.physRadius), ei.pos + Vec3(ei.physRadius), pents, ent_static | ent_rigid | ent_sleeping_rigid);
-	for (i = 0; i < nEnts; i++)
-	{
-		for (j = pents[i]->GetStatus(&snp) - 1; j >= 0; j--)
-		{
-			pp.ipart = j;
-			MARK_UNUSED pp.partid;
-			if (pents[i]->GetParams(&pp) && pp.idmatBreakable >= 0 && !(pp.flagsOR & geom_manually_breakable))
-				break;
-		}
-		pents[i]->GetStatus(&sp);
-	}
 }
 
 void CActionGame::GetMemoryUsage(ICrySizer* s) const

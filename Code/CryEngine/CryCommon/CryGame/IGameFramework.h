@@ -58,7 +58,6 @@ struct ISerializeHelper;
 struct ISystem;
 struct ITimeDemoRecorder;
 struct IViewSystem;
-struct IWeapon;
 struct pe_explosion;
 
 //! Define to control the logging of breakability code.
@@ -451,7 +450,6 @@ enum EEntityEventPriority
 	EEntityEventPriority_GameObject = 0,
 	EEntityEventPriority_PrepareAnimatedCharacterForUpdate,
 	EEntityEventPriority_Actor,         //!< Actor must always be higher than AnimatedCharacter.
-	EEntityEventPriority_Vehicle,       //!< Vehicles can potentially create move request too!
 	EEntityEventPriority_AnimatedCharacter,
 	EEntityEventPriority_StartAnimProc
 };

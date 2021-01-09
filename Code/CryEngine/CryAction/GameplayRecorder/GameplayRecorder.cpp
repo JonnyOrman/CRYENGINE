@@ -131,15 +131,6 @@ void CGameplayRecorder::CExampleMetadataListener::RecordGameData()
 			pActorMetadata->AddField(eDT_name, eBT_str, (uint8*)sActorName.data(), static_cast<uint8>(sActorName.size()));
 			Vec3 pos = pActor->GetEntity()->GetWorldPos();
 			pActorMetadata->AddField(eDT_position, eBT_vec3, (uint8*)&pos, sizeof(pos));
-			if (pActor != nullptr)
-			{
-				uint8 health = pActor->GetHealthAsRoundedPercentage();
-				pActorMetadata->AddField(eDT_health, eBT_i08, &health, 1);
-				uint8 armor = pActor->GetArmor();
-				pActorMetadata->AddField(eDT_armor, eBT_i08, &armor, 1);
-				uint8 isgod = pActor->IsGod() ? 0xff : 0x00;
-				pActorMetadata->AddField(eDT_isgod, eBT_i08, &isgod, 1);
-			}
 
 			//m_pMetadataRecorder->RecordIt(pActorMetadata.get());
 			pRecorder->OnGameData(pActorMetadata.get());
@@ -186,16 +177,7 @@ void CGameplayRecorder::CExampleMetadataListener::OnData(const IMetadata* metada
 			CryLog("entity [%s] [%s] [%f,%f,%f]", name.c_str(), type.c_str(), pos.x, pos.y, pos.z);
 		}
 		break;
-
-	case eDT_actor:
-		{
-			const auto& name = stl::get<string>(data.GetField(eDT_name).GetValue());
-			const auto& pos = stl::get<Vec3>(data.GetField(eDT_position).GetValue());
-			const auto& item = stl::get<string>(data.GetField(eDT_item).GetField(eDT_name).GetValue());
-			const auto& firemode = stl::get<string>(data.GetField(eDT_item).GetField(eDT_weapon).GetField(eDT_firemode).GetValue());
-			CryLog("actor [%s] [%s] [%s] [%f,%f,%f]", name.c_str(), item.c_str(), firemode.c_str(), pos.x, pos.y, pos.z);
-		}
-		break;
+		
 	}
 #endif
 }

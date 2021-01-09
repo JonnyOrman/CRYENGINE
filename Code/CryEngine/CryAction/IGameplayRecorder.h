@@ -35,28 +35,7 @@ typedef enum
 	eGE_Revive,
 
 	eGE_SuitModeChanged,
-
-	eGE_Hit,
-	eGE_Damage,
-
-	eGE_WeaponHit,
-	eGE_WeaponReload,
-	eGE_WeaponShot,
-	eGE_WeaponMelee,
-	eGE_WeaponFireModeChanged,
-	eGE_AmmoCount,
-
-	eGE_ItemSelected,
-	eGE_ItemPickedUp,
-	eGE_ItemDropped,
-	eGE_ItemBought,
-	eGE_ItemExchanged,
-
-	eGE_EnteredVehicle,
-	eGE_LeftVehicle,
-	eGE_HealthChanged,
-	eGE_EntityGrabbed,
-
+	
 	eGE_Last
 } EGameplayEvent;
 

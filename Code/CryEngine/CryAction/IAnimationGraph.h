@@ -29,8 +29,7 @@ enum EAnimationGraphPauser
 
 enum EAnimationGraphTriggerUser
 {
-	eAGTU_AI = 0,
-	eAGTU_VehicleSystem
+	eAGTU_AI = 0
 };
 
 enum EMovementControlMethod

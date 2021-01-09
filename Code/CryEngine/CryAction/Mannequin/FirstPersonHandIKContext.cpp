@@ -7,19 +7,17 @@
 #include "FirstPersonHandIKContext.h"
 
 CFirstPersonHandIKContext::SParams::SParams()
-	: m_weaponTargetIdx(-1)
-	, m_leftHandTargetIdx(-1)
+	: m_leftHandTargetIdx(-1)
 	, m_rightBlendIkIdx(-1)
 {
 }
 
 CFirstPersonHandIKContext::SParams::SParams(IDefaultSkeleton* pIDefaultSkeleton)
 {
-	m_weaponTargetIdx = pIDefaultSkeleton->GetJointIDByName("Bip01 RHand2RiflePos_IKTarget");
+
 	m_leftHandTargetIdx = pIDefaultSkeleton->GetJointIDByName("Bip01 LHand2Weapon_IKTarget");
 	m_rightBlendIkIdx = pIDefaultSkeleton->GetJointIDByName("Bip01 RHand2RiflePos_IKBlend");
-
-	CRY_ASSERT(m_weaponTargetIdx != -1);
+	
 	CRY_ASSERT(m_leftHandTargetIdx != -1);
 	CRY_ASSERT(m_rightBlendIkIdx != -1);
 }
@@ -68,13 +66,7 @@ void CFirstPersonHandIKContext::Update(float timePassed)
 
 	Quat view = Quat::CreateRotationVDir(m_aimDirection);
 	Quat invView = view.GetInverted();
-
-	QuatT rightHand = QuatT(IDENTITY);
-	rightHand.t = view * m_rightOffset.t;
-	rightHand.q = view * (m_rightOffset.q * invView);
-	m_pPoseModifier->PushPosition(m_params.m_weaponTargetIdx, additive, rightHand.t);
-	m_pPoseModifier->PushOrientation(m_params.m_weaponTargetIdx, additive, rightHand.q);
-
+	
 	QuatT leftHand = QuatT(IDENTITY);
 	leftHand.t = view * m_leftOffset.t;
 	leftHand.q = view * (m_leftOffset.q * invView);

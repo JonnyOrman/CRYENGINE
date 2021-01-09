@@ -217,7 +217,6 @@ void CAnimatedCharacter::InitVars()
 	m_shadowCharacterSlot = -1;
 	m_hasShadowCharacter = false;
 	m_bSimpleMovementSetOnce = false;
-	m_curWeaponRaisedPose = eWeaponRaisedPose_None;
 	m_isPlayer = false;
 	m_curFrameTime = 0.0f;
 	m_prevFrameTime = 0.0f;
@@ -778,9 +777,7 @@ void CAnimatedCharacter::ResetVars()
 	m_hasShadowCharacter = false;
 
 	m_bSimpleMovementSetOnce = false;
-
-	m_curWeaponRaisedPose = eWeaponRaisedPose_None;
-
+	
 	m_moveRequest.type = eCMT_None;
 	m_moveRequest.velocity.zero();
 	m_moveRequest.rotation.SetIdentity();
@@ -1360,67 +1357,6 @@ void CAnimatedCharacter::TriggerRecoil(float duration, float kinematicImpact, fl
 		if (pSkeletonPose != NULL)
 			pSkeletonPose->ApplyRecoilAnimation(duration, kinematicImpact, kickIn, static_cast<uint32>(arms));
 	}
-}
-
-void CAnimatedCharacter::SetWeaponRaisedPose(EWeaponRaisedPose pose)
-{
-	if (pose == m_curWeaponRaisedPose)
-		return;
-
-	ICharacterInstance* pCharacter = GetEntity()->GetCharacter(0);
-	if (pCharacter == NULL)
-		return;
-
-	ISkeletonAnim* pSkeletonAnim = pCharacter->GetISkeletonAnim();
-	if (pSkeletonAnim == NULL)
-		return;
-
-	m_curWeaponRaisedPose = pose;
-
-	if ((pose == eWeaponRaisedPose_None) || (pose == eWeaponRaisedPose_Fists))
-	{
-		pSkeletonAnim->StopAnimationInLayer(2, 0.5f);  // Stop weapon raising animation in Layer 2.
-		return;
-	}
-
-	const char* anim = NULL;
-	switch (pose)
-	{
-	case eWeaponRaisedPose_Pistol:
-		anim = "combat_idleAimBlockPoses_pistol_01";
-		break;
-	case eWeaponRaisedPose_PistolLft:
-		anim = "combat_idleAimBlockPoses_dualpistol_left_01";
-		break;
-	case eWeaponRaisedPose_PistolRgt:
-		anim = "combat_idleAimBlockPoses_dualpistol_right_01";
-		break;
-	case eWeaponRaisedPose_PistolBoth:
-		anim = "combat_idleAimBlockPoses_dualpistol_01";
-		break;
-	case eWeaponRaisedPose_Rifle:
-		anim = "combat_idleAimBlockPoses_rifle_01";
-		break;
-	case eWeaponRaisedPose_Rocket:
-		anim = "combat_idleAimBlockPoses_rocket_01";
-		break;
-	case eWeaponRaisedPose_MG:
-		anim = "combat_idleAimBlockPoses_mg_01";
-		break;
-	}
-
-	if (anim == NULL)
-	{
-		m_curWeaponRaisedPose = eWeaponRaisedPose_None;
-		return;
-	}
-
-	// Start the weapon raising in Layer 2. This will automatically deactivate aim-poses.
-	CryCharAnimationParams Params0(0);
-	Params0.m_nLayerID = 2;
-	Params0.m_fTransTime = 0.5f;
-	Params0.m_nFlags |= CA_LOOP_ANIMATION;
-	pSkeletonAnim->StartAnimation(anim, Params0);
 }
 
 SGroundAlignmentParams& CAnimatedCharacter::GetGroundAlignmentParams()

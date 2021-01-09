@@ -10,7 +10,6 @@
 #include <float.h>
 #include "FacialAnimation/FacialInstance.h"
 #include "PoseModifier/PoseModifierHelper.h"
-#include "PoseModifier/Recoil.h"
 #include "DrawHelper.h"
 
 #define MIN_AABB 0.05f

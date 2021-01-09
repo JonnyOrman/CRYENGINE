@@ -16,8 +16,7 @@ private:
 	{
 		SParams();
 		SParams(IDefaultSkeleton* pIDefaultSkeleton);
-
-		int m_weaponTargetIdx;
+		
 		int m_leftHandTargetIdx;
 		int m_rightBlendIkIdx;
 	};

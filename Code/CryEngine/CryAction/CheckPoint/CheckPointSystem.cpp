@@ -667,7 +667,6 @@ void CCheckpointSystem::RespawnAI(XmlNodeRef data)
 		//we don't respawn deactivated actors
 		if (!pEntity->IsHidden() && pEntity->IsActivatedForUpdates())
 		{
-			pActor->SetHealth(0);
 			pActor->Respawn();
 		}
 		else //but we still reset their position

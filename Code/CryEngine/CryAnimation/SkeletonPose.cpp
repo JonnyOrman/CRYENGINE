@@ -12,7 +12,6 @@
 #include "Model.h"
 #include "Helper.h"
 #include "ControllerOpt.h"
-#include "PoseModifier/Recoil.h"
 
 CSkeletonPose::CSkeletonPose()
 	: m_nForceSkeletonUpdate(0)
@@ -136,10 +135,6 @@ void CSkeletonPose::SetDefaultPosePerInstance(bool bDataPoseForceWriteable)
 
 	m_bInstanceVisible = 0;
 	m_bFullSkeletonUpdate = 0;
-
-	PoseModifier::CRecoil* pRecoil = static_cast<PoseModifier::CRecoil*>(m_recoil.get());
-	if (pRecoil)
-		pRecoil->SetState(PoseModifier::CRecoil::State());
 
 	CPoseBlenderLook* pPBLook = static_cast<CPoseBlenderLook*>(m_PoseBlenderLook.get());
 	if (pPBLook)
@@ -280,24 +275,7 @@ void CSkeletonPose::ApplyRecoilAnimation(f32 fDuration, f32 fKinematicImpact, f3
 {
 	if (!Console::GetInst().ca_UseRecoil)
 		return;
-
-	PoseModifier::CRecoil* pRecoil = static_cast<PoseModifier::CRecoil*>(m_recoil.get());
-	if (!pRecoil)
-	{
-		CryCreateClassInstance<IAnimationPoseModifier>(PoseModifier::CRecoil::GetCID(), m_recoil);
-		pRecoil = static_cast<PoseModifier::CRecoil*>(m_recoil.get());
-		CRY_ASSERT(pRecoil);
-	}
-
-	PoseModifier::CRecoil::State state;
-	state.time = 0.0f;
-	state.duration = fDuration;
-	state.strengh = fKinematicImpact; //recoil in cm
-	state.kickin = fKickIn;           //recoil in cm
-	state.displacerad = m_fDisplaceRadiant;
-	state.arms = nArms; //1-right arm  2-left arm   3-both
-	pRecoil->SetState(state);
-
+	
 	m_fDisplaceRadiant += 0.9f;
 	if (m_fDisplaceRadiant > gf_PI)
 		m_fDisplaceRadiant -= gf_PI * 2;

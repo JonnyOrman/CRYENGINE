@@ -57,7 +57,7 @@ struct SEntityHits
 };
 
 //////////////////////////////////////////////////////////////////////////
-class CActionGame : public IHitListener, public CMultiThreadRefCount, public IHostMigrationEventListener, public ISystemEventListener
+class CActionGame : public CMultiThreadRefCount, public IHostMigrationEventListener, public ISystemEventListener
 {
 public:
 	CActionGame();
@@ -153,11 +153,7 @@ private:
 	static int   OnStateChangeImmediate(const EventPhys* pEvent);
 	static int   OnCreatePhysicalEntityImmediate(const EventPhys* pEvent);
 	static int   OnUpdateMeshImmediate(const EventPhys* pEvent);
-
-	virtual void OnHit(const HitInfo&)                   {}
-	virtual void OnExplosion(const ExplosionInfo&);
-	virtual void OnServerExplosion(const ExplosionInfo&) {}
-
+	
 	static void  OnCollisionLogged_MaterialFX(const EventPhys* pEvent);
 	static void  OnPostStepLogged_MaterialFX(const EventPhys* pEvent);
 	static void  OnStateChangeLogged_MaterialFX(const EventPhys* pEvent);

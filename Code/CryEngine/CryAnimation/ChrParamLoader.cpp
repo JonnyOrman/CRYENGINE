@@ -1744,25 +1744,7 @@ bool CChrParamLoader::LoadIKDefRecoil(XmlNodeRef aimNode)
 			const char* pJointName = node->getAttr("Handle");
 			pDefaultSkeleton->m_recoilDesc.m_ikHandleLeft = pJointName;
 		}
-
-		if (stricmp(strTag, "RWeaponJoint") == 0)
-		{
-			const char* pJointName = node->getAttr("JointName");
-			int32 jidx = pDefaultSkeleton->GetJointIDByName(pJointName);
-			if (CRY_VERIFY(jidx > 0))
-				pDefaultSkeleton->m_recoilDesc.m_weaponRightJointIndex = jidx;
-		}
-
-		//----------------------------------------------------------------------------------------
-
-		if (stricmp(strTag, "LWeaponJoint") == 0)
-		{
-			const char* pJointName = node->getAttr("JointName");
-			int32 jidx = pDefaultSkeleton->GetJointIDByName(pJointName);
-			if (CRY_VERIFY(jidx > 0))
-				pDefaultSkeleton->m_recoilDesc.m_weaponLeftJointIndex = jidx;
-		}
-
+		
 		//----------------------------------------------------------------------------
 		if (stricmp(strTag, "ImpactJoints") == 0)
 		{

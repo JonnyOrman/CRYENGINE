@@ -245,7 +245,6 @@ public:
 	virtual bool                            IsAimIkAllowed() const { return m_allowAimIk; }
 
 	virtual void                            TriggerRecoil(float duration, float kinematicImpact, float kickIn /*=0.8f*/, EAnimatedCharacterArms arms /*= eACA_BothArms*/);
-	virtual void                            SetWeaponRaisedPose(EWeaponRaisedPose pose);
 
 	virtual SGroundAlignmentParams&         GetGroundAlignmentParams();
 
@@ -520,9 +519,7 @@ private:
 
 	// TODO: Pack as bits with other bools.
 	bool              m_bSimpleMovementSetOnce;
-
-	EWeaponRaisedPose m_curWeaponRaisedPose;
-
+	
 	// Not serialized
 	SCharacterMoveRequest m_moveRequest;
 

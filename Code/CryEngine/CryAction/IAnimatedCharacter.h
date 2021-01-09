@@ -60,25 +60,6 @@ enum ECharacterMoveType
 
 //--------------------------------------------------------------------------------
 
-enum EWeaponRaisedPose
-{
-	eWeaponRaisedPose_None       = 0x00,
-	eWeaponRaisedPose_Fists      = 0x10,
-	eWeaponRaisedPose_Rifle      = 0x20,
-	eWeaponRaisedPose_Pistol     = 0x30,
-	eWeaponRaisedPose_Rocket     = 0x40,
-	eWeaponRaisedPose_MG         = 0x50,
-
-	eWeaponRaisedPose_DualLft    = 0x01,
-	eWeaponRaisedPose_DualRgt    = 0x02,
-
-	eWeaponRaisedPose_PistolLft  = eWeaponRaisedPose_Pistol | eWeaponRaisedPose_DualLft,
-	eWeaponRaisedPose_PistolRgt  = eWeaponRaisedPose_Pistol | eWeaponRaisedPose_DualRgt,
-	eWeaponRaisedPose_PistolBoth = eWeaponRaisedPose_Pistol | eWeaponRaisedPose_DualLft | eWeaponRaisedPose_DualRgt,
-};
-
-//--------------------------------------------------------------------------------
-
 enum EAnimatedCharacterArms
 {
 	eACA_RightArm = 1,
@@ -376,7 +357,6 @@ struct IAnimatedCharacter : public IGameObjectExtension
 	virtual bool IsAimIkAllowed() const = 0;
 
 	virtual void TriggerRecoil(float duration, float kinematicImpact, float kickIn = 0.8f, EAnimatedCharacterArms arms = eACA_BothArms) = 0;
-	virtual void SetWeaponRaisedPose(EWeaponRaisedPose pose) = 0; // deprecated
 
 	virtual void SetNoMovementOverride(bool external) = 0;
 

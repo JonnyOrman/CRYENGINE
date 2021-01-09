@@ -55,18 +55,8 @@ typedef int ActorClass;
 struct IActor : public IGameObjectExtension
 {
 	virtual ~IActor(){}
-	virtual void                  SetHealth(float health) = 0;
-	virtual float                 GetHealth() const = 0;
-	virtual int                   GetHealthAsRoundedPercentage() const = 0;
-	virtual void                  SetMaxHealth(float maxHealth) = 0;
-	virtual float                 GetMaxHealth() const = 0;
-	virtual int                   GetArmor() const = 0;
-	virtual int                   GetMaxArmor() const = 0;
-	virtual int                   GetTeamId() const = 0;
-
 	virtual bool                  IsFallen() const = 0;
 	virtual bool                  IsDead() const = 0;
-	virtual int                   IsGod() = 0;
 	virtual void                  Fall(Vec3 hitPos = Vec3(0, 0, 0)) = 0;
 	virtual bool                  AllowLandingBob() = 0;
 
@@ -86,8 +76,7 @@ struct IActor : public IGameObjectExtension
 	virtual void                  HideAllAttachments(bool isHiding) = 0;
 
 	virtual void                  SetIKPos(const char* pLimbName, const Vec3& goalPos, int priority) = 0;
-
-	virtual void                  SetViewInVehicle(Quat viewRotation) = 0;
+	
 	virtual void                  SetViewRotation(const Quat& rotation) = 0;
 	virtual Quat                  GetViewRotation() const = 0;
 
@@ -97,15 +86,9 @@ struct IActor : public IGameObjectExtension
 	virtual Vec3                 GetLocalEyePos() const = 0;
 
 	virtual void                 CameraShake(float angle, float shift, float duration, float frequency, Vec3 pos, int ID, const char* source = "") = 0;
-
-	virtual void                 HolsterItem(bool holster, bool playSelect = true, float selectSpeedBias = 1.0f, bool hideLeftHandObject = true) = 0;
-	virtual bool                 DropItem(EntityId itemId, float impulseScale = 1.0f, bool selectNext = true, bool byDeath = false) = 0;
-
+	
 	virtual IMovementController* GetMovementController() const = 0;
-
-	// get currently linked vehicle, or NULL
-	virtual IEntity* LinkToVehicle(EntityId vehicleId) = 0;
-
+	
 	virtual IEntity* GetLinkedEntity() const = 0;
 
 	virtual uint8    GetSpectatorMode() const = 0;
@@ -188,21 +171,7 @@ struct IActor : public IGameObjectExtension
 	//virtual void NotifyInventoryAmmoChange(IEntityClass* pAmmoClass, int amount) = 0;
 
 	virtual void SetCustomHead(const char* customHead) {};// = 0;
-
-	// IVehicle
-	virtual bool      GetValidPositionNearby(const Vec3& proposedPosition, Vec3& adjustedPosition) const = 0;
-	virtual void      SetExpectedPhysicsPos(const Vec3& expectedPosition) = 0;
-
-	virtual void      OnAIProxyEnabled(bool enabled) = 0;
-	virtual void      OnReturnedToPool() = 0;
-	virtual void      OnPreparedFromPool() = 0;
-	virtual void      OnShiftWorld()                        {};
-
-	virtual void      MountedGunControllerEnabled(bool val) {};
-	virtual bool      MountedGunControllerEnabled() const   { return false; }
-
-	virtual bool      ShouldMuteWeaponSoundStimulus() const = 0;
-
+	
 	// Populates list of physics entities to skip for IK raycasting. returns num Entities to skip
 	virtual int  GetPhysicalSkipEntities(IPhysicalEntity** pSkipList, const int maxSkipSize) const { return 0; }
 
