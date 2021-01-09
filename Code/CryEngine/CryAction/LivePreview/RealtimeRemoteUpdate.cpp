@@ -22,7 +22,6 @@
 #include "IViewSystem.h"
 #include <CryEntitySystem/IEntitySystem.h>
 #include <CryGame/IGameFramework.h>
-#include "IGameRulesSystem.h"
 #include <Cry3DEngine/ITimeOfDay.h>
 
 // Should CERTAINLY be moved to CryCommon.
@@ -323,16 +322,7 @@ void CRealtimeRemoteUpdateListener::LoadEntities(XmlNodeRef& root)
 	if (bRemoveAllOld)
 	{
 		IEntityItPtr pIt = pEntitySystem->GetEntityIterator();
-		IGameFramework* piGameFramework(gEnv->pGameFramework);
 		IEntity* piRulesEntity(NULL);
-		if (piGameFramework)
-		{
-			IGameRulesSystem* piGameRulesSystem(piGameFramework->GetIGameRulesSystem());
-			if (piGameRulesSystem)
-			{
-				piRulesEntity = piGameRulesSystem->GetCurrentGameRulesEntity();
-			}
-		}
 
 		pIt->MoveFirst();
 		while (!pIt->IsEnd())

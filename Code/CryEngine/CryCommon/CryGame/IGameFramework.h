@@ -35,8 +35,6 @@ struct IGameObject;
 struct IGameObjectExtension;
 struct IGameObjectSystem;
 struct IGameplayRecorder;
-struct IGameRules;
-struct IGameRulesSystem;
 struct IGameServerNub;
 struct IGameSessionHandler;
 struct IGameToEditorInterface;
@@ -662,11 +660,7 @@ struct IGameFramework
 	//! Returns a pointer to the IGameplayRecorder interface.
 	//! \return Pointer to IGameplayRecorder interface.
 	virtual IGameplayRecorder* GetIGameplayRecorder() = 0;
-
-	//! Returns a pointer to the IGameRulesSystem interface.
-	//! \return Pointer to IGameRulesSystem interface.
-	virtual IGameRulesSystem* GetIGameRulesSystem() = 0;
-
+	
 	//! Returns a pointer to the IEffectSystem interface
 	//! \return Pointer to IEffectSystem interface.
 	virtual IEffectSystem* GetIEffectSystem() = 0;

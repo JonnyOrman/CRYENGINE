@@ -4,7 +4,6 @@
 #include "CET_EntitySystem.h"
 #include "GameContext.h"
 #include <CryNetwork/NetHelpers.h>
-#include "IGameRulesSystem.h"
 #include "ILevelSystem.h"
 #include "CryAction.h"
 #include <CryAction/IMaterialEffects.h>
@@ -31,12 +30,7 @@ public:
 			while (!i->IsEnd())
 			{
 				IEntity* pEnt = i->Next();
-
-				// skip gamerules
-				if (m_skipGameRules)
-					if (pEnt->GetId() == CCryAction::GetCryAction()->GetIGameRulesSystem()->GetCurrentGameRulesEntity()->GetId())
-						continue;
-
+				
 				// skip players
 				if (m_skipPlayers)
 				{
@@ -120,8 +114,6 @@ public:
 		bool allowGameRules = (m_what & eFS_GameRules) != 0;
 		bool allowOthers = (m_what & eFS_Others) != 0;
 		EntityId gameRulesId = 0;
-		if (IEntity* pGameRules = CCryAction::GetCryAction()->GetIGameRulesSystem()->GetCurrentGameRulesEntity())
-			gameRulesId = pGameRules->GetId();
 
 		// we are in the editor, and that means that there have been entities spawned already
 		// that are not bound to the network context... so lets bind them!

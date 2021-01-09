@@ -230,11 +230,7 @@ CActionGame::~CActionGame()
 	// Pause and wait for the physics
 	gEnv->pSystem->SetThreadState(ESubsys_Physics, false);
 	EnablePhysicsEvents(false);
-
-	CCryAction* pCryAction = CCryAction::GetCryAction();
-	if (pCryAction)
-		pCryAction->GetIGameRulesSystem()->DestroyGameRules();
-
+	
 	if (!gEnv->IsDedicated())
 	{
 		if (ICVar* pDefaultGameRulesCVar = gEnv->pConsole->GetCVar("sv_gamerulesdefault"))
@@ -1612,54 +1608,9 @@ int CActionGame::OnCollisionLogged(const EventPhys* pEvent)
 	}
 
 	const EventPhysCollision* pCollision = static_cast<const EventPhysCollision*>(pEvent);
-	IGameRules::SGameCollision gameCollision;
-	memset(&gameCollision, 0, sizeof(IGameRules::SGameCollision));
-	gameCollision.pCollision = pCollision;
-	if (pCollision->iForeignData[0] == PHYS_FOREIGN_ID_ENTITY)
-	{
-		//gameCollision.pSrcEntity = gEnv->pEntitySystem->GetEntityFromPhysics(gameCollision.pCollision->pEntity[0]);
-		gameCollision.pSrcEntity = (IEntity*)pCollision->pForeignData[0];
-		gameCollision.pSrc = GetEntityGameObject(gameCollision.pSrcEntity);
-	}
-	if (pCollision->iForeignData[1] == PHYS_FOREIGN_ID_ENTITY)
-	{
-		//gameCollision.pTrgEntity = gEnv->pEntitySystem->GetEntityFromPhysics(gameCollision.pCollision->pEntity[1]);
-		gameCollision.pTrgEntity = (IEntity*)pCollision->pForeignData[1];
-		gameCollision.pTrg = GetEntityGameObject(gameCollision.pTrgEntity);
-	}
 
 	SGameObjectEvent event(eGFE_OnCollision, eGOEF_ToExtensions | eGOEF_ToGameObject | eGOEF_LoggedPhysicsEvent);
 	event.ptr = (void*)pCollision;
-	if (gameCollision.pSrc && gameCollision.pSrc->WantsPhysicsEvent(eEPE_OnCollisionLogged))
-		gameCollision.pSrc->SendEvent(event);
-	if (gameCollision.pTrg && gameCollision.pTrg->WantsPhysicsEvent(eEPE_OnCollisionLogged))
-		gameCollision.pTrg->SendEvent(event);
-
-	if (gameCollision.pSrc)
-	{
-		IRenderNode* pNode = NULL;
-		if (pCollision->iForeignData[1] == PHYS_FOREIGN_ID_ENTITY)
-		{
-			IEntity* pTarget = (IEntity*)pCollision->pForeignData[1];
-			if (pTarget)
-			{
-				pNode = pTarget->GetRenderNode();
-			}
-		}
-		else if (pCollision->iForeignData[1] == PHYS_FOREIGN_ID_STATIC)
-			pNode = (IRenderNode*)pCollision->pForeignData[1];
-		if (pNode)
-			gEnv->p3DEngine->SelectEntity(pNode);
-	}
-
-	IGameRules* pGameRules = s_this->m_pGameContext->GetFramework()->GetIGameRulesSystem()->GetCurrentGameRules();
-	if (pGameRules)
-	{
-		if (!pGameRules->OnCollision(gameCollision))
-			return 0;
-
-		pGameRules->OnCollision_NotifyAI(pEvent);
-	}
 	
 	OnCollisionLogged_MaterialFX(pEvent);
 

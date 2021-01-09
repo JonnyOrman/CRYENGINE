@@ -2,7 +2,6 @@
 
 #include "StdAfx.h"
 #include "CET_GameRules.h"
-#include "IGameRulesSystem.h"
 #include "GameClientChannel.h"
 #include "GameServerChannel.h"
 #include <CryNetwork/NetHelpers.h>
@@ -29,7 +28,7 @@ public:
 			GameWarning("CreateGameRules: No game rules set");
 			return eCETR_Failed;
 		}
-		return CCryAction::GetCryAction()->GetIGameRulesSystem()->CreateGameRules(CCryAction::GetCryAction()->GetGameContext()->GetRequestedGameRules()) ? eCETR_Ok : eCETR_Failed;
+		return eCETR_Failed;
 	}
 };
 
@@ -51,8 +50,7 @@ public:
 	{
 		SEntityEvent event(ENTITY_EVENT_RESET);
 		event.nParam[0] = 1;
-
-		CCryAction::GetCryAction()->GetIGameRulesSystem()->GetCurrentGameRulesEntity()->SendEvent(event);
+		
 		return eCETR_Ok;
 	}
 };
@@ -94,17 +92,7 @@ public:
 		}
 
 		uint16 id = ~uint16(0);
-
-		// game rules can be set via an alias, if we pass the alias into ClassIdFromName it will fail and disconnect the client, so we lookup the proper name here
-		IGameRulesSystem* pGameRulesSystem = CCryAction::GetCryAction()->GetIGameRulesSystem();
-		const char* gameRulesName = pGameRulesSystem->GetGameRulesName(CCryAction::GetCryAction()->GetGameContext()->GetRequestedGameRules());
-
-		if ((!gameRulesName || !m_pRep->ClassIdFromName(id, string(gameRulesName)) || id == (uint16)(~uint16(0)))
-			&& !CCryAction::GetCryAction()->GetGameContext()->HasContextFlag(eGSF_NoGameRules))
-		{
-			GameWarning("Cannot find rules %s in network class registry", CCryAction::GetCryAction()->GetGameContext()->GetRequestedGameRules().c_str());
-		}
-
+		
 		// called on the server, we should send any information about the
 		// game type that we need to
 

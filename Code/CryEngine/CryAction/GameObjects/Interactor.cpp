@@ -3,7 +3,6 @@
 #include "StdAfx.h"
 #include "Interactor.h"
 #include "CryAction.h"
-#include "IGameRulesSystem.h"
 #include "WorldQuery.h"
 #include "IActorSystem.h"
 #include "CryActionCVars.h"

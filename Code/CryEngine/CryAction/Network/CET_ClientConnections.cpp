@@ -2,7 +2,6 @@
 
 #include "StdAfx.h"
 #include "CET_GameRules.h"
-#include "IGameRulesSystem.h"
 #include "GameClientChannel.h"
 #include "GameServerChannel.h"
 #include "GameContext.h"

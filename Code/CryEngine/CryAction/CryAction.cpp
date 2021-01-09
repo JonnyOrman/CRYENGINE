@@ -14,8 +14,6 @@
 #include <CryCore/Platform/CryLibrary.h>
 #include <CryCore/Platform/platform_impl.inl>
 
-#include "GameRulesSystem.h"
-
 #include "Network/GameClientChannel.h"
 #include "Network/GameServerChannel.h"
 #include "Network/GameQueryListener.h"
@@ -62,7 +60,6 @@
 #include "SharedParams/SharedParamsManager.h"
 #include "ActionMapManager.h"
 
-#include "GameRulesSystem.h"
 #include "ActionGame.h"
 #include "IGameObject.h"
 #include "CallbackTimer.h"
@@ -229,7 +226,6 @@ CCryAction::CCryAction(SSystemInitParams& initParams)
 	m_pActionMapManager(0),
 	m_pViewSystem(0),
 	m_pGameplayRecorder(0),
-	m_pGameRulesSystem(0),
 	m_pGameObjectSystem(0),
 	m_pAnimationGraphCvars(0),
 	m_pMannequin(0),
@@ -466,22 +462,19 @@ void CCryAction::MapCmd(IConsoleCmdArgs* args)
 
 			if (mapname.find("/") == string::npos)
 			{
-				const char* gamerules = pConsole->GetCVar("sv_gamerules")->GetString();
-
-				int i = 0;
 				const char* loc = 0;
 				string tmp;
-				while (loc = CCryAction::GetCryAction()->m_pGameRulesSystem->GetGameRulesLevelLocation(gamerules, i++))
-				{
+				/*while (loc = CCryAction::GetCryAction()->m_pGameRulesSystem->GetGameRulesLevelLocation(gamerules, i++))
+				{*/
 					tmp = loc;
 					tmp.append(mapname);
 
 					if (CCryAction::GetCryAction()->m_pLevelSystem->GetLevelInfo(tmp.c_str()))
 					{
 						mapname = tmp;
-						break;
+
 					}
-				}
+				//}
 			}
 
 			pConsole->GetCVar("sv_map")->Set(mapname);
@@ -491,10 +484,7 @@ void CCryAction::MapCmd(IConsoleCmdArgs* args)
 	}
 
 	const char* tempGameRules = pConsole->GetCVar("sv_gamerules")->GetString();
-
-	if (const char* correctGameRules = CCryAction::GetCryAction()->m_pGameRulesSystem->GetGameRulesName(tempGameRules))
-		tempGameRules = correctGameRules;
-
+	
 	const char* tempLevel = pConsole->GetCVar("sv_map")->GetString();
 	string tempDemoFile;
 
@@ -717,11 +707,8 @@ void CCryAction::MapCmd(IConsoleCmdArgs* args)
 		params.pContextParams = &ctx;
 		params.port = ChooseListenPort();
 		params.session = CCryAction::GetCryAction()->GetIGameSessionHandler()->GetGameSessionHandle();
-
-		if (!CCryAction::GetCryAction()->GetIGameRulesSystem()->GetCurrentGameRules())
-		{
-			params.flags |= (eGSF_NoSpawnPlayer | eGSF_NoGameRules);
-		}
+		
+		params.flags |= (eGSF_NoSpawnPlayer | eGSF_NoGameRules);
 
 		CCryAction::GetCryAction()->StartGameContext(&params);
 	}
@@ -921,10 +908,7 @@ void CCryAction::LegacyStatusCmd(IConsoleCmdArgs* args)
 	CryLogAlways("level: %s", pGameContext->GetLevelName().c_str());
 	CryLogAlways("gamerules: %s", pGameContext->GetRequestedGameRules().c_str());
 	CryLogAlways("players: %d/%d", pServerNub->GetPlayerCount(), pServerNub->GetMaxPlayers());
-
-	if (IGameRules* pRules = CCryAction::GetCryAction()->GetIGameRulesSystem()->GetCurrentGameRules())
-		pRules->ShowStatus();
-
+	
 	if (pServerNub->GetPlayerCount() < 1)
 		return;
 
@@ -1760,7 +1744,6 @@ bool CCryAction::Initialize(SSystemInitParams& startupParams)
 
 	m_pViewSystem = new CViewSystem(m_pSystem);
 	m_pGameplayRecorder = new CGameplayRecorder(this);
-	m_pGameRulesSystem = new CGameRulesSystem(m_pSystem, this);
 
 	m_pSharedParamsManager = new CSharedParamsManager;
 	
@@ -2148,7 +2131,6 @@ void CCryAction::ShutDown()
 	SAFE_RELEASE(m_pLevelSystem);
 	SAFE_RELEASE(m_pViewSystem);
 	SAFE_RELEASE(m_pGameplayRecorder);
-	SAFE_RELEASE(m_pGameRulesSystem);
 	SAFE_RELEASE(m_pSharedParamsManager);
 	SAFE_DELETE(m_pMaterialEffects);
 	SAFE_RELEASE(m_pActorSystem);
@@ -3599,11 +3581,6 @@ IGameplayRecorder* CCryAction::GetIGameplayRecorder()
 	return m_pGameplayRecorder;
 }
 
-IGameRulesSystem* CCryAction::GetIGameRulesSystem()
-{
-	return m_pGameRulesSystem;
-}
-
 IGameObjectSystem* CCryAction::GetIGameObjectSystem()
 {
 	return m_pGameObjectSystem;
@@ -3943,14 +3920,7 @@ void CCryAction::CheckEndLevelSchedule()
 	}
 
 	const bool bHaveNextLevel = (m_pLocalAllocs->m_nextLevelToLoad.empty() == false);
-
-	IEntity* pGameRules = CCryAction::GetCryAction()->GetIGameRulesSystem()->GetCurrentGameRulesEntity();
-	if (pGameRules != 0)
-	{
-		//if (bHaveNextLevel)
-			//params->SetValue("nextlevel", m_pLocalAllocs->m_nextLevelToLoad.c_str());
-	}
-
+	
 	CALL_FRAMEWORK_LISTENERS(OnLevelEnd(m_pLocalAllocs->m_nextLevelToLoad.c_str()));
 
 	if (bHaveNextLevel)
@@ -4290,7 +4260,6 @@ void CCryAction::GetMemoryUsage(ICrySizer* s) const
 	CHILD_STATISTICS(m_pSharedParamsManager);
 	CHILD_STATISTICS(m_pActionMapManager);
 	s->AddObject(m_pViewSystem);
-	CHILD_STATISTICS(m_pGameRulesSystem);
 	s->AddObject(m_pGameObjectSystem);
 	if (m_pAnimationGraphCvars)
 		s->Add(*m_pAnimationGraphCvars);

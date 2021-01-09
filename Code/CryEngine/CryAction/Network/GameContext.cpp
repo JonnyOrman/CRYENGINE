@@ -17,7 +17,6 @@
 #include "IActorSystem.h"
 #include "IGameSessionHandler.h"
 #include "CryAction.h"
-#include "GameRulesSystem.h"
 #include "GameObjects/GameObject.h"
 #include <CryPhysics/IPhysics.h>
 #include "PhysicsSync.h"
@@ -937,19 +936,6 @@ bool CGameContext::OnBeforeSpawn(SEntitySpawnParams& params)
 
 		static const char prefix[] = "GameType_";
 		static const size_t prefixLen = sizeof(prefix) - 1;
-
-		// if a layer prefixed with GameType_ exists,
-		// then discard it if it's not the current game type
-		if (params.sLayerName && !strnicmp(params.sLayerName, prefix, prefixLen))
-		{
-			if (IEntity* pGameRules = CCryAction::GetCryAction()->GetIGameRulesSystem()->GetCurrentGameRulesEntity())
-			{
-				const char* currentType = pGameRules->GetClass()->GetName();
-				const char* gameType = params.sLayerName + prefixLen;
-				if (stricmp(gameType, currentType))
-					return false;
-			}
-		}
 	}
 
 	return true;
@@ -959,10 +945,7 @@ void CGameContext::OnSpawn(IEntity* pEntity, SEntitySpawnParams& params)
 {
 	/*if (HasContextFlag(eGSF_ImmersiveMultiplayer) && m_pBreakReplicator.get())
 		m_pBreakReplicator->OnSpawn(pEntity, params);*/
-
-	if (IGameRules* pGameRules = GetGameRules())
-		pGameRules->OnEntitySpawn(pEntity);
-
+	
 	if (params.nFlags & (ENTITY_FLAG_CLIENT_ONLY | ENTITY_FLAG_SERVER_ONLY))
 		return;
 	if (pEntity->GetFlags() & (ENTITY_FLAG_CLIENT_ONLY | ENTITY_FLAG_SERVER_ONLY))
@@ -1009,10 +992,7 @@ bool CGameContext::OnRemove(IEntity* pEntity)
 {
 	EntityId id = pEntity->GetId();
 	bool bound = m_pNetContext->IsBound(id);
-
-	if (IGameRules* pGameRules = GetGameRules())
-		pGameRules->OnEntityRemoved(pEntity);
-
+	
 	if (gEnv->IsEditor() || CCryAction::GetCryAction()->IsGameSessionMigrating())
 	{
 		if (bound)
@@ -1064,9 +1044,6 @@ bool CGameContext::OnRemove(IEntity* pEntity)
 
 void CGameContext::OnReused(IEntity* pEntity, SEntitySpawnParams& params)
 {
-	if (IGameRules* pGameRules = GetGameRules())
-		pGameRules->OnEntityReused(pEntity, params, params.prevId);
-
 	m_pNetContext->UnbindObject(params.prevId);
 
 	if (0 == m_removeObjectUnlocks && gEnv->bMultiplayer && !CCryAction::GetCryAction()->IsGameSessionMigrating())
@@ -1189,12 +1166,9 @@ bool CGameContext::ChangeContext(bool isServer, const SGameContextParams* params
 			GameWarning("No rules specified: not changing context");
 			return false;
 		}
-
-		if (!m_pFramework->GetIGameRulesSystem()->HaveGameRules(params->gameRules))
-		{
-			GameWarning("Game rules %s not found; not changing context", params->gameRules);
-			return false;
-		}
+		
+		GameWarning("Game rules %s not found; not changing context", params->gameRules);
+		return false;
 	}
 
 	if (params->levelName)
@@ -1336,35 +1310,8 @@ void CGameContext::OnAfterVarChange(ICVar* pVar)
 // IHostMigrationEventListener
 IHostMigrationEventListener::EHostMigrationReturn CGameContext::OnInitiate(SHostMigrationInfo& hostMigrationInfo, HMStateType& state)
 {
-	// Register all client actor data in the game at this point
-	// (N.B. Even if we're not going to become the new server, we know
-	// that we can accurately store all local player statistics here
-	// (such as health and ammo counts) that aren't normally transmitted
-	// to other clients). This info could be sent as part of the
-	// migrating player connection string, or a discrete message.
-	IGameRules* pGameRules = gEnv->pGameFramework->GetIGameRulesSystem()->GetCurrentGameRules();
-	if (pGameRules)
-	{
-		pGameRules->ClearAllMigratingPlayers();
-		IActorSystem* pActorSystem = gEnv->pGameFramework->GetIActorSystem();
-		IActorIteratorPtr pActorIterator = pActorSystem->CreateActorIterator();
-		IActor* pActor = pActorIterator->Next();
-
-		while (pActor != NULL)
-		{
-			if (pActor->IsPlayer())
-			{
-				pGameRules->StoreMigratingPlayer(pActor);
-			}
-
-			pActor = pActorIterator->Next();
-		}
-	}
-	else
-	{
-		CryLogAlways("[Host Migration]: no game rules found - aborting");
-		gEnv->pNetwork->TerminateHostMigration(hostMigrationInfo.m_session);
-	}
+	CryLogAlways("[Host Migration]: no game rules found - aborting");
+	gEnv->pNetwork->TerminateHostMigration(hostMigrationInfo.m_session);
 
 	return IHostMigrationEventListener::Listener_Done;
 }
@@ -1484,17 +1431,6 @@ XmlNodeRef CGameContext::GetGameState()
 	gameProperties->setAttr("maxPlayers", pGameServerNub->GetMaxPlayers());
 
 	return root;
-}
-
-IGameRules* CGameContext::GetGameRules()
-{
-	IEntity* pGameRules = m_pFramework->GetIGameRulesSystem()->GetCurrentGameRulesEntity();
-	if (pGameRules)
-	{
-		return 0;
-	}
-
-	return 0;
 }
 
 void CGameContext::OnStartNetworkFrame()

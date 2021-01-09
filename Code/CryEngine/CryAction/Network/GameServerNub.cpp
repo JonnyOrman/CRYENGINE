@@ -15,7 +15,6 @@
 #include "GameServerChannel.h"
 #include "CryAction.h"
 #include "GameContext.h"
-#include "GameRulesSystem.h"
 
 ICVar* CGameServerNub::sv_timeout_disconnect = 0;
 
@@ -120,35 +119,7 @@ SCreateChannelResult CGameServerNub::CreateChannel(INetChannel* pChannel, const 
 		pChannel->SetPassword(pPass->GetString());
 	}
 	pChannel->SetNickname(info.playerName.c_str());
-
-	// Host migration
-	if (info.isMigrating && CCryAction::GetCryAction()->IsGameSessionMigrating())
-	{
-		// Enable the game rules to find the migrating player details by channel id
-		IGameFramework* pGameFramework = gEnv->pGameFramework;
-		IGameRules* pGameRules = pGameFramework->GetIGameRulesSystem()->GetCurrentGameRules();
-
-		if (pGameRules)
-		{
-			EntityId playerID = pGameRules->SetChannelForMigratingPlayer(info.playerName.c_str(), pNewChannel->GetChannelId());
-
-			if (playerID)
-			{
-				CryLog("CGameServerNub::CreateChannel() assigning actor %u '%s' to channel %u", playerID, info.playerName.c_str(), pNewChannel->GetChannelId());
-				pNewChannel->SetPlayerId(playerID);
-			}
-			else
-			{
-				CryLog("CGameServerNub::CreateChannel() failed to assign actor '%s' to channel %u", info.playerName.c_str(), pNewChannel->GetChannelId());
-			}
-		}
-		else
-		{
-			CryLog("[host migration] terminating because game rules is NULL, game session migrating %d session 0x%08x", CCryAction::GetCryAction()->IsGameSessionMigrating(), pChannel->GetSession());
-			gEnv->pNetwork->TerminateHostMigration(pChannel->GetSession());
-		}
-	}
-
+	
 	m_netchannels.insert(TNetServerChannelMap::value_type(pChannel, pNewChannel->GetChannelId()));
 
 	return SCreateChannelResult(pNewChannel);

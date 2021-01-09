@@ -15,8 +15,6 @@ struct IEffectSystem;
 struct IForceFeedbackSystem;
 struct IGameVolumes;
 
-class CGameRulesSystem;
-
 class CFlowSystem;
 class CDevMode;
 class CTimeDemoRecorder;
@@ -109,7 +107,6 @@ public:
 	virtual IActionMapManager*            GetIActionMapManager();
 	virtual IViewSystem*                  GetIViewSystem();
 	virtual IGameplayRecorder*            GetIGameplayRecorder();
-	virtual IGameRulesSystem*             GetIGameRulesSystem();
 	virtual IGameObjectSystem*            GetIGameObjectSystem();
 	virtual IEffectSystem*                GetIEffectSystem();
 	virtual IMaterialEffects*             GetIMaterialEffects();
@@ -413,7 +410,6 @@ private:
 	CActionMapManager*            m_pActionMapManager;
 	CViewSystem*                  m_pViewSystem;
 	CGameplayRecorder*            m_pGameplayRecorder;
-	CGameRulesSystem*             m_pGameRulesSystem;
 
 	CGameObjectSystem*            m_pGameObjectSystem;
 	CAnimationGraphCVars*         m_pAnimationGraphCvars;

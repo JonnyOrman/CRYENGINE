@@ -15,7 +15,6 @@
 #include "GameServerChannel.h"
 #include "GameContext.h"
 #include "CryAction.h"
-#include "GameRulesSystem.h"
 #include "GameObjects/GameObject.h"
 #include "GameClientNub.h"
 #include "ILevelSystem.h"
@@ -299,7 +298,6 @@ NET_IMPLEMENT_SIMPLE_ATSYNC_MESSAGE(CGameClientChannel, SetGameType, eNRT_Reliab
 			//
 		}
 		//
-		CCryAction::GetCryAction()->GetIGameRulesSystem()->CreateGameRules(rulesClass.c_str()); // we don't do context establishment tasks when playing back demo
 		ok = CCryAction::GetCryAction()->GetILevelSystem()->LoadLevel(levelName.c_str()) != 0;
 		//
 		ILevelSystem* pLS = CCryAction::GetCryAction()->GetILevelSystem();

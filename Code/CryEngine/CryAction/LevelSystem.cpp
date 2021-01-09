@@ -6,7 +6,6 @@
 #include <CryRenderer/IRenderAuxGeom.h>
 #include <CryGame/IGameTokens.h>
 #include "TimeOfDayScheduler.h"
-#include "IGameRulesSystem.h"
 #include <CryAction/IMaterialEffects.h>
 #include <CrySystem/File/IResourceManager.h>
 #include "Network/GameContext.h"
@@ -194,19 +193,6 @@ void CLevelRotation::AddGameMode(int level, const char* gameMode)
 //------------------------------------------------------------------------
 void CLevelRotation::AddGameMode(SLevelRotationEntry& level, const char* gameMode)
 {
-	const char* pActualGameModeName = gEnv->pGameFramework->GetIGameRulesSystem() ?  gEnv->pGameFramework->GetIGameRulesSystem()->GetGameRulesName(gameMode) : nullptr;
-	if (pActualGameModeName)
-	{
-		int idx = level.gameRulesNames.size();
-		level.gameRulesNames.push_back(pActualGameModeName);
-		level.gameRulesShuffle.push_back(idx);
-
-		if (level.gameRulesNames.size() > 1)
-		{
-			//more than one game mode per level is a deck of game modes
-			m_hasGameModesDecks = true;
-		}
-	}
 }
 
 //------------------------------------------------------------------------
@@ -438,8 +424,6 @@ void CLevelRotation::ChangeLevel(IConsoleCmdArgs* pArgs)
 	const char* nextGameRules = GetNextGameRules();
 	if (nextGameRules && nextGameRules[0])
 		ctx.gameRules = nextGameRules;
-	else if (IEntity* pEntity = gEnv->pGameFramework->GetIGameRulesSystem() ? gEnv->pGameFramework->GetIGameRulesSystem()->GetCurrentGameRulesEntity() : nullptr)
-		ctx.gameRules = pEntity->GetClass()->GetName();
 	else if (ILevelInfo* pLevelInfo = gEnv->pGameFramework->GetILevelSystem()->GetLevelInfo(GetNextLevel()))
 		ctx.gameRules = pLevelInfo->GetDefaultGameType()->name;
 
@@ -1372,14 +1356,6 @@ public:
 			{
 				pCustomActionManager->LoadLibraryActions(CUSTOM_ACTIONS_PATH);
 			}
-
-			if (CGameContext* pGameContext = CCryAction::GetCryAction()->GetGameContext())
-			{
-				if (IGameRulesSystem* pGameRulesSystem = gEnv->pGameFramework->GetIGameRulesSystem())
-				{
-					pGameRulesSystem->CreateGameRules(pGameContext->GetRequestedGameRules());
-				}
-			}
 		}
 
 		NEXT_STEP(EStep::LoadEntities)
@@ -1451,14 +1427,6 @@ public:
 		NEXT_STEP(EStep::NotifyPrecache)
 		{
 			gEnv->pSystem->SetSystemGlobalState(ESYSTEM_GLOBAL_STATE_LEVEL_LOAD_START_PRECACHE);
-			if (gEnv->pGameFramework->GetIGameRulesSystem())
-			{
-				// Let gamerules precache anything needed
-				if (IGameRules* pGameRules = gEnv->pGameFramework->GetIGameRulesSystem()->GetCurrentGameRules())
-				{
-					pGameRules->PrecacheLevel();
-				}
-			}
 		}
 
 		NEXT_STEP(EStep::Finish)

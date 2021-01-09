@@ -221,9 +221,7 @@ private:
 			return (IEntity*)p;
 		return NULL;
 	}
-
-	IGameRules* GetGameRules();
-
+	
 	void        BeginChangeContext(const string& levelName);
 	void        CallOnClientEnteredGame(CGameServerChannel*);
 	void        CallOnSpawnComplete(IEntity* pEntity);

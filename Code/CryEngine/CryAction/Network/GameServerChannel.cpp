@@ -16,7 +16,6 @@
 #include "GameServerNub.h"
 #include "GameContext.h"
 #include "CryAction.h"
-#include "GameRulesSystem.h"
 
 ICVar* CGameServerChannel::sv_timeout_disconnect = 0;
 

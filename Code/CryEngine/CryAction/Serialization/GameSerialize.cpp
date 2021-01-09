@@ -11,7 +11,6 @@
 #include <CryGame/IGameTokens.h>
 #include "ILevelSystem.h"
 #include "IActorSystem.h"
-#include "IGameRulesSystem.h"
 #include <CryMovie/IMovieSystem.h>
 #include <CrySystem/IStreamEngine.h>
 #include "MaterialEffects/MaterialEffects.h"
@@ -950,7 +949,6 @@ bool CGameSerialize::SaveMetaData(SSaveEnvironment& savEnv)
 	savEnv.m_pSaveGame->AddMetadata(SAVEGAME_VERSION_TAG, SAVEGAME_VERSION_VALUE);
 	// save current level and game rules
 	savEnv.m_pSaveGame->AddMetadata(SAVEGAME_LEVEL_TAG, levelName);
-	savEnv.m_pSaveGame->AddMetadata(SAVEGAME_GAMERULES_TAG, savEnv.m_pCryAction->GetIGameRulesSystem()->GetCurrentGameRulesEntity()->GetClass()->GetName());
 	// save some useful information for debugging - should not be relied upon in loading
 	const SFileVersion& fileVersion = GetISystem()->GetFileVersion();
 	char tmpbuf[128];
