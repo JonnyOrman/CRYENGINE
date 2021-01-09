@@ -25,7 +25,6 @@
 #include "GameServerNub.h"
 #include "ActionGame.h"
 #include "ILevelSystem.h"
-#include "IPlayerProfiles.h"
 #include "VoiceController.h"
 #include "CVarListProcessor.h"
 #include "NetworkCVars.h"
@@ -1604,32 +1603,6 @@ string CGameContext::GetConnectionString(CryFixedStringT<HOST_MIGRATION_MAX_PLAY
 	if (pNameOverride)
 	{
 		playerName = pNameOverride->c_str();
-	}
-	else
-	{
-		bool bDefaultName = false;
-		if (IPlayerProfileManager* pProfileManager = CCryAction::GetCryAction()->GetIPlayerProfileManager())
-		{
-			IPlatformOS::TUserName userName;
-			IPlatformOS* pOS = GetISystem()->GetPlatformOS();
-			uint32 userIndex = pProfileManager->GetExclusiveControllerDeviceIndex();
-			if (!pOS->UserGetOnlineName(userIndex, userName) || userName.empty())
-			{
-				if (!pOS->UserGetName(userIndex, userName) || userName.empty())
-				{
-					bDefaultName = true;
-				}
-			}
-
-			if (!bDefaultName)
-			{
-				playerName = userName.c_str();
-			}
-			else if (CCryActionCVars::Get().useCurrentUserNameAsDefault != 0)
-			{
-				playerName = gEnv->pSystem->GetUserName();
-			}
-		}
 	}
 
 	char buf[128];

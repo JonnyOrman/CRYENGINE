@@ -13,7 +13,6 @@
 #include "IActorSystem.h"
 #include "IGameRulesSystem.h"
 #include <CryMovie/IMovieSystem.h>
-#include "IPlayerProfiles.h"
 #include <CrySystem/IStreamEngine.h>
 #include "MaterialEffects/MaterialEffects.h"
 #include "Network/GameContext.h"
@@ -284,8 +283,7 @@ void CGameSerialize::Clean()
 
 bool CGameSerialize::IsUserSignedIn(CCryAction* pCryAction) const
 {
-	unsigned int user;
-	return pCryAction->GetISystem()->GetPlatformOS()->UserIsSignedIn(pCryAction->GetIPlayerProfileManager()->GetCurrentUser(), user);
+	return false;
 }
 
 #ifndef _RELEASE

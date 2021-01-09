@@ -22,7 +22,6 @@
 #include <CryGame/IGameFramework.h>
 #include <CryEntitySystem/IEntitySystem.h>
 #include "IActorSystem.h"
-#include "IPlayerProfiles.h"
 #include <CryMovie/IMovieSystem.h>
 #include <CryString/CryPath.h>
 
@@ -302,19 +301,8 @@ void CCheckpointSystem::WriteGameTokens(XmlNodeRef parentNode)
 //////////////////////////////////////////////////////////////////////////
 void CCheckpointSystem::WriteXML(XmlNodeRef data, const char* fileName)
 {
-	IPlayerProfileManager* pPlayerProfMan = CCryAction::GetCryAction()->GetIPlayerProfileManager();
-	;
-
 	string path;
-	if (!pPlayerProfMan)
-	{
-		path = CONSOLE_SAVEGAME_DIRECTORY;
-	}
-	else
-	{
-		const char* sharedSaveGameFolder = pPlayerProfMan->GetSharedSaveGameFolder();
-		path = sharedSaveGameFolder;
-	}
+	path = CONSOLE_SAVEGAME_DIRECTORY;
 
 	path = PathUtil::AddSlash(path);
 	path.append(fileName);
@@ -700,20 +688,8 @@ void CCheckpointSystem::ReadGameTokens(XmlNodeRef parentNode)
 //////////////////////////////////////////////////////////////////////////
 XmlNodeRef CCheckpointSystem::ReadXML(const char* fileName)
 {
-	IPlayerProfileManager* pPlayerProfMan = CCryAction::GetCryAction()->GetIPlayerProfileManager();
-	;
-
 	string path;
-	if (!pPlayerProfMan)
-	{
-		//on consoles there is no profile manager
-		path = CONSOLE_SAVEGAME_DIRECTORY;
-	}
-	else
-	{
-		const char* sharedSaveGameFolder = pPlayerProfMan->GetSharedSaveGameFolder();
-		path = sharedSaveGameFolder;
-	}
+	path = CONSOLE_SAVEGAME_DIRECTORY;
 
 	path = PathUtil::AddSlash(path);
 	path.append(fileName);

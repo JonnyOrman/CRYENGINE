@@ -36,7 +36,6 @@ class CLevelSystem;
 class CViewSystem;
 class CGameplayRecorder;
 class CPersistantDebug;
-class CPlayerProfileManager;
 class CTimeOfDayScheduler;
 class CNetworkCVars;
 class CCryActionCVars;
@@ -114,7 +113,6 @@ public:
 	virtual IGameObjectSystem*            GetIGameObjectSystem();
 	virtual IEffectSystem*                GetIEffectSystem();
 	virtual IMaterialEffects*             GetIMaterialEffects();
-	virtual IPlayerProfileManager*        GetIPlayerProfileManager();
 	virtual ICooperativeAnimationManager* GetICooperativeAnimationManager();
 	virtual ICheckpointSystem*            GetICheckpointSystem();
 	virtual IForceFeedbackSystem*         GetIForceFeedbackSystem() const;
@@ -421,7 +419,6 @@ private:
 	CAnimationGraphCVars*         m_pAnimationGraphCvars;
 	IMannequin*                   m_pMannequin;
 	CMaterialEffects*             m_pMaterialEffects;
-	CPlayerProfileManager*        m_pPlayerProfileManager;
 
 	IEffectSystem*                m_pEffectSystem;
 	CGameSerialize*               m_pGameSerialize;

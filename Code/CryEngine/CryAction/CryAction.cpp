@@ -78,9 +78,6 @@
 
 #include "AnimationGraph/DebugHistory.h"
 
-#include "PlayerProfiles/PlayerProfileManager.h"
-#include "PlayerProfiles/PlayerProfileImplFS.h"
-#include "PlayerProfiles/PlayerProfileImplConsole.h"
 #if CRY_PLATFORM_DURANGO
 	#include "PlayerProfiles/PlayerProfileImplDurango.h"
 #endif
@@ -238,7 +235,6 @@ CCryAction::CCryAction(SSystemInitParams& initParams)
 	m_pMannequin(0),
 	m_pMaterialEffects(0),
 	m_pForceFeedBackSystem(0),
-	m_pPlayerProfileManager(0),
 	m_pEffectSystem(0),
 	m_pGameSerialize(0),
 	m_pCallbackTimer(0),
@@ -1815,8 +1811,6 @@ bool CCryAction::Initialize(SSystemInitParams& startupParams)
 		m_pPlayerProfileManager = new CPlayerProfileManager(new CPlayerProfileImplConsole());
 		#endif
 	#endif
-#else
-		m_pPlayerProfileManager = new CPlayerProfileManager(new CPlayerProfileImplFSDir());
 #endif
 	}
 
@@ -1834,14 +1828,6 @@ bool CCryAction::Initialize(SSystemInitParams& startupParams)
 #if 0
 	BeginLanQuery();
 #endif
-
-	// Player profile stuff
-	if (m_pPlayerProfileManager)
-	{
-		bool ok = m_pPlayerProfileManager->Initialize();
-		if (!ok)
-			GameWarning("[PlayerProfiles] CCryAction::Init: Cannot initialize PlayerProfileManager");
-	}
 
 #ifdef CRYACTION_DEBUG_MEM
 	DumpMemInfo("CryAction::Init End");
@@ -2157,12 +2143,7 @@ void CCryAction::ShutDown()
 		if (movieSys != NULL)
 			movieSys->SetUser(NULL);
 	}
-
-	// profile manager needs to shut down (logout users, ...)
-	// while most systems are still up
-	if (m_pPlayerProfileManager)
-		m_pPlayerProfileManager->Shutdown();
-
+	
 	SAFE_RELEASE(m_pActionMapManager);
 	SAFE_RELEASE(m_pLevelSystem);
 	SAFE_RELEASE(m_pViewSystem);
@@ -2180,7 +2161,6 @@ void CCryAction::ShutDown()
 	m_pDefaultTimeDemoRecorder.reset();
 	SAFE_DELETE(m_pGameSerialize);
 	SAFE_DELETE(m_pPersistantDebug);
-	SAFE_DELETE(m_pPlayerProfileManager);
 	SAFE_DELETE(m_pTimeOfDayScheduler);
 	SAFE_DELETE(m_pLocalAllocs);
 	SAFE_DELETE(m_pCooperativeAnimationManager);
@@ -2886,14 +2866,7 @@ bool CCryAction::SaveGame(const char* path, bool bQuick, bool bForceImmediate, E
 		IPlatformOS::CScopedSaveLoad osSaveLoad(GetISystem()->GetPlatformOS()->GetFirstSignedInUser(), true);
 		if (!osSaveLoad.Allowed())
 			return false;
-
-		// Best save profile or we'll lose persistent stats
-		if (m_pPlayerProfileManager)
-		{
-			IPlayerProfileManager::EProfileOperationResult result;
-			m_pPlayerProfileManager->SaveProfile(m_pPlayerProfileManager->GetCurrentUser(), result, ePR_Game);
-		}
-
+		
 #if ENABLE_STATOSCOPE
 		if (gEnv->pStatoscope)
 		{
@@ -3033,18 +3006,7 @@ ELoadGameResult CCryAction::LoadGame(const char* path, bool quick, bool ignoreDe
 
 	//pause entity event timers update
 	gEnv->pEntitySystem->PauseTimers(true, false);
-
-	// Restore game persistent stats from profile to avoid exploits
-	if (m_pPlayerProfileManager)
-	{
-		const char* userName = m_pPlayerProfileManager->GetCurrentUser();
-		IPlayerProfile* pProfile = m_pPlayerProfileManager->GetCurrentProfile(userName);
-		if (pProfile)
-		{
-			m_pPlayerProfileManager->ReloadProfile(pProfile, ePR_Game);
-		}
-	}
-
+	
 	GameWarning("[CryAction] LoadGame: '%s'", path);
 
 	ELoadGameResult loadResult = m_pGameSerialize ? m_pGameSerialize->LoadGame(this, "xml", path, params, quick) : eLGR_Failed;
@@ -3098,16 +3060,6 @@ IGameFramework::TSaveGameName CCryAction::CreateSaveGameName()
 	saveGameName = CRY_SAVEGAME_FILENAME;
 #else
 	int id = 0;
-	//saves a running savegame id which is displayed with the savegame name
-	if (IPlayerProfileManager* m_pPlayerProfileManager = gEnv->pGameFramework->GetIPlayerProfileManager())
-	{
-		const char* user = m_pPlayerProfileManager->GetCurrentUser();
-		if (IPlayerProfile* pProfile = m_pPlayerProfileManager->GetCurrentProfile(user))
-		{
-			pProfile->GetAttribute("Singleplayer.SaveRunningID", id);
-			pProfile->SetAttribute("Singleplayer.SaveRunningID", id + 1);
-		}
-	}
 
 	saveGameName = CRY_SAVEGAME_FILENAME;
 	char buffer[16];
@@ -3694,11 +3646,6 @@ ITimeDemoRecorder* CCryAction::SetITimeDemoRecorder(ITimeDemoRecorder* pRecorder
 		}
 	}
 	return pRecorder;
-}
-
-IPlayerProfileManager* CCryAction::GetIPlayerProfileManager()
-{
-	return m_pPlayerProfileManager;
 }
 
 IGameVolumes* CCryAction::GetIGameVolumesManager() const
@@ -4348,7 +4295,6 @@ void CCryAction::GetMemoryUsage(ICrySizer* s) const
 	if (m_pAnimationGraphCvars)
 		s->Add(*m_pAnimationGraphCvars);
 	s->AddObject(m_pMaterialEffects);
-	CHILD_STATISTICS(m_pPlayerProfileManager);
 	CHILD_STATISTICS(m_pEffectSystem);
 	CHILD_STATISTICS(m_pGameSerialize);
 	CHILD_STATISTICS(m_pCallbackTimer);
@@ -4456,7 +4402,7 @@ bool CCryAction::CanLoad()
 //////////////////////////////////////////////////////////////////////////
 ISerializeHelper* CCryAction::GetSerializeHelper() const
 {
-	const bool useXMLCPBin = (!CPlayerProfileManager::sUseRichSaveGames && CCryActionCVars::Get().g_useXMLCPBinForSaveLoad == 1);
+	const bool useXMLCPBin = (CCryActionCVars::Get().g_useXMLCPBinForSaveLoad == 1);
 	if (useXMLCPBin)
 		return new CBinarySerializeHelper();
 
@@ -4627,4 +4573,3 @@ STRUCT_INFO_T_INSTANTIATE(Quat_tpl, <float> )
 	#endif
 #endif
 #include <CryCore/TypeInfo_impl.h>
-#include "PlayerProfiles/RichSaveGameTypes_info.h"

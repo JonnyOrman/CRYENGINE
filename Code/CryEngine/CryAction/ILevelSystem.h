@@ -21,7 +21,6 @@
 
 #include <CryMemory/CrySizer.h>
 
-struct ILevelRotationFile;
 struct IConsoleCmdArgs;
 
 struct ILevelRotation
@@ -41,8 +40,7 @@ struct ILevelRotation
 		ePRF_Shuffle       = 1 << 0,
 		ePRF_MaintainPairs = 1 << 1,
 	};
-
-	virtual bool Load(ILevelRotationFile* file) = 0;
+	
 	virtual bool LoadFromXmlRootNode(const XmlNodeRef rootNode, const char* altRootTag) = 0;
 
 	virtual void Reset() = 0;

@@ -116,7 +116,6 @@ public:
 	typedef std::vector<SLevelRotationEntry> TLevelRotationVector;
 
 	// ILevelRotation
-	virtual bool Load(ILevelRotationFile* file);
 	virtual bool LoadFromXmlRootNode(const XmlNodeRef rootNode, const char* altRootTag);
 
 	virtual void Reset();

@@ -51,7 +51,6 @@ struct INetChannel;
 struct INetNub;
 struct INetworkedClientListener;
 struct IPhysicalEntity;
-struct IPlayerProfileManager;
 struct IRealtimeRemoteUpdate;
 struct ISaveGame;
 struct ISerializeHelper;
@@ -675,11 +674,7 @@ struct IGameFramework
 	//! Returns a pointer to the IMaterialEffects interface.
 	//! \return Pointer to IMaterialEffects interface.
 	virtual IMaterialEffects* GetIMaterialEffects() = 0;
-
-	//! Returns a pointer to the IPlayerProfileManager interface.
-	//! \return Pointer to IPlayerProfileManager interface.
-	virtual IPlayerProfileManager* GetIPlayerProfileManager() = 0;
-
+	
 	//! Returns a pointer to the IRealtimeUpdate Interface.
 	virtual IRealtimeRemoteUpdate* GetIRealTimeRemoteUpdate() = 0;
 	

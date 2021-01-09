@@ -11,7 +11,6 @@
 #include <Cry3DEngine/ISurfaceType.h>
 #include <Cry3DEngine/CryEngineDecalInfo.h>
 #include <CryRenderer/IRenderAuxGeom.h>
-#include "IPlayerProfiles.h"
 #include "IGameSessionHandler.h"
 #include <Cry3DEngine/ITimeOfDay.h>
 #include "TimeOfDayScheduler.h"
@@ -1303,10 +1302,8 @@ IHostMigrationEventListener::EHostMigrationReturn CActionGame::OnPromoteToServer
 	int maxPlayers = pCVar->GetIVal();
 
 	// Set the server name
-	IPlayerProfileManager* pPlayerProfileManager = gEnv->pGameFramework->GetIPlayerProfileManager();
 	CryFixedStringT<128> serverName(s_this->m_pNetwork->GetHostName());
 	serverName.append(" ");
-	serverName.append(pPlayerProfileManager->GetCurrentProfile(pPlayerProfileManager->GetCurrentUser())->GetName());
 	gEnv->pConsole->GetCVar("sv_servername")->Set(serverName.c_str());
 
 	// Create a new game server nub

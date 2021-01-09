@@ -8,7 +8,6 @@
 #include "TimeOfDayScheduler.h"
 #include "IGameRulesSystem.h"
 #include <CryAction/IMaterialEffects.h>
-#include "IPlayerProfiles.h"
 #include <CrySystem/File/IResourceManager.h>
 #include "Network/GameContext.h"
 #include "ICooperativeAnimationManager.h"
@@ -40,12 +39,6 @@ CLevelRotation::CLevelRotation() :
 //------------------------------------------------------------------------
 CLevelRotation::~CLevelRotation()
 {
-}
-
-//------------------------------------------------------------------------
-bool CLevelRotation::Load(ILevelRotationFile* file)
-{
-	return LoadFromXmlRootNode(file->Load(), NULL);
 }
 
 //------------------------------------------------------------------------
@@ -962,27 +955,7 @@ void CLevelSystem::LoadRotation()
 {
 	if (ICVar* pLevelRotation = gEnv->pConsole->GetCVar("sv_levelrotation"))
 	{
-		ILevelRotationFile* file = 0;
-		IPlayerProfileManager* pProfileMan = CCryAction::GetCryAction()->GetIPlayerProfileManager();
-		if (pProfileMan)
-		{
-			const char* userName = pProfileMan->GetCurrentUser();
-			IPlayerProfile* pProfile = pProfileMan->GetCurrentProfile(userName);
-			if (pProfile)
-			{
-				file = pProfile->GetLevelRotationFile(pLevelRotation->GetString());
-			}
-			else if (pProfile = pProfileMan->GetDefaultProfile())
-			{
-				file = pProfile->GetLevelRotationFile(pLevelRotation->GetString());
-			}
-		}
 		bool ok = false;
-		if (file)
-		{
-			ok = m_levelRotation.Load(file);
-			file->Complete();
-		}
 
 		if (!ok)
 			CryWarning(VALIDATOR_MODULE_GAME, VALIDATOR_WARNING, "Failed to load '%s' as level rotation!", pLevelRotation->GetString());
